@@ -1,0 +1,85 @@
+name: Build
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+  push:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  build-nim:
+    name: Build Nim
+    strategy:
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            cpu: amd64
+            os: linux
+            cc: gcc
+            packages: "gcc binutils"
+
+          # - runs-on: ubuntu-latest
+          #   cpu: i386
+          #   os: linux
+          #   cc: gcc-i686-linux-gnu
+          #   packages: "gcc-i686-linux-gnu binutils-i686-linux-gnu"
+
+          # - runs-on: ubuntu-latest
+          #   cpu: arm
+          #   os: linux
+          #   cc: gcc-arm-linux-gnueabihf
+          #   packages: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
+
+          # - runs-on: ubuntu-latest
+          #   cpu: aarch64
+          #   os: linux
+          #   cc: gcc-aarch64-linux-gnu
+          #   packages: "gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
+
+          # - runs-on: ubuntu-latest
+          #   cpu: ppc64le
+          #   os: linux
+          #   cc: gcc-powerpc64le-linux-gnu
+          #   packages: "gcc-powerpc64le-linux-gnu binutils-powerpc64le-linux-gnu"
+
+          # - runs-on: ubuntu-latest
+          #   cpu: mips64el
+          #   os: linux
+          #   cc: gcc-mipsel-linux-gnu
+          #   packages: "gcc-mipsel-linux-gnu binutils-mipsel-linux-gnu"
+
+          # - runs-on: macos-latest
+          #   cpu: amd64
+          #   os: darwin
+          #   cc: clang
+
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+      - name: Fetch or build csources
+        env:
+          CC: ${{ matrix.cc }}
+        run: |
+          tarball="csources-0.20.0-${{ matrix.os }}-${{ matrix.cpu }}.tar.xz"
+          curl --fail -L "https://dl.bintray.com/elijahr/nim-csources/${tarball}" -o "$tarball" || true
+          if [ ! -f "$tarball" ]
+          then
+            if [ "${{ matrix.packages }}" != "" ]
+            then
+              sudo apt-get install ${{ matrix.packages }}
+            fi
+            git clone -q --depth 1 https://github.com/nim-lang/csources.git
+            cd csources
+            rm -rf .git/
+            sh build.sh \
+              --cpu ${{ matrix.cpu }} \
+              --os ${{ matrix.os }}
+            tar -cJf "../${tarball}" bin/
+            cd -
+            rm -rf csources
+            curl \
+              -T "$tarball" \
+              -uelijahr:${{ secrets.BINTRAY_API_KEY }} \
+              "https://api.bintray.com/content/elijahr/nim-csources/${tarball}"
+          fi
