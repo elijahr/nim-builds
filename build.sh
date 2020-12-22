@@ -16,9 +16,10 @@ then
   apt-get -qq install -y git xz-utils
 fi
 
-git clone -q --depth 1 --single-branch --branch "v${NIM_VERSION}" https://github.com/nim-lang/Nim.git
+git clone -q --depth 1 --single-branch --branch "v${NIM_VERSION}" https://github.com/nim-lang/Nim.git /root/Nim
+cd /root/Nim
 sh build_all.sh
-export PATH=/Nim/bin:$PATH
+export PATH=/root/Nim/bin:$PATH
 ./koch csource -d:danger
 ./koch xz
 
