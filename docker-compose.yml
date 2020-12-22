@@ -1,0 +1,54 @@
+version: '3'
+services:
+  alpine-build-host:
+    image: elijahru/build-farm:alpine-3.12
+    platform: linux/amd64
+    ports:
+      # amd64
+      - 3804:3804
+      # 386
+      - 3803:3803
+      # arm/v6
+      - 3806:3806
+      # arm/v7
+      - 3807:3807
+      # arm64/v8
+      - 3808:3808
+      # ppc64le
+      - 3810:3810
+
+  alpine-amd64:
+    image: elijahru/build-farm-client:alpine-3.12
+    platform: linux/amd64
+    volumes:
+      - .:/code
+
+  alpine-386:
+    image: elijahru/build-farm-client:alpine-3.12
+    platform: linux/386
+    volumes:
+      - .:/code
+
+  alpine-arm32v6:
+    image: elijahru/build-farm-client:alpine-3.12
+    platform: linux/arm/v6
+    volumes:
+      - .:/code
+
+  alpine-arm32v7:
+    image: elijahru/build-farm-client:alpine-3.12
+    platform: linux/arm/v7
+    volumes:
+      - .:/code
+
+  alpine-arm64v8:
+    image: elijahru/build-farm-client:alpine-3.12
+    platform: linux/arm64/v8
+    volumes:
+      - .:/code
+
+  alpine-ppc64le:
+    image: elijahru/build-farm-client:alpine-3.12
+    platform: linux/ppc64le
+    volumes:
+      - .:/code

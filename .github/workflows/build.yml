@@ -8,132 +8,119 @@ on:
       - "**.md"
 
 jobs:
-  build-nim:
+  alpine-3-12:
     name: Build Nim
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - runs-on: ubuntu-latest
-            cpu: amd64
-            os: linux
-            cc: gcc
-            packages: "gcc binutils"
-
-          # - runs-on: ubuntu-latest
-          #   cpu: i386
-          #   os: linux
-          #   cc: gcc-i686-linux-gnu
-          #   packages: "gcc-i686-linux-gnu binutils-i686-linux-gnu"
-
-          # - runs-on: ubuntu-latest
-          #   cpu: arm
-          #   os: linux
-          #   cc: gcc-arm-linux-gnueabihf
-          #   packages: "gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf"
-
-          # - runs-on: ubuntu-latest
-          #   cpu: aarch64
-          #   os: linux
-          #   cc: gcc-aarch64-linux-gnu
-          #   packages: "gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu"
-
-          # - runs-on: ubuntu-latest
-          #   cpu: ppc64le
-          #   os: linux
-          #   cc: gcc-powerpc64le-linux-gnu
-          #   packages: "gcc-powerpc64le-linux-gnu binutils-powerpc64le-linux-gnu"
-
-          # - runs-on: ubuntu-latest
-          #   cpu: mips64el
-          #   os: linux
-          #   cc: gcc-mipsel-linux-gnu
-          #   packages: "gcc-mipsel-linux-gnu binutils-mipsel-linux-gnu"
-
-          # - runs-on: macos-latest
-          #   cpu: amd64
-          #   os: darwin
-          #   cc: clang
-
-    runs-on: ${{ matrix.runs-on }}
+        build-client: [ 'alpine-amd64', 'alpine-386', 'alpine-arm32v6', 'alpine-arm32v7', 'alpine-arm64v8', 'alpine-ppc64le' ]
+        nim-version: [ '1.2.8', '1.4.2' ]
 
     steps:
-      - name: Fetch or build csources
-        id: build-csources
-        env:
-          CC: ${{ matrix.cc }}
-        run: |
-          set -uex
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
 
-          csources_version="v0.20.0"
-          bin_dir="csources-${{ matrix.os }}-${{ matrix.cpu }}"
-          tarball="${bin_dir}.tar.xz"
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-          echo "::set-output name=csources-version::${csources_version}"
-          echo "::set-output name=bin-dir::${bin_dir}"
-          echo "::set-output name=tarball::${tarball}"
+    - name: Build Nim
+      run: |
+        docker-compose up -d alpine-build-host
+        docker-compose run ${{ matrix.build-client }} /code/build.sh ${{ matrix.nim-version }}
 
-          status=$(curl \
-            --silent \
-            --head \
-            --location \
-            "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
-            | head -n 1 | cut -d ' ' -f2)
+    # - name: Enable Docker experimental features
+    #   run: |
+    #     echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+    #     sudo service docker restart
+    #     docker version -f '{{.Server.Experimental}}'
 
-          if [ "$status" = "404" ]
-          then
-            if [ "${{ matrix.packages }}" != "" ]
-            then
-              sudo apt-get install ${{ matrix.packages }}
-            fi
-            git clone \
-              -q --depth 1 \
-              --branch "$csources_version" \
-              https://github.com/nim-lang/csources.git
-            cd csources
-            rm -rf .git/
-            sh build.sh \
-              --cpu ${{ matrix.cpu }} \
-              --os ${{ matrix.os }}
-            mv bin "../${bin_dir}"
-            cd -
-            rm -rf csources
-            tar -cJf "$tarball" "$bin_dir"
-            echo "::set-output name=do-upload::true"
-          fi
 
-      - name: Upload csources build to Bintray
-        if: ${{ steps.build-csources.outputs.do-upload }}
-        uses: bpicode/github-action-upload-bintray@master
-        with:
-          file: ./${{ steps.build-csources.outputs.tarball }}
-          api_user: elijahr
-          api_key: ${{ secrets.BINTRAY_API_KEY }}
-          repository_user: elijahr
-          repository: nim-builds
-          package: csources
-          version: ${{ steps.build-csources.outputs.csources-version }}
-          publish: 1
 
-      - uses: actions/checkout@v2
-        with:
-          repository: 'nim-lang/Nim'
-          ref: 'v1.4.2'
+    # steps:
+    #   - name: Fetch or build csources
+    #     id: build-csources
+    #     env:
+    #       CC: ${{ matrix.cc }}
+    #     run: |
+    #       set -uex
 
-      - name: Build Nim
-        run: |
-          bin_dir=${{ steps.build-csources.outputs.bin-dir }}
-          tarball=${{ steps.build-csources.outputs.tarball }}
-          curl \
-            --location \
-            --silent \
-            "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
-            -o "$tarball"
-          tar -xJf "$tarball"
-          rm -r "$tarball"
-          mkdir -p bin
-          mv "${bin_dir}/nim" bin/
-          sh build_all.sh \
-            --cpu ${{ matrix.cpu }} \
-            --os ${{ matrix.os }}
-          find .
+    #       csources_version="v0.20.0"
+    #       bin_dir="csources-${{ matrix.os }}-${{ matrix.cpu }}"
+    #       tarball="${bin_dir}.tar.xz"
+
+    #       echo "::set-output name=csources-version::${csources_version}"
+    #       echo "::set-output name=bin-dir::${bin_dir}"
+    #       echo "::set-output name=tarball::${tarball}"
+
+    #       status=$(curl \
+    #         --silent \
+    #         --head \
+    #         --location \
+    #         "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
+    #         | head -n 1 | cut -d ' ' -f2)
+
+    #       if [ "$status" = "404" ]
+    #       then
+    #         if [ "${{ matrix.packages }}" != "" ]
+    #         then
+    #           sudo apt-get install ${{ matrix.packages }}
+    #         fi
+    #         git clone \
+    #           -q --depth 1 \
+    #           --branch "$csources_version" \
+    #           https://github.com/nim-lang/csources.git
+    #         cd csources
+    #         rm -rf .git/
+    #         sh build.sh \
+    #           --cpu ${{ matrix.cpu }} \
+    #           --os ${{ matrix.os }}
+    #         mv bin "../${bin_dir}"
+    #         cd -
+    #         rm -rf csources
+    #         tar -cJf "$tarball" "$bin_dir"
+    #         echo "::set-output name=do-upload::true"
+    #       fi
+
+    #   - name: Upload csources build to Bintray
+    #     if: ${{ steps.build-csources.outputs.do-upload }}
+    #     uses: bpicode/github-action-upload-bintray@master
+    #     with:
+    #       file: ./${{ steps.build-csources.outputs.tarball }}
+    #       api_user: elijahr
+    #       api_key: ${{ secrets.BINTRAY_API_KEY }}
+    #       repository_user: elijahr
+    #       repository: nim-builds
+    #       package: csources
+    #       version: ${{ steps.build-csources.outputs.csources-version }}
+    #       publish: 1
+
+    #   - uses: actions/checkout@v2
+    #     with:
+    #       repository: 'nim-lang/Nim'
+    #       ref: 'v1.4.2'
+
+    #   - name: Build Nim
+    #     run: |
+    #       bin_dir=${{ steps.build-csources.outputs.bin-dir }}
+    #       tarball=${{ steps.build-csources.outputs.tarball }}
+    #       curl \
+    #         --location \
+    #         --silent \
+    #         "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
+    #         -o "$tarball"
+    #       tar -xJf "$tarball"
+    #       rm -r "$tarball"
+    #       mkdir -p bin
+    #       mv "${bin_dir}/nim" bin/
+    #       sh build_all.sh \
+    #         --cpu ${{ matrix.cpu }} \
+    #         --os ${{ matrix.os }}
+    #       find .
+
 
