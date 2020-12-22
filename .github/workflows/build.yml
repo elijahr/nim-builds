@@ -64,7 +64,7 @@ jobs:
         run: |
           set -uex
 
-          csources_version="v0.2.0"
+          csources_version="v0.20.0"
           bin_dir="csources-${{ matrix.os }}-${{ matrix.cpu }}"
           tarball="${bin_dir}.tar.xz"
 
@@ -72,16 +72,22 @@ jobs:
           echo "::set-output name=bin-dir::${bin_dir}"
           echo "::set-output name=tarball::${tarball}"
 
-          curl --fail -L "https://dl.bintray.com/elijahr/nim-csources/${tarball}" -o "$tarball" || true
+          curl \
+            --fail -L \
+            "https://dl.bintray.com/elijahr/nim-csources/${tarball}" \
+            -o "$tarball" || true
+
           if [ ! -f "$tarball" ]
           then
             if [ "${{ matrix.packages }}" != "" ]
             then
               sudo apt-get install ${{ matrix.packages }}
             fi
-            git clone -q --depth 1 https://github.com/nim-lang/csources.git
+            git clone \
+              -q --depth 1 \
+              --branch "$csources_version" \
+              https://github.com/nim-lang/csources.git
             cd csources
-            git checkout "$csources_version"
             rm -rf .git/
             sh build.sh \
               --cpu ${{ matrix.cpu }} \
