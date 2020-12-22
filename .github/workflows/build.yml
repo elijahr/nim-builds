@@ -72,12 +72,14 @@ jobs:
           echo "::set-output name=bin-dir::${bin_dir}"
           echo "::set-output name=tarball::${tarball}"
 
-          curl \
-            --fail -L \
-            "https://dl.bintray.com/elijahr/nim-csources/${tarball}" \
-            -o "$tarball" || true
+          status=$(curl \
+            --silent \
+            --head \
+            --location \
+            "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
+            | head -n 1 | cut -d ' ' -f2)
 
-          if [ ! -f "$tarball" ]
+          if [ "$status" = "404" ]
           then
             if [ "${{ matrix.packages }}" != "" ]
             then
@@ -110,5 +112,28 @@ jobs:
           repository: nim-builds
           package: csources
           version: ${{ steps.build-csources.outputs.csources-version }}
-          upload_path: ""
           publish: 1
+
+      - uses: actions/checkout@v2
+        with:
+          repository: 'nim-lang/Nim'
+          ref: 'v1.4.2'
+
+      - name: Build Nim
+        run: |
+          bin_dir=${{ steps.build-csources.outputs.bin-dir }}
+          tarball=${{ steps.build-csources.outputs.tarball }}
+          curl \
+            --location \
+            --silent \
+            "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
+            -o "$tarball"
+          tar -xJf "$tarball"
+          rm -r "$tarball"
+          mkdir -p bin
+          mv "${bin_dir}/nim" bin/
+          sh build_all.sh \
+            --cpu ${{ matrix.cpu }} \
+            --os ${{ matrix.os }}
+          find .
+
