@@ -32,7 +32,7 @@ jobs:
     - name: Build Nim
       run: |
         docker-compose up -d alpine-build-host
-        docker-compose run ${{ matrix.build-client }} /code/build.sh ${{ matrix.nim-version }}
+        docker-compose run ${{ matrix.build-client }} sh /code/build.sh ${{ matrix.nim-version }}
 
     # - name: Enable Docker experimental features
     #   run: |
