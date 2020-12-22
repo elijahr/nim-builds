@@ -58,10 +58,20 @@ jobs:
 
     steps:
       - name: Fetch or build csources
+        id: build-csources
         env:
           CC: ${{ matrix.cc }}
         run: |
-          tarball="csources-0.20.0-${{ matrix.os }}-${{ matrix.cpu }}.tar.xz"
+          set -uex
+
+          csources_version="v0.2.0"
+          bin_dir="csources-${{ matrix.os }}-${{ matrix.cpu }}"
+          tarball="${bin_dir}.tar.xz"
+
+          echo "::set-output name=csources-version::${csources_version}"
+          echo "::set-output name=bin-dir::${bin_dir}"
+          echo "::set-output name=tarball::${tarball}"
+
           curl --fail -L "https://dl.bintray.com/elijahr/nim-csources/${tarball}" -o "$tarball" || true
           if [ ! -f "$tarball" ]
           then
@@ -71,15 +81,29 @@ jobs:
             fi
             git clone -q --depth 1 https://github.com/nim-lang/csources.git
             cd csources
+            git checkout "$csources_version"
             rm -rf .git/
             sh build.sh \
               --cpu ${{ matrix.cpu }} \
               --os ${{ matrix.os }}
-            tar -cJf "../${tarball}" bin/
+            mv bin "../${bin_dir}"
             cd -
             rm -rf csources
-            curl \
-              -T "$tarball" \
-              -uelijahr:${{ secrets.BINTRAY_API_KEY }} \
-              "https://api.bintray.com/content/elijahr/nim-csources/${tarball}"
+            tar -cJf "$tarball" "$bin_dir"
+            echo "::set-output name=do-upload::true"
           fi
+
+      - name: Upload csources build to Bintray
+        if: ${{ steps.build-csources.outputs.do-upload }}
+        uses: bpicode/github-action-upload-bintray@master
+        with:
+          file: ./${{ steps.build-csources.outputs.tarball }}
+          api_user: elijahr
+          api_key: ${{ secrets.BINTRAY_API_KEY }}
+          repository_user: elijahr
+          repository: nim-builds
+          package: csources
+          version: ${{ steps.build-csources.outputs.csources-version }}
+          upload_path: ""
+          publish: 1
+          calculate_metadata: true # Schedule metadata calculation after upload
