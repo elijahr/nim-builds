@@ -1,0 +1,27 @@
+name: Build
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  render:
+    name: Render build.yml
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Check for new Nim versions
+      run: |
+        pip install "semver~=2.13.0"
+        python update_nim_versions.py
+        git add .
+        if [ "$(git diff --name-only --cached | grep .github/workflows/build.yml)" != "" ]
+        then
+          git commit -m "Updated Nim versions"
+          git push
+        fi

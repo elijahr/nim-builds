@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        nim-version: [ '1.2.8', '1.4.2' ]
+        nim-version: ["1.0.10", "1.2.8", "1.4.2"]
         build-client: [ 'alpine-amd64', 'alpine-386', 'alpine-arm32v6', 'alpine-arm32v7', 'alpine-arm64v8', 'alpine-ppc64le' ]
 
     steps:
