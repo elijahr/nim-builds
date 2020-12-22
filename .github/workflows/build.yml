@@ -112,4 +112,3 @@ jobs:
           version: ${{ steps.build-csources.outputs.csources-version }}
           upload_path: ""
           publish: 1
-          calculate_metadata: true # Schedule metadata calculation after upload
