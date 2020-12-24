@@ -15,6 +15,10 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
     - name: Check for new Nim versions
       run: |
         pip install "semver~=2.13.0"
