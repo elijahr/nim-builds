@@ -25,9 +25,8 @@ then
   if [ ! -f "nim-${NIM_VERSION}.tar.xz" ]
   then
     wget "https://nim-lang.org/download/nim-${NIM_VERSION}.tar.xz"
-  else
-    tar -xJf nim-${NIM_VERSION}.tar.xz
   fi
+  tar -xJf "nim-${NIM_VERSION}.tar.xz"
 fi
 
 cd "nim-${NIM_VERSION}"
