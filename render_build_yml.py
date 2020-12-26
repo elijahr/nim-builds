@@ -27,8 +27,7 @@ def find_max_nim_versions(versions):
 def fetch_nim_versions():
     return (
         v.strip()
-        for v in
-        os.popen(
+        for v in os.popen(
             "git ls-remote --tags --refs https://github.com/nim-lang/Nim "
             "| grep -o 'refs/tags/.*' "
             "| cut -d/ -f3- | sed 's/^v//'"
@@ -43,7 +42,14 @@ distros = [
     {
         "name": "alpine-3-12",
         "build_farm_tag": "alpine-3.12",
-        "platforms": ["linux/amd64", "linux/386", "linux/arm/v6", "linux/arm/v7", "linux/arm64/v8", "linux/ppc64le" ]
+        "platforms": [
+            "linux/amd64",
+            "linux/386",
+            "linux/arm/v6",
+            "linux/arm/v7",
+            "linux/arm64/v8",
+            "linux/ppc64le",
+        ],
     }
 ]
 
@@ -55,17 +61,19 @@ def render_build_yml():
         context = dict(
             distros=distros,
             nim_versions=list(fetch_nim_versions()),
+            slugify=slugify,
         )
         with open(project_dir / ".github/workflows/build.yml.jinja", "r") as f:
             rendered = env.from_string(f.read()).render(**context)
         with open(project_dir / ".github/workflows/build.yml", "w") as f:
             f.write(rendered)
-        print("Rendered .github/workflows/build.yml.jinja -> .github/workflows/build.yml")
+        print(
+            "Rendered .github/workflows/build.yml.jinja -> .github/workflows/build.yml"
+        )
 
 
 if __name__ == "__main__":
     render_build_yml()
-
 
     # versions = json.dumps(list(find_max_nim_versions(fetch_nim_versions())))
     # build_yml = os.path.join(os.path.dirname(__file__), '.github/workflows/build.yml.jinja')
@@ -73,5 +81,3 @@ if __name__ == "__main__":
     #     new_contents = re.sub(r'nim-version: \[.*', f'nim-version: {versions}', f.read())
     # with open(build_yml, 'w') as f:
     #     f.write(new_contents)
-
-

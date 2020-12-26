@@ -113,9 +113,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         {% endraw %}
       with:
-        upload_url: {{ '${{ needs.nim-' + nim_version + '-create-release.outputs.upload_url }}' }}
-        asset_path: {{ '${{ needs.nim-' + nim_version + '-create-release.outputs.asset_path }}' }}
-        asset_name: {{ '${{ needs.nim-' + nim_version + '-create-release.outputs.asset_name }}' }}
+        upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
+        asset_path: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.asset_path }}' }}
+        asset_name: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.asset_name }}' }}
         asset_content_type: application/x-xz
 
   {% endfor %}

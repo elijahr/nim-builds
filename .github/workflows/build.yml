@@ -123,9 +123,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.10.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.10.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.10.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-10-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-10-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-10-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -263,9 +263,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.11.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.11.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.11.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-11-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-11-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-11-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -403,9 +403,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.11.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.11.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.11.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-11-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-11-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-11-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -543,9 +543,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.12.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.12.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.12.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-12-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-12-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-12-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -683,9 +683,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.13.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.13.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.13.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-13-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-13-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-13-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -823,9 +823,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.14.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.14.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.14.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-14-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-14-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-14-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -963,9 +963,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.14.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.14.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.14.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-14-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-14-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-14-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1103,9 +1103,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.15.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.15.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.15.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-15-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-15-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-15-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1243,9 +1243,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.15.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.15.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.15.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-15-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-15-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-15-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1383,9 +1383,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.16.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.16.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.16.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-16-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-16-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-16-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1523,9 +1523,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.17.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.17.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.17.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-17-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-17-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-17-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1663,9 +1663,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.17.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.17.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.17.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-17-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-17-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-17-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1803,9 +1803,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.18.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.18.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.18.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-18-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-18-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-18-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -1943,9 +1943,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.19.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.19.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.19.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-19-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-19-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-19-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2083,9 +2083,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.19.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.19.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.19.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-19-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-19-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-19-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2223,9 +2223,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.19.4-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.19.4-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.19.4-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-19-4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-19-4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-19-4-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2363,9 +2363,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.19.6-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.19.6-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.19.6-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-19-6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-19-6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-19-6-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2503,9 +2503,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.20.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.20.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.20.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-20-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-20-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-20-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2643,9 +2643,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.20.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.20.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.20.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-20-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-20-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2783,9 +2783,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.8.14-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.8.14-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.8.14-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-8-14-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-8-14-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-8-14-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -2923,9 +2923,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.9.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.9.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.9.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-9-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-9-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-9-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3063,9 +3063,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.9.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.9.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.9.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-9-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-9-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-9-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3203,9 +3203,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.9.4-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.9.4-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.9.4-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-9-4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-9-4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-9-4-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3343,9 +3343,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-0.9.6-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-0.9.6-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-0.9.6-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-0-9-6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0-9-6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0-9-6-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3483,9 +3483,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.0.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.0.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.0.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-0-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-0-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-0-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3623,9 +3623,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.0.10-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.0.10-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.0.10-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-0-10-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-0-10-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3763,9 +3763,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.0.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.0.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.0.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-0-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-0-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-0-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -3903,9 +3903,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.0.4-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.0.4-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.0.4-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-0-4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-0-4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-0-4-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4043,9 +4043,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.0.6-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.0.6-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.0.6-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-0-6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-0-6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-0-6-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4183,9 +4183,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.0.8-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.0.8-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.0.8-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-0-8-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-0-8-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-0-8-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4323,9 +4323,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.2.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.2.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.2.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-2-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-2-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-2-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4463,9 +4463,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.2.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.2.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.2.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-2-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-2-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-2-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4603,9 +4603,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.2.4-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.2.4-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.2.4-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-2-4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-2-4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-2-4-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4743,9 +4743,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.2.6-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.2.6-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.2.6-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-2-6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-2-6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-2-6-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -4883,9 +4883,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.2.8-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.2.8-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.2.8-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-2-8-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-2-8-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -5023,9 +5023,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.4.0-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.4.0-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.4.0-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-4-0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-4-0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-4-0-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
@@ -5163,9 +5163,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        upload_url: ${{ needs.nim-1.4.2-create-release.outputs.upload_url }}
-        asset_path: ${{ needs.nim-1.4.2-create-release.outputs.asset_path }}
-        asset_name: ${{ needs.nim-1.4.2-create-release.outputs.asset_name }}
+        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1-4-2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1-4-2-create-release.outputs.asset_name }}
         asset_content_type: application/x-xz
 
   
