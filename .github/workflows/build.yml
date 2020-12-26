@@ -8,13 +8,18 @@ on:
       - "**.md"
 
 jobs:
-  alpine-3-12:
-    name: Build Nim
+  
+  nim-0-10-2-create-release:
+    name: Create release
+
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nim-version: ["1.0.10", "1.2.8", "1.4.2"]
-        build-client: [ 'alpine-amd64', 'alpine-386', 'alpine-arm32v6', 'alpine-arm32v7', 'alpine-arm64v8', 'alpine-ppc64le' ]
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
 
     steps:
     - name: Checkout repo
@@ -23,105 +28,5164 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.10.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-10-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-10-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
     - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
     - name: Build Nim
+      id: build-nim
+      shell: bash
       run: |
-        docker-compose up -d alpine-build-host
-        docker-compose run ${{ matrix.build-client }} \
-          sh /code/build.sh ${{ matrix.nim-version }}
+        set -uexo pipefail
 
-    # - name: Enable Docker experimental features
-    #   run: |
-    #     echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
-    #     sudo service docker restart
-    #     docker version -f '{{.Server.Experimental}}'
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
 
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
 
+        mkdir -p nimcache
 
-    # steps:
-    #   - name: Fetch or build csources
-    #     id: build-csources
-    #     env:
-    #       CC: ${{ matrix.cc }}
-    #     run: |
-    #       set -uex
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.10.2 || (status=$?; dump_logs; exit $status)
 
-    #       csources_version="v0.20.0"
-    #       bin_dir="csources-${{ matrix.os }}-${{ matrix.cpu }}"
-    #       tarball="${bin_dir}.tar.xz"
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.10.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.10.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.10.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
 
-    #       echo "::set-output name=csources-version::${csources_version}"
-    #       echo "::set-output name=bin-dir::${bin_dir}"
-    #       echo "::set-output name=tarball::${tarball}"
+  
 
-    #       status=$(curl \
-    #         --silent \
-    #         --head \
-    #         --location \
-    #         "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
-    #         | head -n 1 | cut -d ' ' -f2)
+  nim-0-10-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-10-2-create-release
+      
+      - nim-0-10-2-alpine-3-12-build
+      
 
-    #       if [ "$status" = "404" ]
-    #       then
-    #         if [ "${{ matrix.packages }}" != "" ]
-    #         then
-    #           sudo apt-get install ${{ matrix.packages }}
-    #         fi
-    #         git clone \
-    #           -q --depth 1 \
-    #           --branch "$csources_version" \
-    #           https://github.com/nim-lang/csources.git
-    #         cd csources
-    #         rm -rf .git/
-    #         sh build.sh \
-    #           --cpu ${{ matrix.cpu }} \
-    #           --os ${{ matrix.os }}
-    #         mv bin "../${bin_dir}"
-    #         cd -
-    #         rm -rf csources
-    #         tar -cJf "$tarball" "$bin_dir"
-    #         echo "::set-output name=do-upload::true"
-    #       fi
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.10.2-create-release.outputs.upload_url }}
 
-    #   - name: Upload csources build to Bintray
-    #     if: ${{ steps.build-csources.outputs.do-upload }}
-    #     uses: bpicode/github-action-upload-bintray@master
-    #     with:
-    #       file: ./${{ steps.build-csources.outputs.tarball }}
-    #       api_user: elijahr
-    #       api_key: ${{ secrets.BINTRAY_API_KEY }}
-    #       repository_user: elijahr
-    #       repository: nim-builds
-    #       package: csources
-    #       version: ${{ steps.build-csources.outputs.csources-version }}
-    #       publish: 1
+  
+  nim-0-11-0-create-release:
+    name: Create release
 
-    #   - uses: actions/checkout@v2
-    #     with:
-    #       repository: 'nim-lang/Nim'
-    #       ref: 'v1.4.2'
+    runs-on: ubuntu-latest
 
-    #   - name: Build Nim
-    #     run: |
-    #       bin_dir=${{ steps.build-csources.outputs.bin-dir }}
-    #       tarball=${{ steps.build-csources.outputs.tarball }}
-    #       curl \
-    #         --location \
-    #         --silent \
-    #         "https://dl.bintray.com/elijahr/nim-builds/${tarball}" \
-    #         -o "$tarball"
-    #       tar -xJf "$tarball"
-    #       rm -r "$tarball"
-    #       mkdir -p bin
-    #       mv "${bin_dir}/nim" bin/
-    #       sh build_all.sh \
-    #         --cpu ${{ matrix.cpu }} \
-    #         --os ${{ matrix.os }}
-    #       find .
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
 
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
 
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.11.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-11-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-11-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.11.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.11.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.11.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.11.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-11-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-11-0-create-release
+      
+      - nim-0-11-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.11.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-11-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.11.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-11-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-11-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.11.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.11.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.11.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.11.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-11-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-11-2-create-release
+      
+      - nim-0-11-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.11.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-12-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.12.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-12-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-12-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.12.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.12.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.12.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.12.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-12-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-12-0-create-release
+      
+      - nim-0-12-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.12.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-13-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.13.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-13-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-13-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.13.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.13.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.13.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.13.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-13-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-13-0-create-release
+      
+      - nim-0-13-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.13.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-14-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.14.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-14-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-14-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.14.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.14.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.14.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.14.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-14-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-14-0-create-release
+      
+      - nim-0-14-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.14.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-14-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.14.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-14-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-14-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.14.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.14.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.14.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.14.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-14-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-14-2-create-release
+      
+      - nim-0-14-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.14.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-15-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.15.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-15-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-15-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.15.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.15.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.15.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.15.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-15-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-15-0-create-release
+      
+      - nim-0-15-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.15.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-15-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.15.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-15-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-15-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.15.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.15.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.15.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.15.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-15-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-15-2-create-release
+      
+      - nim-0-15-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.15.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-16-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.16.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-16-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-16-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.16.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.16.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.16.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.16.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-16-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-16-0-create-release
+      
+      - nim-0-16-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.16.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-17-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.17.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-17-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-17-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.17.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.17.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.17.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.17.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-17-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-17-0-create-release
+      
+      - nim-0-17-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.17.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-17-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.17.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-17-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-17-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.17.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.17.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.17.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.17.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-17-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-17-2-create-release
+      
+      - nim-0-17-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.17.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-18-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.18.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-18-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-18-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.18.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.18.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.18.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.18.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-18-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-18-0-create-release
+      
+      - nim-0-18-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.18.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-19-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.19.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-19-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-19-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.19.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.19.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.19.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.19.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-19-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-19-0-create-release
+      
+      - nim-0-19-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.19.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-19-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.19.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-19-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-19-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.19.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.19.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.19.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.19.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-19-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-19-2-create-release
+      
+      - nim-0-19-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.19.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-19-4-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.19.4--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-19-4-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-19-4-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.19.4 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.19.4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.19.4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.19.4-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-19-4-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-19-4-create-release
+      
+      - nim-0-19-4-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.19.4-create-release.outputs.upload_url }}
+
+  
+  nim-0-19-6-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.19.6--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-19-6-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-19-6-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.19.6 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.19.6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.19.6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.19.6-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-19-6-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-19-6-create-release
+      
+      - nim-0-19-6-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.19.6-create-release.outputs.upload_url }}
+
+  
+  nim-0-20-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.20.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-20-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-20-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.20.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.20.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.20.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.20.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-20-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-20-0-create-release
+      
+      - nim-0-20-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.20.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-20-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.20.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-20-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-20-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.20.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.20.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.20.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.20.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-20-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-20-2-create-release
+      
+      - nim-0-20-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.20.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-8-14-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.8.14--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-8-14-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-8-14-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.8.14 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.8.14-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.8.14-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.8.14-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-8-14-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-8-14-create-release
+      
+      - nim-0-8-14-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.8.14-create-release.outputs.upload_url }}
+
+  
+  nim-0-9-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.9.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-9-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-9-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.9.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.9.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.9.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.9.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-9-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-9-0-create-release
+      
+      - nim-0-9-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.9.0-create-release.outputs.upload_url }}
+
+  
+  nim-0-9-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.9.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-9-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-9-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.9.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.9.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.9.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.9.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-9-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-9-2-create-release
+      
+      - nim-0-9-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.9.2-create-release.outputs.upload_url }}
+
+  
+  nim-0-9-4-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.9.4--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-9-4-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-9-4-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.9.4 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.9.4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.9.4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.9.4-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-9-4-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-9-4-create-release
+      
+      - nim-0-9-4-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.9.4-create-release.outputs.upload_url }}
+
+  
+  nim-0-9-6-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-0.9.6--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-0-9-6-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-0-9-6-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 0.9.6 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-0.9.6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-0.9.6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-0.9.6-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-0-9-6-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-0-9-6-create-release
+      
+      - nim-0-9-6-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-0.9.6-create-release.outputs.upload_url }}
+
+  
+  nim-1-0-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.0.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-0-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.0.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.0.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.0.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.0.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-0-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-0-0-create-release
+      
+      - nim-1-0-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.0.0-create-release.outputs.upload_url }}
+
+  
+  nim-1-0-10-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.0.10--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-0-10-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-10-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.0.10 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.0.10-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.0.10-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.0.10-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-0-10-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-0-10-create-release
+      
+      - nim-1-0-10-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.0.10-create-release.outputs.upload_url }}
+
+  
+  nim-1-0-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.0.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-0-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.0.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.0.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.0.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.0.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-0-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-0-2-create-release
+      
+      - nim-1-0-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.0.2-create-release.outputs.upload_url }}
+
+  
+  nim-1-0-4-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.0.4--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-0-4-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-4-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.0.4 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.0.4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.0.4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.0.4-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-0-4-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-0-4-create-release
+      
+      - nim-1-0-4-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.0.4-create-release.outputs.upload_url }}
+
+  
+  nim-1-0-6-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.0.6--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-0-6-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-6-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.0.6 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.0.6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.0.6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.0.6-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-0-6-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-0-6-create-release
+      
+      - nim-1-0-6-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.0.6-create-release.outputs.upload_url }}
+
+  
+  nim-1-0-8-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.0.8--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-0-8-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-8-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.0.8 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.0.8-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.0.8-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.0.8-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-0-8-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-0-8-create-release
+      
+      - nim-1-0-8-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.0.8-create-release.outputs.upload_url }}
+
+  
+  nim-1-2-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.2.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-2-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.2.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.2.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.2.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.2.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-2-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-2-0-create-release
+      
+      - nim-1-2-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.2.0-create-release.outputs.upload_url }}
+
+  
+  nim-1-2-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.2.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-2-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.2.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.2.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.2.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.2.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-2-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-2-2-create-release
+      
+      - nim-1-2-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.2.2-create-release.outputs.upload_url }}
+
+  
+  nim-1-2-4-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.2.4--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-2-4-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-4-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.2.4 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.2.4-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.2.4-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.2.4-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-2-4-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-2-4-create-release
+      
+      - nim-1-2-4-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.2.4-create-release.outputs.upload_url }}
+
+  
+  nim-1-2-6-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.2.6--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-2-6-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-6-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.2.6 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.2.6-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.2.6-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.2.6-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-2-6-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-2-6-create-release
+      
+      - nim-1-2-6-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.2.6-create-release.outputs.upload_url }}
+
+  
+  nim-1-2-8-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.2.8--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-2-8-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-8-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.2.8 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.2.8-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.2.8-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.2.8-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-2-8-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-2-8-create-release
+      
+      - nim-1-2-8-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.2.8-create-release.outputs.upload_url }}
+
+  
+  nim-1-4-0-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.4.0--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-4-0-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-4-0-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.4.0 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.4.0-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.4.0-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.4.0-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-4-0-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-4-0-create-release
+      
+      - nim-1-4-0-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.4.0-create-release.outputs.upload_url }}
+
+  
+  nim-1-4-2-create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.4.2--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+      
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+      
+
+  
+  nim-1-4-2-alpine-3-12-build:
+    name: Build Nim
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-4-2-create-release"
+    strategy:
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:alpine-3.12
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /code/build.sh 1.4.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1.4.2-create-release.outputs.upload_url }}
+        asset_path: ${{ needs.nim-1.4.2-create-release.outputs.asset_path }}
+        asset_name: ${{ needs.nim-1.4.2-create-release.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+
+  nim-1-4-2-publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs:
+      - nim-1-4-2-create-release
+      
+      - nim-1-4-2-alpine-3-12-build
+      
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        release_id: ${{ needs.nim-1.4.2-create-release.outputs.upload_url }}
+
+  

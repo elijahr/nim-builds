@@ -1,4 +1,4 @@
-name: Build
+name: Check for new versions of Nim
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -17,15 +17,15 @@ jobs:
 
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.9'
 
     - name: Check for new Nim versions
       run: |
-        pip install "semver~=2.13.0"
-        python update_nim_versions.py
+        pip install -r requirements.tx
+        python3.9 render_build_yml.py
         git add .
         if [ "$(git diff --name-only --cached | grep .github/workflows/build.yml)" != "" ]
         then
-          git commit -m "Updated Nim versions"
+          git commit -m "Re-rendered build.yml"
           git push
         fi

@@ -4,25 +4,41 @@ set -uex
 
 NIM_VERSION=$1
 
-tarball="nim-${NIM_VERSION}-$(gcc -dumpmachine).tar.xz"
 
 if [ "$(which apk)" != "" ]
 then
-  apk add --update --no-cache git xz
+  apk add --update --no-cache wget xz
   tarball="nim-${NIM_VERSION}-$(gcc -dumpmachine | sed 's/alpine-//').tar.xz"
 elif [ "$(which apt)" != "" ]
 then
   apt-get update -q -y
-  apt-get -qq install -y git xz-utils
+  apt-get -qq install -y wget xz-utils
+elif [ "$(which brew)" != "" ]
+then
+  brew install wget xz
 fi
 
-git clone -q --depth 1 --single-branch --branch "v${NIM_VERSION}" https://github.com/nim-lang/Nim.git /root/Nim
-cd /root/Nim
-sh build_all.sh
-export PATH=/root/Nim/bin:$PATH
-./koch csource -d:danger
-./koch xz
+cd /code
 
-mv ./build/nim-*.tar.xz "/code/${tarball}"
+if [ ! -d "nim-${NIM_VERSION}" ]
+then
+  if [ ! -f "nim-${NIM_VERSION}.tar.xz" ]
+  then
+    wget "https://nim-lang.org/download/nim-${NIM_VERSION}.tar.xz"
+  else
+    tar -xJf nim-${NIM_VERSION}.tar.xz
+  fi
+fi
 
-echo "::set-output name=tarball::${tarball}"
+cd "nim-${NIM_VERSION}"
+sh build.sh
+bin/nim c koch
+./koch boot -d:release
+./koch tools
+cd -
+
+tarball="nim-${NIM_VERSION}-$(gcc -dumpmachine).tar.xz"
+tar -cJf "$tarball" "nim-${NIM_VERSION}"
+
+echo "::set-output name=asset_name::${tarball}"
+echo "::set-output name=asset_path::${PWD}/${tarball}"

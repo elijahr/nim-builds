@@ -1,0 +1,4 @@
+semver~=2.13.0
+Jinja2~=2.11.2
+path~=15.0.0
+ruamel.yaml~=0.16.12
