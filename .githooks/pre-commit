@@ -14,13 +14,8 @@ then
 		if [ "$file" == ".github/workflows/build.yml.jinja" ]
 		then
 			echo "Change detected, re-rendering GitHub Actions"
-			pipenv run ./builder.py render-github-actions
-			git add .github/workflows/*.yml || true
-		elif [ "$file" == "README.md.jinja" ]
-		then
-				echo "Change detected, re-rendering README"
-			pipenv run ./builder.py render-readme
-			git add README.md || true
+			pipenv run python render_build_yml.py
+			git add .github/workflows/*.yml || tru
 		fi
 
 		case $file in

@@ -136,6 +136,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         {% endraw %}
       with:
-        release_id: {{ '${{ needs.nim-' + nim_version + '-create-release.outputs.upload_url }}' }}
+        release_id: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
 
   {% endfor %}

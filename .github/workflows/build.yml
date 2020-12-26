@@ -146,7 +146,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.10.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-10-2-create-release.outputs.upload_url }}
 
   
   nim-0-11-0-create-release:
@@ -286,7 +286,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.11.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-11-0-create-release.outputs.upload_url }}
 
   
   nim-0-11-2-create-release:
@@ -426,7 +426,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.11.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-11-2-create-release.outputs.upload_url }}
 
   
   nim-0-12-0-create-release:
@@ -566,7 +566,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.12.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-12-0-create-release.outputs.upload_url }}
 
   
   nim-0-13-0-create-release:
@@ -706,7 +706,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.13.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-13-0-create-release.outputs.upload_url }}
 
   
   nim-0-14-0-create-release:
@@ -846,7 +846,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.14.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-14-0-create-release.outputs.upload_url }}
 
   
   nim-0-14-2-create-release:
@@ -986,7 +986,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.14.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-14-2-create-release.outputs.upload_url }}
 
   
   nim-0-15-0-create-release:
@@ -1126,7 +1126,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.15.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-15-0-create-release.outputs.upload_url }}
 
   
   nim-0-15-2-create-release:
@@ -1266,7 +1266,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.15.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-15-2-create-release.outputs.upload_url }}
 
   
   nim-0-16-0-create-release:
@@ -1406,7 +1406,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.16.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-16-0-create-release.outputs.upload_url }}
 
   
   nim-0-17-0-create-release:
@@ -1546,7 +1546,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.17.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-17-0-create-release.outputs.upload_url }}
 
   
   nim-0-17-2-create-release:
@@ -1686,7 +1686,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.17.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-17-2-create-release.outputs.upload_url }}
 
   
   nim-0-18-0-create-release:
@@ -1826,7 +1826,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.18.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-18-0-create-release.outputs.upload_url }}
 
   
   nim-0-19-0-create-release:
@@ -1966,7 +1966,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.19.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-19-0-create-release.outputs.upload_url }}
 
   
   nim-0-19-2-create-release:
@@ -2106,7 +2106,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.19.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-19-2-create-release.outputs.upload_url }}
 
   
   nim-0-19-4-create-release:
@@ -2246,7 +2246,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.19.4-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-19-4-create-release.outputs.upload_url }}
 
   
   nim-0-19-6-create-release:
@@ -2386,7 +2386,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.19.6-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-19-6-create-release.outputs.upload_url }}
 
   
   nim-0-20-0-create-release:
@@ -2526,7 +2526,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.20.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-20-0-create-release.outputs.upload_url }}
 
   
   nim-0-20-2-create-release:
@@ -2666,7 +2666,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.20.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
 
   
   nim-0-8-14-create-release:
@@ -2806,7 +2806,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.8.14-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-8-14-create-release.outputs.upload_url }}
 
   
   nim-0-9-0-create-release:
@@ -2946,7 +2946,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.9.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-9-0-create-release.outputs.upload_url }}
 
   
   nim-0-9-2-create-release:
@@ -3086,7 +3086,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.9.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-9-2-create-release.outputs.upload_url }}
 
   
   nim-0-9-4-create-release:
@@ -3226,7 +3226,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.9.4-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-9-4-create-release.outputs.upload_url }}
 
   
   nim-0-9-6-create-release:
@@ -3366,7 +3366,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-0.9.6-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-0-9-6-create-release.outputs.upload_url }}
 
   
   nim-1-0-0-create-release:
@@ -3506,7 +3506,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.0.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-0-0-create-release.outputs.upload_url }}
 
   
   nim-1-0-10-create-release:
@@ -3646,7 +3646,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.0.10-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
 
   
   nim-1-0-2-create-release:
@@ -3786,7 +3786,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.0.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-0-2-create-release.outputs.upload_url }}
 
   
   nim-1-0-4-create-release:
@@ -3926,7 +3926,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.0.4-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-0-4-create-release.outputs.upload_url }}
 
   
   nim-1-0-6-create-release:
@@ -4066,7 +4066,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.0.6-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-0-6-create-release.outputs.upload_url }}
 
   
   nim-1-0-8-create-release:
@@ -4206,7 +4206,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.0.8-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-0-8-create-release.outputs.upload_url }}
 
   
   nim-1-2-0-create-release:
@@ -4346,7 +4346,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.2.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-2-0-create-release.outputs.upload_url }}
 
   
   nim-1-2-2-create-release:
@@ -4486,7 +4486,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.2.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-2-2-create-release.outputs.upload_url }}
 
   
   nim-1-2-4-create-release:
@@ -4626,7 +4626,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.2.4-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-2-4-create-release.outputs.upload_url }}
 
   
   nim-1-2-6-create-release:
@@ -4766,7 +4766,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.2.6-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-2-6-create-release.outputs.upload_url }}
 
   
   nim-1-2-8-create-release:
@@ -4906,7 +4906,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.2.8-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
 
   
   nim-1-4-0-create-release:
@@ -5046,7 +5046,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.4.0-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-4-0-create-release.outputs.upload_url }}
 
   
   nim-1-4-2-create-release:
@@ -5186,6 +5186,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       with:
-        release_id: ${{ needs.nim-1.4.2-create-release.outputs.upload_url }}
+        release_id: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
 
   
