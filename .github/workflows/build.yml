@@ -54,6 +54,7 @@ jobs:
     needs:
       - "nim-1-0-10-create-release"
     strategy:
+      fail-fast: false
       matrix:
         platform:
           
@@ -200,6 +201,7 @@ jobs:
     needs:
       - "nim-1-2-8-create-release"
     strategy:
+      fail-fast: false
       matrix:
         platform:
           
@@ -346,6 +348,7 @@ jobs:
     needs:
       - "nim-1-4-2-create-release"
     strategy:
+      fail-fast: false
       matrix:
         platform:
           

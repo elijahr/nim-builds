@@ -54,6 +54,7 @@ jobs:
     needs:
       - "nim-{{ nim_version|slugify }}-create-release"
     strategy:
+      fail-fast: false
       matrix:
         platform:
           {% for platform in distro.platforms %}
