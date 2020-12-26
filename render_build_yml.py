@@ -18,9 +18,9 @@ def slugify(string, delim="-", allowed_chars=""):
 
 
 def find_max_nim_versions(versions):
-    versions = (VersionInfo.parse(v.strip()) for v in sorted(versions))
+    versions = (VersionInfo.parse(v.strip()) for v in versions)
     versions = (v for v in versions if v >= min_version)
-    for key, versions in groupby(versions, lambda v: f"{v.major}.{v.minor}"):
+    for key, versions in groupby(sorted(versions), lambda v: f"{v.major}.{v.minor}"):
         yield str(max(versions))
 
 
@@ -60,7 +60,7 @@ def render_build_yml():
     with project_dir:
         context = dict(
             distros=distros,
-            nim_versions=list(fetch_nim_versions()),
+            nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
             slugify=slugify,
         )
         with open(project_dir / ".github/workflows/build.yml.jinja", "r") as f:
