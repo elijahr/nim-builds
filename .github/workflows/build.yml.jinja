@@ -49,7 +49,7 @@ jobs:
 
   {% for distro in distros %}
   nim-{{ nim_version|slugify }}-{{ distro.name }}-build:
-    name: Build Nim {{ nim_version }}
+    name: Build Nim {{ nim_version }} {{ distro.name }}
     runs-on: ubuntu-latest
     needs:
       - "nim-{{ nim_version|slugify }}-create-release"
@@ -121,8 +121,8 @@ jobs:
         {% endraw %}
       with:
         upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
-        asset_path: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.asset_path }}' }}
-        asset_name: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.asset_name }}' }}
+        asset_path: {{ '${{ steps.build-nim.outputs.asset_path }}' }}
+        asset_name: {{ '${{ steps.build-nim.outputs.asset_name }}' }}
         asset_content_type: application/x-xz
 
   {% endfor %}
