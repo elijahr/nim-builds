@@ -2,7 +2,10 @@
 
 set -uex
 
-NIM_DIR=$1
+SCRIPT_DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+cd "${SCRIPT_DIR}/src"
+
+nim_dir=$1
 
 if [ "$(which apk)" != "" ]
 then
@@ -20,19 +23,17 @@ then
   brew install wget xz
 fi
 
-cd src
 sh build.sh
 bin/nim c koch
 ./koch boot -d:release
-./koch docs
 ./koch tools -d:release
-./koch test
-rm -Rf "../${NIM_DIR}"
-mkdir "../${NIM_DIR}"
-./install.sh "../${NIM_DIR}"
+
+rm -Rf "../${nim_dir}"
+mkdir "../${nim_dir}"
+./install.sh "../${nim_dir}"
 for fn in nimble nimsuggest nimgrep
 do
-  cp "./bin/${fn}" "../${NIM_DIR}/nim/bin/"
+  cp "./bin/${fn}" "../${nim_dir}/nim/bin/"
 done
 
-echo "::set-output name=asset_name::${NIM_DIR}-$(gcc -dumpmachine).tar.xz"
+echo "::set-output name=asset_name::${nim_dir}-$(gcc -dumpmachine).tar.xz"

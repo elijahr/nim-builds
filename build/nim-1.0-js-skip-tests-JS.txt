@@ -1,0 +1,2 @@
+tests/threads/threadex.nim
+tests/js/tconsole.nim

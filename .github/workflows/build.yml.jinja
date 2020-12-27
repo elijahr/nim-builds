@@ -92,6 +92,10 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y pixz
 
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -127,9 +131,23 @@ jobs:
           {{ distro.build_farm_client_image }} \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          {{ distro.build_farm_client_image }} \
+          sh test-nim.sh ${nim}
+
     - name: Create tarball
       id: create-tarball
       run: |
+        cd build
         nim="nim-{{ nim_version }}"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
