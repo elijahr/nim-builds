@@ -98,10 +98,3 @@ def render_build_yml():
 
 if __name__ == "__main__":
     render_build_yml()
-
-    # versions = json.dumps(list(find_max_nim_versions(fetch_nim_versions())))
-    # build_yml = os.path.join(os.path.dirname(__file__), '.github/workflows/build.yml.jinja')
-    # with open(build_yml, 'r') as f:
-    #     new_contents = re.sub(r'nim-version: \[.*', f'nim-version: {versions}', f.read())
-    # with open(build_yml, 'w') as f:
-    #     f.write(new_contents)
