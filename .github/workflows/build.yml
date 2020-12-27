@@ -121,6 +121,7 @@ jobs:
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
         tar xf "${nim}.tar"
+        mv "$nim" src
         rm "${nim}.tar.xz" "${nim}.tar"
 
         # Build in emulated container
@@ -228,6 +229,7 @@ jobs:
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
         tar xf "${nim}.tar"
+        mv "$nim" src
         rm "${nim}.tar.xz" "${nim}.tar"
 
         # Build in emulated container
@@ -337,6 +339,7 @@ jobs:
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
         tar xf "${nim}.tar"
+        mv "$nim" src
         rm "${nim}.tar.xz" "${nim}.tar"
 
         # Build in emulated container
@@ -505,6 +508,7 @@ jobs:
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
         tar xf "${nim}.tar"
+        mv "$nim" src
         rm "${nim}.tar.xz" "${nim}.tar"
 
         # Build in emulated container
@@ -612,6 +616,7 @@ jobs:
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
         tar xf "${nim}.tar"
+        mv "$nim" src
         rm "${nim}.tar.xz" "${nim}.tar"
 
         # Build in emulated container
@@ -721,6 +726,7 @@ jobs:
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
         tar xf "${nim}.tar"
+        mv "$nim" src
         rm "${nim}.tar.xz" "${nim}.tar"
 
         # Build in emulated container

@@ -20,11 +20,19 @@ then
   brew install wget xz
 fi
 
-cd "$NIM_DIR"
+cd src
 sh build.sh
 bin/nim c koch
 ./koch boot -d:release
-./koch tools
+./koch docs
+./koch tools -d:release
 ./koch test
+rm -Rf "../${NIM_DIR}"
+mkdir "../${NIM_DIR}"
+./install.sh "../${NIM_DIR}"
+for fn in nimble nimsuggest nimgrep
+do
+  cp "./bin/${fn}" "../${NIM_DIR}/nim/bin/"
+done
 
-echo "::set-output name=asset_name::nim-${NIM_VERSION}-$(gcc -dumpmachine).tar.xz"
+echo "::set-output name=asset_name::${NIM_DIR}-$(gcc -dumpmachine).tar.xz"
