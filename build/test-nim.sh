@@ -29,6 +29,22 @@ test () {
   testament/testament --nim:bin/nim --targets:$target $extra_args all
 }
 
+if [ "$(which apk)" != "" ]
+then
+  apk add --update --no-cache sfml
+elif [ "$(which apt)" != "" ]
+then
+  apt-get update -q -y
+  apt-get -qq install -y libcsfml-dev
+elif [ "$(which pacman)" != "" ]
+then
+  pacman -Syu --noconfirm sfml
+  pacman -Sc --noconfirm || true
+elif [ "$(which brew)" != "" ]
+then
+  brew install sfml
+fi
+
 bin/nim cc --opt:speed testament/testament
 
 test c

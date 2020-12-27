@@ -1,3 +1,8 @@
-/.vscode
+Pipfile
+/build/src
+/build/nim-*.tar
+/build/nim-*.tar.xz
+/nimcache
+.vscode
 .DS_Store
-/nim-builds.code-workspace
+nim-builds.code-workspace

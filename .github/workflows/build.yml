@@ -157,7 +157,7 @@ jobs:
         nim="nim-1.2.8"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
+        echo "::set-output name=asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -283,7 +283,7 @@ jobs:
         nim="nim-1.2.8"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
+        echo "::set-output name=asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -411,7 +411,7 @@ jobs:
         nim="nim-1.2.8"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
+        echo "::set-output name=asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -598,7 +598,7 @@ jobs:
         nim="nim-1.4.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
+        echo "::set-output name=asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -724,7 +724,7 @@ jobs:
         nim="nim-1.4.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
+        echo "::set-output name=asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -852,7 +852,7 @@ jobs:
         nim="nim-1.4.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
+        echo "::set-output name=asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
