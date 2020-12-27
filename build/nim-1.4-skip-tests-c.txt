@@ -1,0 +1,2 @@
+tests/arc/tasyncorc.nim
+tests/osproc/treadlines.nim
