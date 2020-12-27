@@ -16,7 +16,6 @@ if [ "$(which apk)" != "" ]
 then
   apk add --update --no-cache wget xz $extra_packages
   apk add --update --no-cache pixz --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-  tarball="nim-${NIM_VERSION}-$(gcc -dumpmachine | sed 's/alpine-//').tar.xz"
 elif [ "$(which apt)" != "" ]
 then
   apt-get update -q -y
@@ -36,7 +35,10 @@ dir="nim-${NIM_VERSION}-$(gcc -dumpmachine)"
 
 if [ ! -d "$dir" ]
 then
-  wget "https://nim-lang.org/download/nim-${NIM_VERSION}.tar.xz" -O- | pixz -d | tar x
+  wget "https://nim-lang.org/download/nim-${NIM_VERSION}.tar.xz"
+  pixz -d "nim-${NIM_VERSION}.tar.xz" "nim-${NIM_VERSION}.tar"
+  tar xf "nim-${NIM_VERSION}.tar"
+  rm "nim-${NIM_VERSION}.tar" "nim-${NIM_VERSION}.tar.xz"
   mv "nim-${NIM_VERSION}" "$dir"
 fi
 
@@ -44,6 +46,8 @@ cd "$dir"
 if [ "$DEBUG" = "yes" ]
 then
   sh build.sh --extraBuildArgs "-g"
+  # strip ptrace since we're debugging in QEMU and ptrace isn't supported
+  sed -i 's|ptrace|isnanl|' bin/nim
   valgrind -k bin/nim c koch
 else
   sh build.sh
@@ -54,7 +58,7 @@ fi
 cd -
 
 tarball="${dir}.tar.xz"
-tar -c "$dir" | pixz > "$tarball"
+tar -Ipixz -cf "$tarball" "$dir"
 
 echo "::set-output name=asset_name::${tarball}"
-echo "::set-output name=asset_path::${PWD}/${tarball}"
+echo "::set-output name=asset_path::/code/${tarball}"

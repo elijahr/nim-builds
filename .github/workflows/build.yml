@@ -68,8 +68,6 @@ jobs:
           
           - linux/arm64/v8
           
-          - linux/ppc64le
-          
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
@@ -106,6 +104,8 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
           -p 3800-3850:3800-3850/tcp \
           elijahru/build-farm:alpine-3.12
 
@@ -136,6 +136,188 @@ jobs:
         asset_content_type: application/x-xz
 
   
+  nim-1-0-10-archlinux-build:
+    name: Build Nim 1.0.10 archlinux
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-10-create-release"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/arm/v5
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: "nim-1.0.10-archlinux-${{ matrix.platform }}-nimcache"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:archlinux
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:archlinux \
+          sh /code/build.sh 1.0.10 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+  nim-1-0-10-debian-buster-build:
+    name: Build Nim 1.0.10 debian-buster
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-0-10-create-release"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v5
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+          - linux/s390x
+          
+          - linux/mips64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: "nim-1.0.10-debian-buster-${{ matrix.platform }}-nimcache"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /code/build.sh 1.0.10 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
 
   nim-1-0-10-publish-release:
     name: Publish release
@@ -144,6 +326,10 @@ jobs:
       - nim-1-0-10-create-release
       
       - nim-1-0-10-alpine-3-12-build
+      
+      - nim-1-0-10-archlinux-build
+      
+      - nim-1-0-10-debian-buster-build
       
 
     steps:
@@ -215,8 +401,6 @@ jobs:
           
           - linux/arm64/v8
           
-          - linux/ppc64le
-          
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
@@ -253,6 +437,8 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
           -p 3800-3850:3800-3850/tcp \
           elijahru/build-farm:alpine-3.12
 
@@ -283,6 +469,188 @@ jobs:
         asset_content_type: application/x-xz
 
   
+  nim-1-2-8-archlinux-build:
+    name: Build Nim 1.2.8 archlinux
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-8-create-release"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/arm/v5
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: "nim-1.2.8-archlinux-${{ matrix.platform }}-nimcache"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:archlinux
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:archlinux \
+          sh /code/build.sh 1.2.8 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+  nim-1-2-8-debian-buster-build:
+    name: Build Nim 1.2.8 debian-buster
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-2-8-create-release"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v5
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+          - linux/s390x
+          
+          - linux/mips64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: "nim-1.2.8-debian-buster-${{ matrix.platform }}-nimcache"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /code/build.sh 1.2.8 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
 
   nim-1-2-8-publish-release:
     name: Publish release
@@ -291,6 +659,10 @@ jobs:
       - nim-1-2-8-create-release
       
       - nim-1-2-8-alpine-3-12-build
+      
+      - nim-1-2-8-archlinux-build
+      
+      - nim-1-2-8-debian-buster-build
       
 
     steps:
@@ -362,8 +734,6 @@ jobs:
           
           - linux/arm64/v8
           
-          - linux/ppc64le
-          
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
@@ -400,6 +770,8 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
           -p 3800-3850:3800-3850/tcp \
           elijahru/build-farm:alpine-3.12
 
@@ -430,6 +802,188 @@ jobs:
         asset_content_type: application/x-xz
 
   
+  nim-1-4-2-archlinux-build:
+    name: Build Nim 1.4.2 archlinux
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-4-2-create-release"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/arm/v5
+          
+          - linux/arm/v6
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: "nim-1.4.2-archlinux-${{ matrix.platform }}-nimcache"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:archlinux
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:archlinux \
+          sh /code/build.sh 1.4.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
+  nim-1-4-2-debian-buster-build:
+    name: Build Nim 1.4.2 debian-buster
+    runs-on: ubuntu-latest
+    needs:
+      - "nim-1-4-2-create-release"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          
+          - linux/amd64
+          
+          - linux/386
+          
+          - linux/arm/v5
+          
+          - linux/arm/v7
+          
+          - linux/arm64/v8
+          
+          - linux/ppc64le
+          
+          - linux/s390x
+          
+          - linux/mips64le
+          
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      if: ${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: "nim-1.4.2-debian-buster-${{ matrix.platform }}-nimcache"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        # Start distcc host
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
+          -p 3800-3850:3800-3850/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        mkdir -p nimcache
+
+        # Build in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD},dst=/code" \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /code/build.sh 1.4.2 || (status=$?; dump_logs; exit $status)
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_content_type: application/x-xz
+
+  
 
   nim-1-4-2-publish-release:
     name: Publish release
@@ -438,6 +992,10 @@ jobs:
       - nim-1-4-2-create-release
       
       - nim-1-4-2-alpine-3-12-build
+      
+      - nim-1-4-2-archlinux-build
+      
+      - nim-1-4-2-debian-buster-build
       
 
     steps:

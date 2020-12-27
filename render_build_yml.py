@@ -41,16 +41,43 @@ def fetch_nim_versions():
 distros = [
     {
         "name": "alpine-3-12",
-        "build_farm_tag": "alpine-3.12",
+        "build_farm_host_image": "elijahru/build-farm:alpine-3.12",
+        "build_farm_client_image": "elijahru/build-farm-client:alpine-3.12",
         "platforms": [
             "linux/amd64",
             "linux/386",
             "linux/arm/v6",
             "linux/arm/v7",
             "linux/arm64/v8",
-            "linux/ppc64le",
         ],
-    }
+    },
+    {
+        "name": "archlinux",
+        "build_farm_host_image": "elijahru/build-farm:archlinux",
+        "build_farm_client_image": "elijahru/build-farm-client:archlinux",
+        "platforms": [
+            "linux/amd64",
+            "linux/arm/v5",
+            "linux/arm/v6",
+            "linux/arm/v7",
+            "linux/arm64/v8",
+        ],
+    },
+    {
+        "name": "debian-buster",
+        "build_farm_host_image": "elijahru/build-farm:debian-buster-slim",
+        "build_farm_client_image": "elijahru/build-farm-client:debian-buster-slim",
+        "platforms": [
+            "linux/amd64",
+            "linux/386",
+            "linux/arm/v5",
+            "linux/arm/v7",
+            "linux/arm64/v8",
+            "linux/ppc64le",
+            "linux/s390x",
+            "linux/mips64le",
+        ],
+    },
 ]
 
 

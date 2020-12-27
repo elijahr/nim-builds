@@ -96,11 +96,13 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
+          -p 3600-3650:3800-3850/tcp \
+          -p 3700-3750:3800-3850/tcp \
           -p 3800-3850:3800-3850/tcp \
-          elijahru/build-farm:{{ distro.build_farm_tag }}
+          {{ distro.build_farm_host_image }}
 
         dump_logs () {
-          docker logs $(docker ps --filter ancestor=elijahru/build-farm:{{ distro.build_farm_tag }} --format "{{ '{{.ID}}' }}")
+          docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
         }
 
         mkdir -p nimcache
@@ -110,7 +112,7 @@ jobs:
           --platform {% raw %}${{ matrix.platform }}{% endraw %} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD},dst=/code" \
-          elijahru/build-farm-client:{{ distro.build_farm_tag }} \
+          {{ distro.build_farm_client_image }} \
           sh /code/build.sh {{ nim_version }} || (status=$?; dump_logs; exit $status)
 
     - name: Add tarball to release
