@@ -31,18 +31,18 @@ test () {
 
 if [ "$(which apk)" != "" ]
 then
-  apk add --update --no-cache sfml prcre gc sqlite-dev sqlite
+  apk add --update --no-cache sfml pcre gc sqlite-dev sqlite
 elif [ "$(which apt)" != "" ]
 then
   apt-get update -q -y
-  apt-get -qq install -y libcsfml-dev libpcre3 libgc-dev libgc1c2 sqlite3
+  apt-get -qq install -y libcsfml-dev libpcre3 libgc-dev libgc1c2 sqlite3 libsqlite3 libsqlite3-dev
 elif [ "$(which pacman)" != "" ]
 then
   pacman -Syu --noconfirm sfml pcre gc sqlite
   pacman -Sc --noconfirm || true
 elif [ "$(which brew)" != "" ]
 then
-  brew install sfml sqlite
+  brew install sfml sqlite libgc
 fi
 
 bin/nim cc --opt:speed testament/testament
