@@ -137,19 +137,6 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-    - name: Run tests
-      run: |
-        cd build
-
-        # Test in emulated container
-        docker run \
-          --platform ${{ matrix.platform }} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          elijahru/build-farm-client:alpine-3.12 \
-          sh test-nim.sh
-
     - name: Create tarball
       id: create-tarball
       run: |
@@ -170,6 +157,19 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
+
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh test-nim.sh
 
   
   nim-1-2-8-archlinux-build:
@@ -263,19 +263,6 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-    - name: Run tests
-      run: |
-        cd build
-
-        # Test in emulated container
-        docker run \
-          --platform ${{ matrix.platform }} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          elijahru/build-farm-client:archlinux \
-          sh test-nim.sh
-
     - name: Create tarball
       id: create-tarball
       run: |
@@ -296,6 +283,19 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
+
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:archlinux \
+          sh test-nim.sh
 
   
   nim-1-2-8-debian-buster-build:
@@ -391,19 +391,6 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-    - name: Run tests
-      run: |
-        cd build
-
-        # Test in emulated container
-        docker run \
-          --platform ${{ matrix.platform }} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          elijahru/build-farm-client:debian-buster-slim \
-          sh test-nim.sh
-
     - name: Create tarball
       id: create-tarball
       run: |
@@ -424,6 +411,19 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
+
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh test-nim.sh
 
   
 
@@ -578,19 +578,6 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-    - name: Run tests
-      run: |
-        cd build
-
-        # Test in emulated container
-        docker run \
-          --platform ${{ matrix.platform }} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          elijahru/build-farm-client:alpine-3.12 \
-          sh test-nim.sh
-
     - name: Create tarball
       id: create-tarball
       run: |
@@ -611,6 +598,19 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
+
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh test-nim.sh
 
   
   nim-1-4-2-archlinux-build:
@@ -704,19 +704,6 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-    - name: Run tests
-      run: |
-        cd build
-
-        # Test in emulated container
-        docker run \
-          --platform ${{ matrix.platform }} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          elijahru/build-farm-client:archlinux \
-          sh test-nim.sh
-
     - name: Create tarball
       id: create-tarball
       run: |
@@ -737,6 +724,19 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
+
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:archlinux \
+          sh test-nim.sh
 
   
   nim-1-4-2-debian-buster-build:
@@ -832,19 +832,6 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-    - name: Run tests
-      run: |
-        cd build
-
-        # Test in emulated container
-        docker run \
-          --platform ${{ matrix.platform }} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          elijahru/build-farm-client:debian-buster-slim \
-          sh test-nim.sh
-
     - name: Create tarball
       id: create-tarball
       run: |
@@ -865,6 +852,19 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
+
+    - name: Run tests
+      run: |
+        cd build
+
+        # Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh test-nim.sh
 
   
 
