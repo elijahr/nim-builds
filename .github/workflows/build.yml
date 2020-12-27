@@ -95,6 +95,11 @@ jobs:
           nimcache
         key: "nim-1.0.10-alpine-3-12-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -104,9 +109,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:alpine-3.12
 
         dump_logs () {
@@ -115,13 +118,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.0.10"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh /code/build.sh 1.0.10 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.0.10"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -131,7 +150,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -183,6 +202,11 @@ jobs:
           nimcache
         key: "nim-1.0.10-archlinux-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -192,9 +216,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:archlinux
 
         dump_logs () {
@@ -203,13 +225,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.0.10"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:archlinux \
-          sh /code/build.sh 1.0.10 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.0.10"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -219,7 +257,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -277,6 +315,11 @@ jobs:
           nimcache
         key: "nim-1.0.10-debian-buster-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -286,9 +329,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:debian-buster-slim
 
         dump_logs () {
@@ -297,13 +338,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.0.10"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /code/build.sh 1.0.10 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.0.10"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -313,7 +370,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -428,6 +485,11 @@ jobs:
           nimcache
         key: "nim-1.2.8-alpine-3-12-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -437,9 +499,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:alpine-3.12
 
         dump_logs () {
@@ -448,13 +508,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.2.8"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh /code/build.sh 1.2.8 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.2.8"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -464,7 +540,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -516,6 +592,11 @@ jobs:
           nimcache
         key: "nim-1.2.8-archlinux-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -525,9 +606,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:archlinux
 
         dump_logs () {
@@ -536,13 +615,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.2.8"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:archlinux \
-          sh /code/build.sh 1.2.8 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.2.8"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -552,7 +647,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -610,6 +705,11 @@ jobs:
           nimcache
         key: "nim-1.2.8-debian-buster-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -619,9 +719,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:debian-buster-slim
 
         dump_logs () {
@@ -630,13 +728,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.2.8"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /code/build.sh 1.2.8 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.2.8"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -646,7 +760,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -761,6 +875,11 @@ jobs:
           nimcache
         key: "nim-1.4.2-alpine-3-12-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -770,9 +889,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:alpine-3.12
 
         dump_logs () {
@@ -781,13 +898,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.4.2"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh /code/build.sh 1.4.2 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.4.2"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -797,7 +930,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -849,6 +982,11 @@ jobs:
           nimcache
         key: "nim-1.4.2-archlinux-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -858,9 +996,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:archlinux
 
         dump_logs () {
@@ -869,13 +1005,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.4.2"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:archlinux \
-          sh /code/build.sh 1.4.2 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.4.2"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -885,7 +1037,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
@@ -943,6 +1095,11 @@ jobs:
           nimcache
         key: "nim-1.4.2-debian-buster-${{ matrix.platform }}-nimcache"
 
+    - name: Install pixz
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y pixz
+
     - name: Build Nim
       id: build-nim
       shell: bash
@@ -952,9 +1109,7 @@ jobs:
         # Start distcc host
         docker run -d \
           --platform linux/amd64 \
-          -p 3600-3650:3800-3850/tcp \
-          -p 3700-3750:3800-3850/tcp \
-          -p 3800-3850:3800-3850/tcp \
+          -p 3600-3900:3600-3900/tcp \
           elijahru/build-farm:debian-buster-slim
 
         dump_logs () {
@@ -963,13 +1118,29 @@ jobs:
 
         mkdir -p nimcache
 
+        cd build
+        nim="nim-1.4.2"
+        wget "https://nim-lang.org/download/${nim}.tar.xz"
+        pixz -d "${nim}.tar.xz" "${nim}.tar"
+        tar xf "${nim}.tar"
+        rm "${nim}.tar.xz" "${nim}.tar"
+
         # Build in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD},dst=/code" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /code/build.sh 1.4.2 || (status=$?; dump_logs; exit $status)
+          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        nim="nim-1.4.2"
+        tarball="${nim}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim"
+        echo "::set-output name=asset_path::${PWD}/build/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -979,7 +1150,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.build-nim.outputs.asset_path }}
+        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
