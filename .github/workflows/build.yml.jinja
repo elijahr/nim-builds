@@ -142,7 +142,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           {{ distro.build_farm_client_image }} \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball

@@ -148,7 +148,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball
@@ -274,7 +274,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           elijahru/build-farm-client:archlinux \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball
@@ -402,7 +402,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball
@@ -589,7 +589,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball
@@ -715,7 +715,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           elijahru/build-farm-client:archlinux \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball
@@ -843,7 +843,7 @@ jobs:
           --mount "type=bind,src=${PWD}/,dst=/build" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh test-nim.sh ${nim}
+          sh test-nim.sh
 
     - name: Create tarball
       id: create-tarball
