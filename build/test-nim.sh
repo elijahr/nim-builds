@@ -8,16 +8,12 @@ SRC_DIR=${1:-"${SCRIPT_DIR}/src"}
 
 cd "$SRC_DIR"
 
-targets=("c" "c++" "js")
-
 major=$(bin/nim -v | head -n1 | sed 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\1/')
 minor=$(bin/nim -v | head -n1 | sed 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\2/')
 patch=$(bin/nim -v | head -n1 | sed 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\3/')
 
-bin/nim cc --opt:speed testament/testament
-
-for target in ${targets[@]}
-do
+test () {
+  target=$1
   extra_args=""
   skip_file="../nim-${major}.${minor}.${patch}-${target}-skip-tests.txt"
   if [ -f "$skip_file" ]
@@ -31,4 +27,10 @@ do
     fi
   fi
   testament/testament --nim:bin/nim --targets:$target $extra_args all
-done
+}
+
+bin/nim cc --opt:speed testament/testament
+
+test c
+test c++
+test js
