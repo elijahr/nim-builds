@@ -74,7 +74,6 @@ distros = [
             "linux/arm/v7",
             "linux/arm64/v8",
             "linux/ppc64le",
-            "linux/mips64le",
         ],
     },
 ]
