@@ -1,20 +1,22 @@
-#!/bin/bash
+#!/bin/sh
 
-set -uexo pipefail
+set -uex
 
 SCRIPT_DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-cd "${SCRIPT_DIR}/src"
 
-targets=("C" "C++" "JS")
+SRC_DIR=${1:-"${SCRIPT_DIR}/src"}
 
-major=$(bin/nim -v | head -n1 | 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\1/')
-minor=$(bin/nim -v | head -n1 | 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\2/')
-patch=$(bin/nim -v | head -n1 | 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\3/')
+cd "$SRC_DIR"
 
+targets=("c" "c++" "js")
+
+major=$(bin/nim -v | head -n1 | sed 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\1/')
+minor=$(bin/nim -v | head -n1 | sed 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\2/')
+patch=$(bin/nim -v | head -n1 | sed 's/.* Version \([0-9]\{1,\}\)\.\([0-9]\{1,\}\)\.\([0-9]\{1,\}\) .*/\3/')
 
 bin/nim cc --opt:speed testament/testament
 
-for in ${targets[@]}
+for target in ${targets[@]}
 do
   extra_args=""
   skip_file="../nim-${major}.${minor}.${patch}-${target}-skip-tests.txt"
@@ -28,5 +30,5 @@ do
       extra_args="--skipFrom:${skip_file}"
     fi
   fi
-  testament/testament --nim:bin/nim --targets:$target $extra_args
+  testament/testament --nim:bin/nim --targets:$target $extra_args all
 done
