@@ -15,18 +15,17 @@ fi
 if [ "$(which apk)" != "" ]
 then
   apk add --update --no-cache wget xz $extra_packages
-  apk add --update --no-cache pixz --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
 elif [ "$(which apt)" != "" ]
 then
   apt-get update -q -y
-  apt-get -qq install -y wget xz-utils pixz $extra_packages
+  apt-get -qq install -y wget xz-utils $extra_packages
 elif [ "$(which pacman)" != "" ]
 then
-  pacman -Syu --noconfirm wget xz pixz $extra_packages
+  pacman -Syu --noconfirm wget xz $extra_packages
   pacman -Sc --noconfirm || true
 elif [ "$(which brew)" != "" ]
 then
-  brew install wget xz pixz $extra_packages
+  brew install wget xz $extra_packages
 fi
 
 cd /code
@@ -36,9 +35,8 @@ dir="nim-${NIM_VERSION}-$(gcc -dumpmachine)"
 if [ ! -d "$dir" ]
 then
   wget "https://nim-lang.org/download/nim-${NIM_VERSION}.tar.xz"
-  pixz -d "nim-${NIM_VERSION}.tar.xz" "nim-${NIM_VERSION}.tar"
-  tar xf "nim-${NIM_VERSION}.tar"
-  rm "nim-${NIM_VERSION}.tar" "nim-${NIM_VERSION}.tar.xz"
+  tar xJf "nim-${NIM_VERSION}.tar.xz"
+  rm "nim-${NIM_VERSION}.tar.xz"
   mv "nim-${NIM_VERSION}" "$dir"
 fi
 
@@ -58,7 +56,7 @@ fi
 cd -
 
 tarball="${dir}.tar.xz"
-tar -Ipixz -cf "$tarball" "$dir"
+tar -cJf "$tarball" "$dir"
 
 echo "::set-output name=asset_name::${tarball}"
 echo "::set-output name=asset_path::/code/${tarball}"
