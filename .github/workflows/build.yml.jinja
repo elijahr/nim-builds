@@ -152,18 +152,18 @@ jobs:
         asset_name: {{ '${{ steps.build-nim.outputs.asset_name }}' }}
         asset_content_type: application/x-xz
 
-    - name: Run tests
-      run: |
-        cd build
+    # - name: Run tests
+    #   run: |
+    #     cd build
 
-        # Test in emulated container
-        docker run \
-          --platform {% raw %}${{ matrix.platform }}{% endraw %} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          {{ distro.build_farm_client_image }} \
-          sh test-nim.sh
+    #     # Test in emulated container
+    #     docker run \
+    #       --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+    #       --mount "type=bind,src=${PWD}/,dst=/build" \
+    #       --workdir /build \
+    #       {{ distro.build_farm_client_image }} \
+    #       sh test-nim.sh
 
   {% endfor %}
 
