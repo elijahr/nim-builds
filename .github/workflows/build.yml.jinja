@@ -84,7 +84,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-{{ nim_version }}-{{ distro.name }}-{{ '${{ matrix.platform }}' }}-nimcache"
 
     - name: Install pixz
@@ -108,9 +108,9 @@ jobs:
           docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-{{ nim_version }}"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"

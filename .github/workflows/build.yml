@@ -92,7 +92,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.0.10-alpine-3-12-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -116,9 +116,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.0.10"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -199,7 +199,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.0.10-archlinux-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -223,9 +223,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.0.10"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -312,7 +312,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.0.10-debian-buster-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -336,9 +336,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.0.10"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -482,7 +482,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.2.8-alpine-3-12-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -506,9 +506,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -589,7 +589,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.2.8-archlinux-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -613,9 +613,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -702,7 +702,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.2.8-debian-buster-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -726,9 +726,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -872,7 +872,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.4.2-alpine-3-12-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -896,9 +896,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -979,7 +979,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.4.2-archlinux-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -1003,9 +1003,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
@@ -1092,7 +1092,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          nimcache
+          build/nimcache
         key: "nim-1.4.2-debian-buster-${{ matrix.platform }}-nimcache"
 
     - name: Install pixz
@@ -1116,9 +1116,9 @@ jobs:
           docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
         }
 
+        cd build
         mkdir -p nimcache
 
-        cd build
         nim="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim}.tar.xz"
         pixz -d "${nim}.tar.xz" "${nim}.tar"
