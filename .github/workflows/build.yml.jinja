@@ -85,7 +85,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: {% raw %}${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache{% endraw %}
+        key: "nim-{{ nim_version }}-{{ distro.name }}-{{ '${{ matrix.platform }}' }}-nimcache"
 
     - name: Build Nim
       id: build-nim

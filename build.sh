@@ -20,24 +20,27 @@ fi
 
 cd /code
 
-if [ ! -d "nim-${NIM_VERSION}" ]
+dir="nim-${NIM_VERSION}-$(gcc -dumpmachine)"
+tarball="${dir}.tar.xz"
+
+if [ ! -d "$dir" ]
 then
   if [ ! -f "nim-${NIM_VERSION}.tar.xz" ]
   then
     wget "https://nim-lang.org/download/nim-${NIM_VERSION}.tar.xz"
   fi
   tar -xJf "nim-${NIM_VERSION}.tar.xz"
+  mv "nim-${NIM_VERSION}" "$dir"
 fi
 
-cd "nim-${NIM_VERSION}"
-sh build.sh
+cd "$dir"
+sh build.sh --extraBuildArgs "-ggdb"
 bin/nim c koch
 ./koch boot -d:release
 ./koch tools
 cd -
 
-tarball="nim-${NIM_VERSION}-$(gcc -dumpmachine).tar.xz"
-tar -cJf "$tarball" "nim-${NIM_VERSION}"
+tar -cJf "$tarball" "$dir"
 
 echo "::set-output name=asset_name::${tarball}"
 echo "::set-output name=asset_path::${PWD}/${tarball}"

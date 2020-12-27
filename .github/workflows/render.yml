@@ -1,7 +1,7 @@
 name: Check for new versions of Nim
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '* */6 * * *'
 
 jobs:
   render:
@@ -21,9 +21,9 @@ jobs:
 
     - name: Check for new Nim versions
       run: |
-        pip install -r requirements.tx
+        pip install -r requirements.txt
         python3.9 render_build_yml.py
-        git add .
+        git add .github/workflows/build.yml || true
         if [ "$(git diff --name-only --cached | grep .github/workflows/build.yml)" != "" ]
         then
           git commit -m "Re-rendered build.yml"

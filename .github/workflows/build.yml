@@ -95,7 +95,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+        key: "nim-1.0.10-alpine-3-12-${{ matrix.platform }}-nimcache"
 
     - name: Build Nim
       id: build-nim
@@ -242,7 +242,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+        key: "nim-1.2.8-alpine-3-12-${{ matrix.platform }}-nimcache"
 
     - name: Build Nim
       id: build-nim
@@ -389,7 +389,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: ${{ matrix.platform }}-${{ matrix.nim-version }}-nimcache
+        key: "nim-1.4.2-alpine-3-12-${{ matrix.platform }}-nimcache"
 
     - name: Build Nim
       id: build-nim
