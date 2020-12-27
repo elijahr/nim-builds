@@ -45,7 +45,6 @@ distros = [
         "build_farm_client_image": "elijahru/build-farm-client:alpine-3.12",
         "platforms": [
             "linux/amd64",
-            "linux/386",
             "linux/arm/v6",
             "linux/arm/v7",
             "linux/arm64/v8",
