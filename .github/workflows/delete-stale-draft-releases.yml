@@ -1,10 +1,7 @@
 name: Delete stale draft releases
 on:
-  push:
-    branches:
-      - '*'
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 1,13 * * *'
 
 jobs:
   render:
@@ -17,7 +14,7 @@ jobs:
       with:
         fetch-depth: 1
         submodules: recursive
-  
+
     - name: Delete stale draft releases
       shell: bash
       env:
