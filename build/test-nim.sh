@@ -20,7 +20,7 @@ main () {
   elif [ "$(which apt)" != "" ]
   then
     apt-get update -q -y
-    apt-get -qq install -y libcsfml-dev libpcre3 libgc-dev libgc1c2 sqlite3 libsqlite3 libsqlite3-dev
+    apt-get -qq install -y libcsfml-dev libpcre3 libgc-dev libgc1c2 sqlite3 libsqlite3-0 libsqlite3-dev
   elif [ "$(which pacman)" != "" ]
   then
     pacman -Syu --noconfirm sfml pcre gc sqlite
