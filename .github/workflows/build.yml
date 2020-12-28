@@ -10,7 +10,7 @@ on:
 jobs:
   
   nim-0-20-2-create-release:
-    name: Create release
+    name: Create release 0.20.2
 
     runs-on: ubuntu-latest
 
@@ -49,7 +49,7 @@ jobs:
 
   
   nim-0-20-2-alpine-3-12-build:
-    name: Build Nim 0.20.2 alpine-3-12
+    name: 0.20.2, alpine-3-12, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-0-20-2-create-release"
@@ -162,7 +162,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -185,9 +185,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-0-20-2-archlinux-build:
-    name: Build Nim 0.20.2 archlinux
+    name: 0.20.2, archlinux, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-0-20-2-create-release"
@@ -302,7 +310,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -325,9 +333,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-0-20-2-debian-buster-build:
-    name: Build Nim 0.20.2 debian-buster
+    name: 0.20.2, debian-buster, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-0-20-2-create-release"
@@ -444,7 +460,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -466,6 +482,14 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
+
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
 
   
 
@@ -493,7 +517,7 @@ jobs:
 
   
   nim-1-0-10-create-release:
-    name: Create release
+    name: Create release 1.0.10
 
     runs-on: ubuntu-latest
 
@@ -532,7 +556,7 @@ jobs:
 
   
   nim-1-0-10-alpine-3-12-build:
-    name: Build Nim 1.0.10 alpine-3-12
+    name: 1.0.10, alpine-3-12, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-0-10-create-release"
@@ -645,7 +669,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -668,9 +692,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-1-0-10-archlinux-build:
-    name: Build Nim 1.0.10 archlinux
+    name: 1.0.10, archlinux, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-0-10-create-release"
@@ -785,7 +817,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -808,9 +840,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-1-0-10-debian-buster-build:
-    name: Build Nim 1.0.10 debian-buster
+    name: 1.0.10, debian-buster, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-0-10-create-release"
@@ -927,7 +967,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -949,6 +989,14 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
+
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
 
   
 
@@ -976,7 +1024,7 @@ jobs:
 
   
   nim-1-2-8-create-release:
-    name: Create release
+    name: Create release 1.2.8
 
     runs-on: ubuntu-latest
 
@@ -1015,7 +1063,7 @@ jobs:
 
   
   nim-1-2-8-alpine-3-12-build:
-    name: Build Nim 1.2.8 alpine-3-12
+    name: 1.2.8, alpine-3-12, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-2-8-create-release"
@@ -1128,7 +1176,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -1151,9 +1199,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-1-2-8-archlinux-build:
-    name: Build Nim 1.2.8 archlinux
+    name: 1.2.8, archlinux, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-2-8-create-release"
@@ -1268,7 +1324,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -1291,9 +1347,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-1-2-8-debian-buster-build:
-    name: Build Nim 1.2.8 debian-buster
+    name: 1.2.8, debian-buster, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-2-8-create-release"
@@ -1410,7 +1474,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -1432,6 +1496,14 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
+
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
 
   
 
@@ -1459,7 +1531,7 @@ jobs:
 
   
   nim-1-4-2-create-release:
-    name: Create release
+    name: Create release 1.4.2
 
     runs-on: ubuntu-latest
 
@@ -1498,7 +1570,7 @@ jobs:
 
   
   nim-1-4-2-alpine-3-12-build:
-    name: Build Nim 1.4.2 alpine-3-12
+    name: 1.4.2, alpine-3-12, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-4-2-create-release"
@@ -1611,7 +1683,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -1634,9 +1706,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-1-4-2-archlinux-build:
-    name: Build Nim 1.4.2 archlinux
+    name: 1.4.2, archlinux, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-4-2-create-release"
@@ -1751,7 +1831,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -1774,9 +1854,17 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
   
   nim-1-4-2-debian-buster-build:
-    name: Build Nim 1.4.2 debian-buster
+    name: 1.4.2, debian-buster, ${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-1-4-2-create-release"
@@ -1893,7 +1981,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform ${{ matrix.platform }} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -1915,6 +2003,14 @@ jobs:
         asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
+
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
 
   
 

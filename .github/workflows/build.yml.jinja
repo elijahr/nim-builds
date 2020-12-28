@@ -10,7 +10,7 @@ on:
 jobs:
   {% for nim_version in nim_versions %}
   nim-{{ nim_version|slugify }}-create-release:
-    name: Create release
+    name: Create release {{ nim_version }}
 
     runs-on: ubuntu-latest
 
@@ -49,7 +49,7 @@ jobs:
 
   {% for distro in distros %}
   nim-{{ nim_version|slugify }}-{{ distro.name }}-build:
-    name: Build Nim {{ nim_version }} {{ distro.name }}
+    name: {{ nim_version }}, {{ distro.name }}, {{ '${{ matrix.platform }}' }}
     runs-on: ubuntu-latest
     needs:
       - "nim-{{ nim_version|slugify }}-create-release"
@@ -156,7 +156,7 @@ jobs:
       run: |
         cd build
 
-        Test in emulated container
+        # Test in emulated container
         docker run \
           --platform {% raw %}${{ matrix.platform }}{% endraw %} \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
@@ -178,6 +178,14 @@ jobs:
         asset_path: {{ '${{ steps.create-tarball.outputs.test_log_path }}' }}
         asset_name: {{ '${{ steps.build-nim.outputs.test_log_name }}' }}
         asset_content_type: text/plain
+
+    - name: Stop build host
+      run: |
+        id=$(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
 
   {% endfor %}
 
