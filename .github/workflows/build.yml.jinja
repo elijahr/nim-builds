@@ -153,6 +153,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -175,7 +176,7 @@ jobs:
         {% endraw %}
       with:
         upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
-        asset_path: {{ '${{ steps.create-tarball.outputs.test_log_path }}' }}
+        asset_path: {{ '${{ steps.run-tests.outputs.test_log_path }}' }}
         asset_name: {{ '${{ steps.build-nim.outputs.test_log_name }}' }}
         asset_content_type: text/plain
 

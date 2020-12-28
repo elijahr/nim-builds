@@ -159,6 +159,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -181,7 +182,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -307,6 +308,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -329,7 +331,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -457,6 +459,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -479,7 +482,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -666,6 +669,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -688,7 +692,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -814,6 +818,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -836,7 +841,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -964,6 +969,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -986,7 +992,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -1173,6 +1179,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -1195,7 +1202,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -1321,6 +1328,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -1343,7 +1351,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -1471,6 +1479,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -1493,7 +1502,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -1680,6 +1689,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -1702,7 +1712,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -1828,6 +1838,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -1850,7 +1861,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
@@ -1978,6 +1989,7 @@ jobs:
         asset_content_type: application/x-xz
 
     - name: Run tests
+      id: run-tests
       run: |
         cd build
 
@@ -2000,7 +2012,7 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
         asset_name: ${{ steps.build-nim.outputs.test_log_name }}
         asset_content_type: text/plain
 
