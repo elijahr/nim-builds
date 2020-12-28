@@ -10,8 +10,9 @@ from semver import VersionInfo
 
 
 project_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-min_version = VersionInfo.parse("1.2.8")
+min_version = VersionInfo.parse("0.20.2")
 # min_version = VersionInfo.parse("1.0.10")
+# min_version = VersionInfo.parse("1.2.8")
 
 
 def slugify(string, delim="-", allowed_chars=""):
