@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+  
     - name: Delete stale draft releases
       shell: bash
       env:
