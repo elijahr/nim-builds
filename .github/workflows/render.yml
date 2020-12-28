@@ -1,7 +1,7 @@
 name: Check for new versions of Nim
 on:
   schedule:
-    - cron: '* */6 * * *'
+    - cron: '* */2 * * *'
 
 jobs:
   render:

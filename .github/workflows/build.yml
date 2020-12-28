@@ -158,18 +158,32 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform ${{ matrix.platform }} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       elijahru/build-farm-client:alpine-3.12 \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_content_type: text/plain
 
   
   nim-1-2-8-archlinux-build:
@@ -284,18 +298,32 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform ${{ matrix.platform }} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       elijahru/build-farm-client:archlinux \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:archlinux \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_content_type: text/plain
 
   
   nim-1-2-8-debian-buster-build:
@@ -412,18 +440,32 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform ${{ matrix.platform }} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       elijahru/build-farm-client:debian-buster-slim \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_content_type: text/plain
 
   
 
@@ -599,18 +641,32 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform ${{ matrix.platform }} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       elijahru/build-farm-client:alpine-3.12 \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_content_type: text/plain
 
   
   nim-1-4-2-archlinux-build:
@@ -725,18 +781,32 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform ${{ matrix.platform }} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       elijahru/build-farm-client:archlinux \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:archlinux \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_content_type: text/plain
 
   
   nim-1-4-2-debian-buster-build:
@@ -853,18 +923,32 @@ jobs:
         asset_name: ${{ steps.build-nim.outputs.asset_name }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform ${{ matrix.platform }} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       elijahru/build-farm-client:debian-buster-slim \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform ${{ matrix.platform }} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      with:
+        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.test_log_path }}
+        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_content_type: text/plain
 
   
 

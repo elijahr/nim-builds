@@ -152,18 +152,32 @@ jobs:
         asset_name: {{ '${{ steps.build-nim.outputs.asset_name }}' }}
         asset_content_type: application/x-xz
 
-    # - name: Run tests
-    #   run: |
-    #     cd build
+    - name: Run tests
+      run: |
+        cd build
 
-    #     # Test in emulated container
-    #     docker run \
-    #       --platform {% raw %}${{ matrix.platform }}{% endraw %} \
-    #       --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-    #       --mount "type=bind,src=${PWD}/,dst=/build" \
-    #       --workdir /build \
-    #       {{ distro.build_farm_client_image }} \
-    #       sh test-nim.sh
+        Test in emulated container
+        docker run \
+          --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/,dst=/build" \
+          --workdir /build \
+          {{ distro.build_farm_client_image }} \
+          sh test-nim.sh > test-log.txt 2>&1 || true
+
+        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+
+    - name: Add test log to release
+      uses: actions/upload-release-asset@v1
+      env:
+        {% raw %}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        {% endraw %}
+      with:
+        upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
+        asset_path: {{ '${{ steps.create-tarball.outputs.test_log_path }}' }}
+        asset_name: {{ '${{ steps.build-nim.outputs.test_log_name }}' }}
+        asset_content_type: text/plain
 
   {% endfor %}
 

@@ -1,8 +1,0 @@
-#tests/closure/tboehmdeepcopy.nim
-tests/stdlib/tgetaddrinfo.nim
-tests/stdlib/tnetdial.nim
-tests/generics/tparser_generator.nim
-tests/coroutines/twait.nim
-tests/coroutines/tgc.nim
-tests/stdlib/ttimes.nim
-tests/dll/nimhcr_integration.nim
