@@ -1,5 +1,8 @@
 name: Delete stale draft releases
 on:
+  push:
+    branches:
+      - '*'
   schedule:
     - cron: '0 */2 * * *'
 
@@ -9,13 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: geertvdc/setup-hub@master
     - name: Delete stale draft releases
       shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -uexo pipefail
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y install hub
 
         delete_release () {
           echo "Deleting release: $1 ($2)"
