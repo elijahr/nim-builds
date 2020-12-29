@@ -196,7 +196,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -310,7 +310,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -424,7 +424,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -630,7 +630,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -744,7 +744,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -858,7 +858,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -972,7 +972,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -1172,7 +1172,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -1288,7 +1288,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -1404,7 +1404,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -1520,7 +1520,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -1636,7 +1636,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -1887,7 +1887,7 @@ jobs:
 
   
   test-nim-1-0-10--alpine-3-12--amd64:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1918,7 +1918,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--alpine-3-12--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -1991,7 +1991,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -2055,7 +2055,7 @@ jobs:
 
   
   test-nim-1-0-10--alpine-3-12--arm32v6:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--alpine-3-12--arm32v6.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2087,7 +2087,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2099,7 +2099,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--alpine-3-12--arm32v6.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -2180,7 +2180,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -2244,7 +2244,7 @@ jobs:
 
   
   test-nim-1-0-10--alpine-3-12--arm32v7:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--alpine-3-12--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2276,7 +2276,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2288,7 +2288,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--alpine-3-12--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -2369,7 +2369,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -2433,7 +2433,7 @@ jobs:
 
   
   test-nim-1-0-10--alpine-3-12--arm64v8:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--alpine-3-12--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2465,7 +2465,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2477,7 +2477,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--alpine-3-12--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -2600,7 +2600,7 @@ jobs:
 
   
   test-nim-1-0-10--archlinux--amd64:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--archlinux--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2631,7 +2631,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--archlinux--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -2704,7 +2704,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -2768,7 +2768,7 @@ jobs:
 
   
   test-nim-1-0-10--archlinux--arm32v5:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--archlinux--arm32v5.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2800,7 +2800,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2812,7 +2812,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--archlinux--arm32v5.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -2893,7 +2893,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -2957,7 +2957,7 @@ jobs:
 
   
   test-nim-1-0-10--archlinux--arm32v6:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--archlinux--arm32v6.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2989,7 +2989,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3001,7 +3001,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--archlinux--arm32v6.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -3082,7 +3082,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -3146,7 +3146,7 @@ jobs:
 
   
   test-nim-1-0-10--archlinux--arm32v7:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--archlinux--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3178,7 +3178,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3190,7 +3190,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--archlinux--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -3271,7 +3271,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -3335,7 +3335,7 @@ jobs:
 
   
   test-nim-1-0-10--archlinux--arm64v8:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--archlinux--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3367,7 +3367,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3379,7 +3379,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--archlinux--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -3502,7 +3502,7 @@ jobs:
 
   
   test-nim-1-0-10--debian-buster--amd64:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--debian-buster--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3533,7 +3533,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--debian-buster--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -3600,7 +3600,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -3666,7 +3666,7 @@ jobs:
 
   
   test-nim-1-0-10--debian-buster--386:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--debian-buster--386.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3692,7 +3692,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3704,7 +3704,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--debian-buster--386.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -3787,7 +3787,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -3853,7 +3853,7 @@ jobs:
 
   
   test-nim-1-0-10--debian-buster--arm32v5:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--debian-buster--arm32v5.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3885,7 +3885,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3897,7 +3897,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--debian-buster--arm32v5.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -3980,7 +3980,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -4046,7 +4046,7 @@ jobs:
 
   
   test-nim-1-0-10--debian-buster--arm32v7:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--debian-buster--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -4078,7 +4078,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4090,7 +4090,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--debian-buster--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -4173,7 +4173,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -4239,7 +4239,7 @@ jobs:
 
   
   test-nim-1-0-10--debian-buster--arm64v8:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--debian-buster--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -4271,7 +4271,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4283,7 +4283,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--debian-buster--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -4366,7 +4366,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -4432,7 +4432,7 @@ jobs:
 
   
   test-nim-1-0-10--debian-buster--ppc64le:
-    name: Test 1.0.10
+    name: Test nim-1.0.10--debian-buster--ppc64le.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -4464,7 +4464,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4476,7 +4476,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--debian-buster--ppc64le.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.0.10.tar"
@@ -4694,7 +4694,7 @@ jobs:
 
   
   test-nim-1-2-8--alpine-3-12--amd64:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4725,7 +4725,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--alpine-3-12--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -4798,7 +4798,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -4862,7 +4862,7 @@ jobs:
 
   
   test-nim-1-2-8--alpine-3-12--arm32v6:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--alpine-3-12--arm32v6.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4894,7 +4894,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4906,7 +4906,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--alpine-3-12--arm32v6.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -4987,7 +4987,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -5051,7 +5051,7 @@ jobs:
 
   
   test-nim-1-2-8--alpine-3-12--arm32v7:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--alpine-3-12--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5083,7 +5083,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5095,7 +5095,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--alpine-3-12--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -5176,7 +5176,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -5240,7 +5240,7 @@ jobs:
 
   
   test-nim-1-2-8--alpine-3-12--arm64v8:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--alpine-3-12--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5272,7 +5272,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5284,7 +5284,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--alpine-3-12--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -5407,7 +5407,7 @@ jobs:
 
   
   test-nim-1-2-8--archlinux--amd64:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--archlinux--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5438,7 +5438,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--archlinux--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -5511,7 +5511,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -5575,7 +5575,7 @@ jobs:
 
   
   test-nim-1-2-8--archlinux--arm32v5:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--archlinux--arm32v5.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5607,7 +5607,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5619,7 +5619,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--archlinux--arm32v5.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -5700,7 +5700,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -5764,7 +5764,7 @@ jobs:
 
   
   test-nim-1-2-8--archlinux--arm32v6:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--archlinux--arm32v6.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5796,7 +5796,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5808,7 +5808,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--archlinux--arm32v6.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -5889,7 +5889,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -5953,7 +5953,7 @@ jobs:
 
   
   test-nim-1-2-8--archlinux--arm32v7:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--archlinux--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5985,7 +5985,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5997,7 +5997,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--archlinux--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -6078,7 +6078,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -6142,7 +6142,7 @@ jobs:
 
   
   test-nim-1-2-8--archlinux--arm64v8:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--archlinux--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6174,7 +6174,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6186,7 +6186,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--archlinux--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -6309,7 +6309,7 @@ jobs:
 
   
   test-nim-1-2-8--debian-buster--amd64:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--debian-buster--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6340,7 +6340,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--debian-buster--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -6407,7 +6407,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -6473,7 +6473,7 @@ jobs:
 
   
   test-nim-1-2-8--debian-buster--386:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--debian-buster--386.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6499,7 +6499,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6511,7 +6511,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--debian-buster--386.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -6594,7 +6594,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -6660,7 +6660,7 @@ jobs:
 
   
   test-nim-1-2-8--debian-buster--arm32v5:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--debian-buster--arm32v5.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6692,7 +6692,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6704,7 +6704,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--debian-buster--arm32v5.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -6787,7 +6787,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -6853,7 +6853,7 @@ jobs:
 
   
   test-nim-1-2-8--debian-buster--arm32v7:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--debian-buster--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6885,7 +6885,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6897,7 +6897,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--debian-buster--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -6980,7 +6980,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -7046,7 +7046,7 @@ jobs:
 
   
   test-nim-1-2-8--debian-buster--arm64v8:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--debian-buster--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -7078,7 +7078,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7090,7 +7090,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--debian-buster--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -7173,7 +7173,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -7239,7 +7239,7 @@ jobs:
 
   
   test-nim-1-2-8--debian-buster--ppc64le:
-    name: Test 1.2.8
+    name: Test nim-1.2.8--debian-buster--ppc64le.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -7271,7 +7271,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7283,7 +7283,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--debian-buster--ppc64le.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.2.8.tar"
@@ -7501,7 +7501,7 @@ jobs:
 
   
   test-nim-1-4-2--alpine-3-12--amd64:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7532,7 +7532,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--alpine-3-12--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -7605,7 +7605,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -7669,7 +7669,7 @@ jobs:
 
   
   test-nim-1-4-2--alpine-3-12--arm32v6:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--alpine-3-12--arm32v6.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7701,7 +7701,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7713,7 +7713,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--alpine-3-12--arm32v6.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -7794,7 +7794,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -7858,7 +7858,7 @@ jobs:
 
   
   test-nim-1-4-2--alpine-3-12--arm32v7:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--alpine-3-12--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7890,7 +7890,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7902,7 +7902,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--alpine-3-12--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -7983,7 +7983,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Download Nim source
       run: |
@@ -8047,7 +8047,7 @@ jobs:
 
   
   test-nim-1-4-2--alpine-3-12--arm64v8:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--alpine-3-12--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8079,7 +8079,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12}
+          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8091,7 +8091,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--alpine-3-12--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -8214,7 +8214,7 @@ jobs:
 
   
   test-nim-1-4-2--archlinux--amd64:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--archlinux--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8245,7 +8245,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--archlinux--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -8318,7 +8318,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -8382,7 +8382,7 @@ jobs:
 
   
   test-nim-1-4-2--archlinux--arm32v5:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--archlinux--arm32v5.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8414,7 +8414,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8426,7 +8426,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--archlinux--arm32v5.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -8507,7 +8507,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -8571,7 +8571,7 @@ jobs:
 
   
   test-nim-1-4-2--archlinux--arm32v6:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--archlinux--arm32v6.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8603,7 +8603,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8615,7 +8615,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--archlinux--arm32v6.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -8696,7 +8696,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -8760,7 +8760,7 @@ jobs:
 
   
   test-nim-1-4-2--archlinux--arm32v7:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--archlinux--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8792,7 +8792,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8804,7 +8804,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--archlinux--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -8885,7 +8885,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Download Nim source
       run: |
@@ -8949,7 +8949,7 @@ jobs:
 
   
   test-nim-1-4-2--archlinux--arm64v8:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--archlinux--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8981,7 +8981,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux}
+          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8993,7 +8993,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--archlinux--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -9116,7 +9116,7 @@ jobs:
 
   
   test-nim-1-4-2--debian-buster--amd64:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--debian-buster--amd64.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9147,7 +9147,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--debian-buster--amd64.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -9214,7 +9214,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -9280,7 +9280,7 @@ jobs:
 
   
   test-nim-1-4-2--debian-buster--386:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--debian-buster--386.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9306,7 +9306,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9318,7 +9318,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--debian-buster--386.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -9401,7 +9401,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -9467,7 +9467,7 @@ jobs:
 
   
   test-nim-1-4-2--debian-buster--arm32v5:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--debian-buster--arm32v5.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9499,7 +9499,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9511,7 +9511,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--debian-buster--arm32v5.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -9594,7 +9594,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -9660,7 +9660,7 @@ jobs:
 
   
   test-nim-1-4-2--debian-buster--arm32v7:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--debian-buster--arm32v7.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9692,7 +9692,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9704,7 +9704,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--debian-buster--arm32v7.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -9787,7 +9787,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -9853,7 +9853,7 @@ jobs:
 
   
   test-nim-1-4-2--debian-buster--arm64v8:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--debian-buster--arm64v8.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9885,7 +9885,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9897,7 +9897,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--debian-buster--arm64v8.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"
@@ -9980,7 +9980,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Download Nim source
       run: |
@@ -10046,7 +10046,7 @@ jobs:
 
   
   test-nim-1-4-2--debian-buster--ppc64le:
-    name: Test 1.4.2
+    name: Test nim-1.4.2--debian-buster--ppc64le.tar.xz
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -10078,7 +10078,7 @@ jobs:
         docker run -d \
           --platform linux/amd64 \
           -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim}
+          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -10090,7 +10090,7 @@ jobs:
     - name: Download released tarball
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--debian-buster--ppc64le.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "tarball" "nim-1.4.2.tar"

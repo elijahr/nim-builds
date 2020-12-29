@@ -47,7 +47,7 @@ _anchors:
       docker run -d \
         --platform linux/amd64 \
         -p 3600-3900:3600-3900/tcp \
-        {{ distro.build_farm_host_image }}}
+        {{ distro.build_farm_host_image }}
 
   stop_distcc_host_{{ distro.name|slugify }}: &stop_distcc_host_{{ distro.name|slugify }}
     name: Stop distcc host
@@ -163,7 +163,7 @@ _anchors:
     name: Download released tarball
     run: |
       cd build
-      tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name' }}
+      tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
       tarball=nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
       hub release download "$tag" -i "$tarball"
       pixz -d "tarball" "nim-{{ nim_version }}.tar"
@@ -255,7 +255,7 @@ jobs:
 
   {% if nim_version[0] > "0" %}
   test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}:
-    name: Test {{ nim_version }}
+    name: Test nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}
