@@ -1948,21 +1948,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--alpine-3-12--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2086,21 +2072,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--alpine-3-12--arm32v6.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2232,21 +2204,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--alpine-3-12--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2378,21 +2336,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--alpine-3-12--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2510,21 +2454,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--archlinux--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2648,21 +2578,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--archlinux--arm32v5.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2794,21 +2710,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--archlinux--arm32v6.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -2940,21 +2842,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--archlinux--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3086,21 +2974,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--archlinux--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3218,21 +3092,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--debian-buster--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3350,21 +3210,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--debian-buster--386.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3496,21 +3342,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--debian-buster--arm32v5.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3642,21 +3474,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--debian-buster--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3788,21 +3606,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--debian-buster--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -3934,21 +3738,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.0.10--debian-buster--ppc64le.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -4159,21 +3949,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--alpine-3-12--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -4297,21 +4073,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--alpine-3-12--arm32v6.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -4443,21 +4205,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--alpine-3-12--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -4589,21 +4337,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--alpine-3-12--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -4721,21 +4455,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--archlinux--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -4859,21 +4579,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--archlinux--arm32v5.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5005,21 +4711,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--archlinux--arm32v6.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5151,21 +4843,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--archlinux--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5297,21 +4975,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--archlinux--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5429,21 +5093,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--debian-buster--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5561,21 +5211,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--debian-buster--386.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5707,21 +5343,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--debian-buster--arm32v5.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5853,21 +5475,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--debian-buster--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -5999,21 +5607,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--debian-buster--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -6145,21 +5739,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.2.8--debian-buster--ppc64le.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -6370,21 +5950,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--alpine-3-12--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -6508,21 +6074,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--alpine-3-12--arm32v6.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -6654,21 +6206,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--alpine-3-12--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -6800,21 +6338,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--alpine-3-12--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -6932,21 +6456,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--archlinux--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7070,21 +6580,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--archlinux--arm32v5.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7216,21 +6712,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--archlinux--arm32v6.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7362,21 +6844,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--archlinux--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7508,21 +6976,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--archlinux--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7640,21 +7094,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--debian-buster--amd64.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7772,21 +7212,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--debian-buster--386.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -7918,21 +7344,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--debian-buster--arm32v5.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -8064,21 +7476,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--debian-buster--arm32v7.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -8210,21 +7608,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--debian-buster--arm64v8.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
@@ -8356,21 +7740,7 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh > test-log.txt 2>&1 || true
-
-          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
-
-      - name: Add test log to release
-        uses: actions/upload-release-asset@v1
-        env:
-          
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-        with:
-          upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-          asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
-          asset_name: nim-1.4.2--debian-buster--ppc64le.test-log.txt
-          asset_content_type: text/plain
+            sh test-nim.sh || true
       
 
       
