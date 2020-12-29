@@ -1379,7 +1379,7 @@ jobs:
   
   
   test-nim-1-0-10--x86_64-linux-musl--on-alpine-3-12:
-    name: Test nim-1.0.10--x86_64-linux-musl.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1438,7 +1438,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-musl--on-alpine-3-11:
-    name: Test nim-1.0.10--x86_64-linux-musl.tar.xz on alpine:3.11
+    name: Test on alpine:3.11
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1497,7 +1497,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-musl--on-alpine-3-10:
-    name: Test nim-1.0.10--x86_64-linux-musl.tar.xz on alpine:3.10
+    name: Test on alpine:3.10
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1556,7 +1556,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-musl--on-alpine-3-9:
-    name: Test nim-1.0.10--x86_64-linux-musl.tar.xz on alpine:3.9
+    name: Test on alpine:3.9
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1615,7 +1615,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-musl--on-alpine-3-8:
-    name: Test nim-1.0.10--x86_64-linux-musl.tar.xz on alpine:3.8
+    name: Test on alpine:3.8
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1791,7 +1791,7 @@ jobs:
   
   
   test-nim-1-0-10--armv6-linux-musleabihf--on-alpine-3-12:
-    name: Test nim-1.0.10--armv6-linux-musleabihf.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1981,7 +1981,7 @@ jobs:
   
   
   test-nim-1-0-10--armv7-linux-musleabihf--on-alpine-3-12:
-    name: Test nim-1.0.10--armv7-linux-musleabihf.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2171,7 +2171,7 @@ jobs:
   
   
   test-nim-1-0-10--aarch64-linux-musl--on-alpine-3-12:
-    name: Test nim-1.0.10--aarch64-linux-musl.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2339,7 +2339,7 @@ jobs:
   
   
   test-nim-1-0-10--x86_64-linux-gnu--on-debian-buster:
-    name: Test nim-1.0.10--x86_64-linux-gnu.tar.xz on debian:buster
+    name: Test on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2398,7 +2398,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-gnu--on-archlinux:
-    name: Test nim-1.0.10--x86_64-linux-gnu.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2459,7 +2459,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-gnu--on-jonathonf-manjaro:
-    name: Test nim-1.0.10--x86_64-linux-gnu.tar.xz on jonathonf/manjaro
+    name: Test on jonathonf/manjaro
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2518,7 +2518,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-gnu--on-ubuntu-bionic:
-    name: Test nim-1.0.10--x86_64-linux-gnu.tar.xz on ubuntu:bionic
+    name: Test on ubuntu:bionic
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2577,7 +2577,7 @@ jobs:
 
 
   test-nim-1-0-10--x86_64-linux-gnu--on-ubuntu-focal:
-    name: Test nim-1.0.10--x86_64-linux-gnu.tar.xz on ubuntu:focal
+    name: Test on ubuntu:focal
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2881,7 +2881,7 @@ jobs:
   
   
   test-nim-1-0-10--armv5-linux-gnueabi--on-archlinux:
-    name: Test nim-1.0.10--armv5-linux-gnueabi.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3077,7 +3077,7 @@ jobs:
   
   
   test-nim-1-0-10--armv7-linux-gnueabihf--on-archlinux:
-    name: Test nim-1.0.10--armv7-linux-gnueabihf.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3273,7 +3273,7 @@ jobs:
   
   
   test-nim-1-0-10--aarch64-linux-gnu--on-archlinux:
-    name: Test nim-1.0.10--aarch64-linux-gnu.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3340,7 +3340,7 @@ jobs:
 
 
   test-nim-1-0-10--aarch64-linux-gnu--on-abyo-manjaro_aarch64:
-    name: Test nim-1.0.10--aarch64-linux-gnu.tar.xz on abyo/manjaro_aarch64
+    name: Test on abyo/manjaro_aarch64
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3905,7 +3905,7 @@ jobs:
   
   
   test-nim-1-2-8--x86_64-linux-musl--on-alpine-3-12:
-    name: Test nim-1.2.8--x86_64-linux-musl.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -3964,7 +3964,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-musl--on-alpine-3-11:
-    name: Test nim-1.2.8--x86_64-linux-musl.tar.xz on alpine:3.11
+    name: Test on alpine:3.11
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4023,7 +4023,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-musl--on-alpine-3-10:
-    name: Test nim-1.2.8--x86_64-linux-musl.tar.xz on alpine:3.10
+    name: Test on alpine:3.10
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4082,7 +4082,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-musl--on-alpine-3-9:
-    name: Test nim-1.2.8--x86_64-linux-musl.tar.xz on alpine:3.9
+    name: Test on alpine:3.9
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4141,7 +4141,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-musl--on-alpine-3-8:
-    name: Test nim-1.2.8--x86_64-linux-musl.tar.xz on alpine:3.8
+    name: Test on alpine:3.8
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4317,7 +4317,7 @@ jobs:
   
   
   test-nim-1-2-8--armv6-linux-musleabihf--on-alpine-3-12:
-    name: Test nim-1.2.8--armv6-linux-musleabihf.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4507,7 +4507,7 @@ jobs:
   
   
   test-nim-1-2-8--armv7-linux-musleabihf--on-alpine-3-12:
-    name: Test nim-1.2.8--armv7-linux-musleabihf.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4697,7 +4697,7 @@ jobs:
   
   
   test-nim-1-2-8--aarch64-linux-musl--on-alpine-3-12:
-    name: Test nim-1.2.8--aarch64-linux-musl.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4865,7 +4865,7 @@ jobs:
   
   
   test-nim-1-2-8--x86_64-linux-gnu--on-debian-buster:
-    name: Test nim-1.2.8--x86_64-linux-gnu.tar.xz on debian:buster
+    name: Test on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4924,7 +4924,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-gnu--on-archlinux:
-    name: Test nim-1.2.8--x86_64-linux-gnu.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4985,7 +4985,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-gnu--on-jonathonf-manjaro:
-    name: Test nim-1.2.8--x86_64-linux-gnu.tar.xz on jonathonf/manjaro
+    name: Test on jonathonf/manjaro
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5044,7 +5044,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-gnu--on-ubuntu-bionic:
-    name: Test nim-1.2.8--x86_64-linux-gnu.tar.xz on ubuntu:bionic
+    name: Test on ubuntu:bionic
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5103,7 +5103,7 @@ jobs:
 
 
   test-nim-1-2-8--x86_64-linux-gnu--on-ubuntu-focal:
-    name: Test nim-1.2.8--x86_64-linux-gnu.tar.xz on ubuntu:focal
+    name: Test on ubuntu:focal
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5407,7 +5407,7 @@ jobs:
   
   
   test-nim-1-2-8--armv5-linux-gnueabi--on-archlinux:
-    name: Test nim-1.2.8--armv5-linux-gnueabi.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5603,7 +5603,7 @@ jobs:
   
   
   test-nim-1-2-8--armv7-linux-gnueabihf--on-archlinux:
-    name: Test nim-1.2.8--armv7-linux-gnueabihf.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5799,7 +5799,7 @@ jobs:
   
   
   test-nim-1-2-8--aarch64-linux-gnu--on-archlinux:
-    name: Test nim-1.2.8--aarch64-linux-gnu.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5866,7 +5866,7 @@ jobs:
 
 
   test-nim-1-2-8--aarch64-linux-gnu--on-abyo-manjaro_aarch64:
-    name: Test nim-1.2.8--aarch64-linux-gnu.tar.xz on abyo/manjaro_aarch64
+    name: Test on abyo/manjaro_aarch64
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6431,7 +6431,7 @@ jobs:
   
   
   test-nim-1-4-2--x86_64-linux-musl--on-alpine-3-12:
-    name: Test nim-1.4.2--x86_64-linux-musl.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -6490,7 +6490,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-musl--on-alpine-3-11:
-    name: Test nim-1.4.2--x86_64-linux-musl.tar.xz on alpine:3.11
+    name: Test on alpine:3.11
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -6549,7 +6549,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-musl--on-alpine-3-10:
-    name: Test nim-1.4.2--x86_64-linux-musl.tar.xz on alpine:3.10
+    name: Test on alpine:3.10
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -6608,7 +6608,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-musl--on-alpine-3-9:
-    name: Test nim-1.4.2--x86_64-linux-musl.tar.xz on alpine:3.9
+    name: Test on alpine:3.9
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -6667,7 +6667,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-musl--on-alpine-3-8:
-    name: Test nim-1.4.2--x86_64-linux-musl.tar.xz on alpine:3.8
+    name: Test on alpine:3.8
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -6843,7 +6843,7 @@ jobs:
   
   
   test-nim-1-4-2--armv6-linux-musleabihf--on-alpine-3-12:
-    name: Test nim-1.4.2--armv6-linux-musleabihf.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7033,7 +7033,7 @@ jobs:
   
   
   test-nim-1-4-2--armv7-linux-musleabihf--on-alpine-3-12:
-    name: Test nim-1.4.2--armv7-linux-musleabihf.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7223,7 +7223,7 @@ jobs:
   
   
   test-nim-1-4-2--aarch64-linux-musl--on-alpine-3-12:
-    name: Test nim-1.4.2--aarch64-linux-musl.tar.xz on alpine:3.12
+    name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7391,7 +7391,7 @@ jobs:
   
   
   test-nim-1-4-2--x86_64-linux-gnu--on-debian-buster:
-    name: Test nim-1.4.2--x86_64-linux-gnu.tar.xz on debian:buster
+    name: Test on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7450,7 +7450,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-gnu--on-archlinux:
-    name: Test nim-1.4.2--x86_64-linux-gnu.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7511,7 +7511,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-gnu--on-jonathonf-manjaro:
-    name: Test nim-1.4.2--x86_64-linux-gnu.tar.xz on jonathonf/manjaro
+    name: Test on jonathonf/manjaro
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7570,7 +7570,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-gnu--on-ubuntu-bionic:
-    name: Test nim-1.4.2--x86_64-linux-gnu.tar.xz on ubuntu:bionic
+    name: Test on ubuntu:bionic
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7629,7 +7629,7 @@ jobs:
 
 
   test-nim-1-4-2--x86_64-linux-gnu--on-ubuntu-focal:
-    name: Test nim-1.4.2--x86_64-linux-gnu.tar.xz on ubuntu:focal
+    name: Test on ubuntu:focal
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7933,7 +7933,7 @@ jobs:
   
   
   test-nim-1-4-2--armv5-linux-gnueabi--on-archlinux:
-    name: Test nim-1.4.2--armv5-linux-gnueabi.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8129,7 +8129,7 @@ jobs:
   
   
   test-nim-1-4-2--armv7-linux-gnueabihf--on-archlinux:
-    name: Test nim-1.4.2--armv7-linux-gnueabihf.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8325,7 +8325,7 @@ jobs:
   
   
   test-nim-1-4-2--aarch64-linux-gnu--on-archlinux:
-    name: Test nim-1.4.2--aarch64-linux-gnu.tar.xz on archlinux
+    name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8392,7 +8392,7 @@ jobs:
 
 
   test-nim-1-4-2--aarch64-linux-gnu--on-abyo-manjaro_aarch64:
-    name: Test nim-1.4.2--aarch64-linux-gnu.tar.xz on abyo/manjaro_aarch64
+    name: Test on abyo/manjaro_aarch64
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2

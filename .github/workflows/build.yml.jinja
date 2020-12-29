@@ -252,7 +252,7 @@ jobs:
   {% for image, platform_map in distro.test_targets.items() %}
   {% if platform in platform_map %}
   test-nim-{{ asset_id(nim_version, distro, platform) }}--on-{{ image|slugify }}:
-    name: Test nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz on {{ image }}
+    name: Test on {{ image }}
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}
