@@ -154,7 +154,7 @@ _anchors:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       {% endraw %}
     with:
-      upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
+      upload_url: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.upload_url }}' }}
       asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
       asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}.tar.xz
       asset_content_type: application/x-xz
@@ -300,6 +300,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           {% endraw %}
         with:
-          release_id: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.id }}' }}
+          release_id: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.id }}' }}
 
   {% endfor %}

@@ -138,7 +138,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--alpine-3-12--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -244,7 +244,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--alpine-3-12--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -358,7 +358,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--alpine-3-12--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -472,7 +472,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--alpine-3-12--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -572,7 +572,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--archlinux--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -678,7 +678,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--archlinux--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -792,7 +792,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--archlinux--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -906,7 +906,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--archlinux--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -1020,7 +1020,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--archlinux--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -1120,7 +1120,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--debian-buster--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -1220,7 +1220,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--debian-buster--386.tar.xz
         asset_content_type: application/x-xz
@@ -1336,7 +1336,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--debian-buster--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -1452,7 +1452,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--debian-buster--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -1568,7 +1568,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--debian-buster--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -1684,7 +1684,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-0.20.2--debian-buster--ppc64le.tar.xz
         asset_content_type: application/x-xz
@@ -1753,7 +1753,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        release_id: ${{ needs.nim-0-20-2-create-release.outputs.id }}
+        release_id: ${{ needs.create-release-nim-0-20-2.outputs.id }}
 
 
   create-release-nim-1-0-10:
@@ -1879,7 +1879,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--alpine-3-12--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -2039,7 +2039,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--alpine-3-12--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -2228,7 +2228,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--alpine-3-12--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -2417,7 +2417,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--alpine-3-12--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -2592,7 +2592,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--archlinux--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -2752,7 +2752,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--archlinux--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -2941,7 +2941,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--archlinux--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -3130,7 +3130,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--archlinux--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -3319,7 +3319,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--archlinux--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -3494,7 +3494,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--debian-buster--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -3648,7 +3648,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--debian-buster--386.tar.xz
         asset_content_type: application/x-xz
@@ -3835,7 +3835,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--debian-buster--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -4028,7 +4028,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--debian-buster--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -4221,7 +4221,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--debian-buster--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -4414,7 +4414,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.0.10--debian-buster--ppc64le.tar.xz
         asset_content_type: application/x-xz
@@ -4560,7 +4560,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        release_id: ${{ needs.nim-1-0-10-create-release.outputs.id }}
+        release_id: ${{ needs.create-release-nim-1-0-10.outputs.id }}
 
 
   create-release-nim-1-2-8:
@@ -4686,7 +4686,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--alpine-3-12--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -4846,7 +4846,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--alpine-3-12--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -5035,7 +5035,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--alpine-3-12--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -5224,7 +5224,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--alpine-3-12--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -5399,7 +5399,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--archlinux--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -5559,7 +5559,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--archlinux--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -5748,7 +5748,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--archlinux--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -5937,7 +5937,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--archlinux--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -6126,7 +6126,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--archlinux--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -6301,7 +6301,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--debian-buster--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -6455,7 +6455,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--debian-buster--386.tar.xz
         asset_content_type: application/x-xz
@@ -6642,7 +6642,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--debian-buster--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -6835,7 +6835,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--debian-buster--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -7028,7 +7028,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--debian-buster--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -7221,7 +7221,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.2.8--debian-buster--ppc64le.tar.xz
         asset_content_type: application/x-xz
@@ -7367,7 +7367,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        release_id: ${{ needs.nim-1-2-8-create-release.outputs.id }}
+        release_id: ${{ needs.create-release-nim-1-2-8.outputs.id }}
 
 
   create-release-nim-1-4-2:
@@ -7493,7 +7493,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--alpine-3-12--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -7653,7 +7653,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--alpine-3-12--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -7842,7 +7842,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--alpine-3-12--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -8031,7 +8031,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--alpine-3-12--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -8206,7 +8206,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--archlinux--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -8366,7 +8366,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--archlinux--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -8555,7 +8555,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--archlinux--arm32v6.tar.xz
         asset_content_type: application/x-xz
@@ -8744,7 +8744,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--archlinux--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -8933,7 +8933,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--archlinux--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -9108,7 +9108,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--debian-buster--amd64.tar.xz
         asset_content_type: application/x-xz
@@ -9262,7 +9262,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--debian-buster--386.tar.xz
         asset_content_type: application/x-xz
@@ -9449,7 +9449,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--debian-buster--arm32v5.tar.xz
         asset_content_type: application/x-xz
@@ -9642,7 +9642,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--debian-buster--arm32v7.tar.xz
         asset_content_type: application/x-xz
@@ -9835,7 +9835,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--debian-buster--arm64v8.tar.xz
         asset_content_type: application/x-xz
@@ -10028,7 +10028,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
         asset_name: nim-1.4.2--debian-buster--ppc64le.tar.xz
         asset_content_type: application/x-xz
@@ -10175,5 +10175,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        release_id: ${{ needs.nim-1-4-2-create-release.outputs.id }}
+        release_id: ${{ needs.create-release-nim-1-4-2.outputs.id }}
 
