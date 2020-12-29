@@ -4,7 +4,7 @@ set -uex
 
 NIM_DIR=$1
 
-cd "${nim_dir}"
+cd "${NIM_DIR}"
 
 sh build.sh
 bin/nim c koch
