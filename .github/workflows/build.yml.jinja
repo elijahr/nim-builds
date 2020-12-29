@@ -259,10 +259,12 @@ jobs:
       - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}
     steps:
       - *checkout_repo
-      - *install_deps
       {% if platform not in ("linux/amd64", "linux/386") %}
       - *configure_qemu
       {% endif %}
+      - *enable_docker_experimental_features
+      - *setup_dirs
+      - *install_deps
       - *download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
       - *run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}
   {% endif %}
