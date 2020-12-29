@@ -161,6 +161,7 @@ jobs:
           asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.tar.xz
           asset_content_type: application/x-xz
 
+      {% if nim_version[0] > "0" %}
       - name: Run tests
         id: run-tests
         run: |
@@ -188,6 +189,7 @@ jobs:
           asset_path: {{ '${{ steps.run-tests.outputs.test_log_asset_path }}' }}
           asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.test-log.txt
           asset_content_type: text/plain
+      {% endif %}
 
       - name: Stop build host
         run: |
