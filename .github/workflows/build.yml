@@ -1886,8 +1886,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--alpine-3-12--amd64:
-    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz
+  
+  
+  test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-12:
+    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -1905,9 +1907,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -1924,19 +1923,229 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-11:
+    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz on alpine:3.11
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.11 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-10:
+    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz on alpine:3.10
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.10 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-9:
+    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz on alpine:3.9
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.9 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-8:
+    name: Test nim-1.0.10--alpine-3-12--amd64.tar.xz on alpine:3.8
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.8 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
 
 
 
@@ -2054,8 +2263,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--alpine-3-12--arm32v6:
-    name: Test nim-1.0.10--alpine-3-12--arm32v6.tar.xz
+  
+  
+  test-nim-1-0-10--alpine-3-12--arm32v6--on-alpine-3-12:
+    name: Test nim-1.0.10--alpine-3-12--arm32v6.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2073,21 +2284,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2105,10 +2306,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -2116,19 +2318,20 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-0-10--alpine-3-12--arm32v7:
     name: Build nim-1.0.10--alpine-3-12--arm32v7.tar.xz
@@ -2243,8 +2446,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--alpine-3-12--arm32v7:
-    name: Test nim-1.0.10--alpine-3-12--arm32v7.tar.xz
+  
+  
+  test-nim-1-0-10--alpine-3-12--arm32v7--on-alpine-3-12:
+    name: Test nim-1.0.10--alpine-3-12--arm32v7.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2262,21 +2467,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2294,10 +2489,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -2305,19 +2501,20 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-0-10--alpine-3-12--arm64v8:
     name: Build nim-1.0.10--alpine-3-12--arm64v8.tar.xz
@@ -2432,8 +2629,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--alpine-3-12--arm64v8:
-    name: Test nim-1.0.10--alpine-3-12--arm64v8.tar.xz
+  
+  
+  test-nim-1-0-10--alpine-3-12--arm64v8--on-alpine-3-12:
+    name: Test nim-1.0.10--alpine-3-12--arm64v8.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2451,21 +2650,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2483,10 +2672,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -2494,7 +2684,7 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
@@ -2502,13 +2692,14 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-0-10--archlinux--amd64:
     name: Build nim-1.0.10--archlinux--amd64.tar.xz
@@ -2599,8 +2790,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--archlinux--amd64:
-    name: Test nim-1.0.10--archlinux--amd64.tar.xz
+  
+  
+  test-nim-1-0-10--archlinux--amd64--on-archlinux:
+    name: Test nim-1.0.10--archlinux--amd64.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2618,9 +2811,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -2637,19 +2827,75 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+
+
+  test-nim-1-0-10--archlinux--amd64--on-jonathonf-manjaro:
+    name: Test nim-1.0.10--archlinux--amd64.tar.xz on jonathonf/manjaro
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--archlinux--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-archlinux-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--archlinux--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          jonathonf/manjaro \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
 
 
 
@@ -2767,8 +3013,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--archlinux--arm32v5:
-    name: Test nim-1.0.10--archlinux--arm32v5.tar.xz
+  
+  
+  test-nim-1-0-10--archlinux--arm32v5--on-archlinux:
+    name: Test nim-1.0.10--archlinux--arm32v5.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2786,21 +3034,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -2818,10 +3056,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -2829,19 +3068,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-0-10--archlinux--arm32v6:
     name: Build nim-1.0.10--archlinux--arm32v6.tar.xz
@@ -2956,8 +3192,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--archlinux--arm32v6:
-    name: Test nim-1.0.10--archlinux--arm32v6.tar.xz
+  
+  
+  test-nim-1-0-10--archlinux--arm32v6--on-archlinux:
+    name: Test nim-1.0.10--archlinux--arm32v6.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -2975,21 +3213,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3007,10 +3235,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -3018,19 +3247,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-0-10--archlinux--arm32v7:
     name: Build nim-1.0.10--archlinux--arm32v7.tar.xz
@@ -3145,8 +3371,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--archlinux--arm32v7:
-    name: Test nim-1.0.10--archlinux--arm32v7.tar.xz
+  
+  
+  test-nim-1-0-10--archlinux--arm32v7--on-archlinux:
+    name: Test nim-1.0.10--archlinux--arm32v7.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3164,21 +3392,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3196,10 +3414,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -3207,19 +3426,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-0-10--archlinux--arm64v8:
     name: Build nim-1.0.10--archlinux--arm64v8.tar.xz
@@ -3334,8 +3550,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--archlinux--arm64v8:
-    name: Test nim-1.0.10--archlinux--arm64v8.tar.xz
+  
+  
+  test-nim-1-0-10--archlinux--arm64v8--on-archlinux:
+    name: Test nim-1.0.10--archlinux--arm64v8.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3353,21 +3571,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3385,10 +3593,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -3396,7 +3605,65 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--archlinux--arm64v8--on-abyo-manjaro_aarch64:
+    name: Test nim-1.0.10--archlinux--arm64v8.tar.xz on abyo/manjaro_aarch64
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--archlinux--arm64v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-archlinux-linux/arm64/v8-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--archlinux--arm64v8.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          abyo/manjaro_aarch64 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
@@ -3404,13 +3671,8 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
   build-nim-1-0-10--debian-buster--amd64:
     name: Build nim-1.0.10--debian-buster--amd64.tar.xz
@@ -3501,8 +3763,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--debian-buster--amd64:
-    name: Test nim-1.0.10--debian-buster--amd64.tar.xz
+  
+  
+  test-nim-1-0-10--debian-buster--amd64--on-debian-buster:
+    name: Test nim-1.0.10--debian-buster--amd64.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3520,9 +3784,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -3539,19 +3800,125 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--debian-buster--amd64--on-ubuntu-bionic:
+    name: Test nim-1.0.10--debian-buster--amd64.tar.xz on ubuntu:bionic
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--debian-buster--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-debian-buster-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--debian-buster--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:bionic \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--debian-buster--amd64--on-ubuntu-focal:
+    name: Test nim-1.0.10--debian-buster--amd64.tar.xz on ubuntu:focal
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--debian-buster--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.0.10-debian-buster-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--debian-buster--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:focal \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
 
 
 
@@ -3665,8 +4032,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--debian-buster--386:
-    name: Test nim-1.0.10--debian-buster--386.tar.xz
+  
+  
+  test-nim-1-0-10--debian-buster--386--on-debian-buster:
+    name: Test nim-1.0.10--debian-buster--386.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3684,16 +4053,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
-
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -3710,10 +4069,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -3721,19 +4081,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -3852,8 +4207,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--debian-buster--arm32v5:
-    name: Test nim-1.0.10--debian-buster--arm32v5.tar.xz
+  
+  
+  test-nim-1-0-10--debian-buster--arm32v5--on-debian-buster:
+    name: Test nim-1.0.10--debian-buster--arm32v5.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -3871,21 +4228,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -3903,10 +4250,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -3914,19 +4262,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -4045,8 +4388,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--debian-buster--arm32v7:
-    name: Test nim-1.0.10--debian-buster--arm32v7.tar.xz
+  
+  
+  test-nim-1-0-10--debian-buster--arm32v7--on-debian-buster:
+    name: Test nim-1.0.10--debian-buster--arm32v7.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -4064,21 +4409,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4096,10 +4431,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -4107,19 +4443,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -4238,8 +4569,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--debian-buster--arm64v8:
-    name: Test nim-1.0.10--debian-buster--arm64v8.tar.xz
+  
+  
+  test-nim-1-0-10--debian-buster--arm64v8--on-debian-buster:
+    name: Test nim-1.0.10--debian-buster--arm64v8.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -4257,21 +4590,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4289,10 +4612,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -4300,19 +4624,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -4431,8 +4750,10 @@ jobs:
 
 
   
-  test-nim-1-0-10--debian-buster--ppc64le:
-    name: Test nim-1.0.10--debian-buster--ppc64le.tar.xz
+  
+  
+  test-nim-1-0-10--debian-buster--ppc64le--on-debian-buster:
+    name: Test nim-1.0.10--debian-buster--ppc64le.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -4450,21 +4771,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4482,10 +4793,11 @@ jobs:
         pixz -d "tarball" "nim-1.0.10.tar"
         tar xf "nim-1.0.10.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -4493,20 +4805,15 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.0.10
 
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -4693,8 +5000,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--alpine-3-12--amd64:
-    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz
+  
+  
+  test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-12:
+    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4712,9 +5021,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -4731,19 +5037,229 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-11:
+    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz on alpine:3.11
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.11 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-10:
+    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz on alpine:3.10
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.10 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-9:
+    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz on alpine:3.9
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.9 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-8:
+    name: Test nim-1.2.8--alpine-3-12--amd64.tar.xz on alpine:3.8
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.8 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
 
 
 
@@ -4861,8 +5377,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--alpine-3-12--arm32v6:
-    name: Test nim-1.2.8--alpine-3-12--arm32v6.tar.xz
+  
+  
+  test-nim-1-2-8--alpine-3-12--arm32v6--on-alpine-3-12:
+    name: Test nim-1.2.8--alpine-3-12--arm32v6.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -4880,21 +5398,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -4912,10 +5420,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -4923,19 +5432,20 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-2-8--alpine-3-12--arm32v7:
     name: Build nim-1.2.8--alpine-3-12--arm32v7.tar.xz
@@ -5050,8 +5560,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--alpine-3-12--arm32v7:
-    name: Test nim-1.2.8--alpine-3-12--arm32v7.tar.xz
+  
+  
+  test-nim-1-2-8--alpine-3-12--arm32v7--on-alpine-3-12:
+    name: Test nim-1.2.8--alpine-3-12--arm32v7.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5069,21 +5581,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5101,10 +5603,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -5112,19 +5615,20 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-2-8--alpine-3-12--arm64v8:
     name: Build nim-1.2.8--alpine-3-12--arm64v8.tar.xz
@@ -5239,8 +5743,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--alpine-3-12--arm64v8:
-    name: Test nim-1.2.8--alpine-3-12--arm64v8.tar.xz
+  
+  
+  test-nim-1-2-8--alpine-3-12--arm64v8--on-alpine-3-12:
+    name: Test nim-1.2.8--alpine-3-12--arm64v8.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5258,21 +5764,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5290,10 +5786,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -5301,7 +5798,7 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
@@ -5309,13 +5806,14 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-2-8--archlinux--amd64:
     name: Build nim-1.2.8--archlinux--amd64.tar.xz
@@ -5406,8 +5904,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--archlinux--amd64:
-    name: Test nim-1.2.8--archlinux--amd64.tar.xz
+  
+  
+  test-nim-1-2-8--archlinux--amd64--on-archlinux:
+    name: Test nim-1.2.8--archlinux--amd64.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5425,9 +5925,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -5444,19 +5941,75 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+
+
+  test-nim-1-2-8--archlinux--amd64--on-jonathonf-manjaro:
+    name: Test nim-1.2.8--archlinux--amd64.tar.xz on jonathonf/manjaro
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--archlinux--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-archlinux-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--archlinux--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          jonathonf/manjaro \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
 
 
 
@@ -5574,8 +6127,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--archlinux--arm32v5:
-    name: Test nim-1.2.8--archlinux--arm32v5.tar.xz
+  
+  
+  test-nim-1-2-8--archlinux--arm32v5--on-archlinux:
+    name: Test nim-1.2.8--archlinux--arm32v5.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5593,21 +6148,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5625,10 +6170,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -5636,19 +6182,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-2-8--archlinux--arm32v6:
     name: Build nim-1.2.8--archlinux--arm32v6.tar.xz
@@ -5763,8 +6306,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--archlinux--arm32v6:
-    name: Test nim-1.2.8--archlinux--arm32v6.tar.xz
+  
+  
+  test-nim-1-2-8--archlinux--arm32v6--on-archlinux:
+    name: Test nim-1.2.8--archlinux--arm32v6.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5782,21 +6327,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -5814,10 +6349,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -5825,19 +6361,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-2-8--archlinux--arm32v7:
     name: Build nim-1.2.8--archlinux--arm32v7.tar.xz
@@ -5952,8 +6485,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--archlinux--arm32v7:
-    name: Test nim-1.2.8--archlinux--arm32v7.tar.xz
+  
+  
+  test-nim-1-2-8--archlinux--arm32v7--on-archlinux:
+    name: Test nim-1.2.8--archlinux--arm32v7.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -5971,21 +6506,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6003,10 +6528,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -6014,19 +6540,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-2-8--archlinux--arm64v8:
     name: Build nim-1.2.8--archlinux--arm64v8.tar.xz
@@ -6141,8 +6664,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--archlinux--arm64v8:
-    name: Test nim-1.2.8--archlinux--arm64v8.tar.xz
+  
+  
+  test-nim-1-2-8--archlinux--arm64v8--on-archlinux:
+    name: Test nim-1.2.8--archlinux--arm64v8.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6160,21 +6685,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6192,10 +6707,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -6203,7 +6719,65 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--archlinux--arm64v8--on-abyo-manjaro_aarch64:
+    name: Test nim-1.2.8--archlinux--arm64v8.tar.xz on abyo/manjaro_aarch64
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--archlinux--arm64v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-archlinux-linux/arm64/v8-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--archlinux--arm64v8.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          abyo/manjaro_aarch64 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
@@ -6211,13 +6785,8 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
   build-nim-1-2-8--debian-buster--amd64:
     name: Build nim-1.2.8--debian-buster--amd64.tar.xz
@@ -6308,8 +6877,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--debian-buster--amd64:
-    name: Test nim-1.2.8--debian-buster--amd64.tar.xz
+  
+  
+  test-nim-1-2-8--debian-buster--amd64--on-debian-buster:
+    name: Test nim-1.2.8--debian-buster--amd64.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6327,9 +6898,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -6346,19 +6914,125 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--debian-buster--amd64--on-ubuntu-bionic:
+    name: Test nim-1.2.8--debian-buster--amd64.tar.xz on ubuntu:bionic
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--debian-buster--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-debian-buster-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--debian-buster--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:bionic \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--debian-buster--amd64--on-ubuntu-focal:
+    name: Test nim-1.2.8--debian-buster--amd64.tar.xz on ubuntu:focal
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--debian-buster--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.2.8-debian-buster-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--debian-buster--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:focal \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
 
 
 
@@ -6472,8 +7146,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--debian-buster--386:
-    name: Test nim-1.2.8--debian-buster--386.tar.xz
+  
+  
+  test-nim-1-2-8--debian-buster--386--on-debian-buster:
+    name: Test nim-1.2.8--debian-buster--386.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6491,16 +7167,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
-
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -6517,10 +7183,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -6528,19 +7195,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -6659,8 +7321,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--debian-buster--arm32v5:
-    name: Test nim-1.2.8--debian-buster--arm32v5.tar.xz
+  
+  
+  test-nim-1-2-8--debian-buster--arm32v5--on-debian-buster:
+    name: Test nim-1.2.8--debian-buster--arm32v5.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6678,21 +7342,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6710,10 +7364,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -6721,19 +7376,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -6852,8 +7502,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--debian-buster--arm32v7:
-    name: Test nim-1.2.8--debian-buster--arm32v7.tar.xz
+  
+  
+  test-nim-1-2-8--debian-buster--arm32v7--on-debian-buster:
+    name: Test nim-1.2.8--debian-buster--arm32v7.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -6871,21 +7523,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -6903,10 +7545,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -6914,19 +7557,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -7045,8 +7683,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--debian-buster--arm64v8:
-    name: Test nim-1.2.8--debian-buster--arm64v8.tar.xz
+  
+  
+  test-nim-1-2-8--debian-buster--arm64v8--on-debian-buster:
+    name: Test nim-1.2.8--debian-buster--arm64v8.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -7064,21 +7704,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7096,10 +7726,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -7107,19 +7738,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -7238,8 +7864,10 @@ jobs:
 
 
   
-  test-nim-1-2-8--debian-buster--ppc64le:
-    name: Test nim-1.2.8--debian-buster--ppc64le.tar.xz
+  
+  
+  test-nim-1-2-8--debian-buster--ppc64le--on-debian-buster:
+    name: Test nim-1.2.8--debian-buster--ppc64le.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -7257,21 +7885,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7289,10 +7907,11 @@ jobs:
         pixz -d "tarball" "nim-1.2.8.tar"
         tar xf "nim-1.2.8.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -7300,20 +7919,15 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -7500,8 +8114,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--alpine-3-12--amd64:
-    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz
+  
+  
+  test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-12:
+    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7519,9 +8135,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -7538,19 +8151,229 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-11:
+    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz on alpine:3.11
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.11 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-10:
+    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz on alpine:3.10
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.10 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-9:
+    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz on alpine:3.9
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.9 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-8:
+    name: Test nim-1.4.2--alpine-3-12--amd64.tar.xz on alpine:3.8
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--alpine-3-12--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--alpine-3-12--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.8 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
 
 
 
@@ -7668,8 +8491,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--alpine-3-12--arm32v6:
-    name: Test nim-1.4.2--alpine-3-12--arm32v6.tar.xz
+  
+  
+  test-nim-1-4-2--alpine-3-12--arm32v6--on-alpine-3-12:
+    name: Test nim-1.4.2--alpine-3-12--arm32v6.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7687,21 +8512,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7719,10 +8534,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -7730,19 +8546,20 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-4-2--alpine-3-12--arm32v7:
     name: Build nim-1.4.2--alpine-3-12--arm32v7.tar.xz
@@ -7857,8 +8674,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--alpine-3-12--arm32v7:
-    name: Test nim-1.4.2--alpine-3-12--arm32v7.tar.xz
+  
+  
+  test-nim-1-4-2--alpine-3-12--arm32v7--on-alpine-3-12:
+    name: Test nim-1.4.2--alpine-3-12--arm32v7.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -7876,21 +8695,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -7908,10 +8717,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -7919,19 +8729,20 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-4-2--alpine-3-12--arm64v8:
     name: Build nim-1.4.2--alpine-3-12--arm64v8.tar.xz
@@ -8046,8 +8857,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--alpine-3-12--arm64v8:
-    name: Test nim-1.4.2--alpine-3-12--arm64v8.tar.xz
+  
+  
+  test-nim-1-4-2--alpine-3-12--arm64v8--on-alpine-3-12:
+    name: Test nim-1.4.2--alpine-3-12--arm64v8.tar.xz on alpine:3.12
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8065,21 +8878,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:alpine-3.12
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8097,10 +8900,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -8108,7 +8912,7 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:alpine-3.12 \
+          alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
@@ -8116,13 +8920,14 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
+
+
+
+
 
   build-nim-1-4-2--archlinux--amd64:
     name: Build nim-1.4.2--archlinux--amd64.tar.xz
@@ -8213,8 +9018,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--archlinux--amd64:
-    name: Test nim-1.4.2--archlinux--amd64.tar.xz
+  
+  
+  test-nim-1-4-2--archlinux--amd64--on-archlinux:
+    name: Test nim-1.4.2--archlinux--amd64.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8232,9 +9039,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -8251,19 +9055,75 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+
+
+  test-nim-1-4-2--archlinux--amd64--on-jonathonf-manjaro:
+    name: Test nim-1.4.2--archlinux--amd64.tar.xz on jonathonf/manjaro
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--archlinux--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-archlinux-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--archlinux--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          jonathonf/manjaro \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
 
 
 
@@ -8381,8 +9241,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--archlinux--arm32v5:
-    name: Test nim-1.4.2--archlinux--arm32v5.tar.xz
+  
+  
+  test-nim-1-4-2--archlinux--arm32v5--on-archlinux:
+    name: Test nim-1.4.2--archlinux--arm32v5.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8400,21 +9262,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8432,10 +9284,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -8443,19 +9296,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-4-2--archlinux--arm32v6:
     name: Build nim-1.4.2--archlinux--arm32v6.tar.xz
@@ -8570,8 +9420,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--archlinux--arm32v6:
-    name: Test nim-1.4.2--archlinux--arm32v6.tar.xz
+  
+  
+  test-nim-1-4-2--archlinux--arm32v6--on-archlinux:
+    name: Test nim-1.4.2--archlinux--arm32v6.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8589,21 +9441,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8621,10 +9463,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -8632,19 +9475,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-4-2--archlinux--arm32v7:
     name: Build nim-1.4.2--archlinux--arm32v7.tar.xz
@@ -8759,8 +9599,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--archlinux--arm32v7:
-    name: Test nim-1.4.2--archlinux--arm32v7.tar.xz
+  
+  
+  test-nim-1-4-2--archlinux--arm32v7--on-archlinux:
+    name: Test nim-1.4.2--archlinux--arm32v7.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8778,21 +9620,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8810,10 +9642,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -8821,19 +9654,16 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
+
+
 
   build-nim-1-4-2--archlinux--arm64v8:
     name: Build nim-1.4.2--archlinux--arm64v8.tar.xz
@@ -8948,8 +9778,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--archlinux--arm64v8:
-    name: Test nim-1.4.2--archlinux--arm64v8.tar.xz
+  
+  
+  test-nim-1-4-2--archlinux--arm64v8--on-archlinux:
+    name: Test nim-1.4.2--archlinux--arm64v8.tar.xz on archlinux
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -8967,21 +9799,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:archlinux
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -8999,10 +9821,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -9010,7 +9833,65 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:archlinux \
+          archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--archlinux--arm64v8--on-abyo-manjaro_aarch64:
+    name: Test nim-1.4.2--archlinux--arm64v8.tar.xz on abyo/manjaro_aarch64
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--archlinux--arm64v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-archlinux-linux/arm64/v8-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--archlinux--arm64v8.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          abyo/manjaro_aarch64 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
@@ -9018,13 +9899,8 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:archlinux --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
   build-nim-1-4-2--debian-buster--amd64:
     name: Build nim-1.4.2--debian-buster--amd64.tar.xz
@@ -9115,8 +9991,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--debian-buster--amd64:
-    name: Test nim-1.4.2--debian-buster--amd64.tar.xz
+  
+  
+  test-nim-1-4-2--debian-buster--amd64--on-debian-buster:
+    name: Test nim-1.4.2--debian-buster--amd64.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9134,9 +10012,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -9153,19 +10028,125 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
 
-
-        # Test in native container
+        # Test in emulated container
         docker run \
           --platform linux/amd64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--debian-buster--amd64--on-ubuntu-bionic:
+    name: Test nim-1.4.2--debian-buster--amd64.tar.xz on ubuntu:bionic
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--debian-buster--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-debian-buster-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--debian-buster--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:bionic \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--debian-buster--amd64--on-ubuntu-focal:
+    name: Test nim-1.4.2--debian-buster--amd64.tar.xz on ubuntu:focal
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--debian-buster--amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          build/nimcache
+        key: nim-1.4.2-debian-buster-linux/amd64-nimcache
+
+    - name: Download released tarball
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--debian-buster--amd64.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:focal \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
 
 
 
@@ -9279,8 +10260,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--debian-buster--386:
-    name: Test nim-1.4.2--debian-buster--386.tar.xz
+  
+  
+  test-nim-1-4-2--debian-buster--386--on-debian-buster:
+    name: Test nim-1.4.2--debian-buster--386.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9298,16 +10281,6 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
-
     - name: Restore Nim cache
       uses: actions/cache@v2
       with:
@@ -9324,10 +10297,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -9335,19 +10309,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -9466,8 +10435,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--debian-buster--arm32v5:
-    name: Test nim-1.4.2--debian-buster--arm32v5.tar.xz
+  
+  
+  test-nim-1-4-2--debian-buster--arm32v5--on-debian-buster:
+    name: Test nim-1.4.2--debian-buster--arm32v5.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9485,21 +10456,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9517,10 +10478,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -9528,19 +10490,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -9659,8 +10616,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--debian-buster--arm32v7:
-    name: Test nim-1.4.2--debian-buster--arm32v7.tar.xz
+  
+  
+  test-nim-1-4-2--debian-buster--arm32v7--on-debian-buster:
+    name: Test nim-1.4.2--debian-buster--arm32v7.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9678,21 +10637,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9710,10 +10659,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -9721,19 +10671,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -9852,8 +10797,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--debian-buster--arm64v8:
-    name: Test nim-1.4.2--debian-buster--arm64v8.tar.xz
+  
+  
+  test-nim-1-4-2--debian-buster--arm64v8--on-debian-buster:
+    name: Test nim-1.4.2--debian-buster--arm64v8.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -9871,21 +10818,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -9903,10 +10840,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -9914,19 +10852,14 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 
@@ -10045,8 +10978,10 @@ jobs:
 
 
   
-  test-nim-1-4-2--debian-buster--ppc64le:
-    name: Test nim-1.4.2--debian-buster--ppc64le.tar.xz
+  
+  
+  test-nim-1-4-2--debian-buster--ppc64le--on-debian-buster:
+    name: Test nim-1.4.2--debian-buster--ppc64le.tar.xz on debian:buster
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -10064,21 +10999,11 @@ jobs:
         sudo apt-get update -q -y
         sudo apt-get -qq install -y hub pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
     - name: Configure QEMU
       run: |
         sudo apt-get update -q -y
         sudo apt-get -qq install -y qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-    - name: Start distcc host
-      run: |
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          elijahru/build-farm:debian-buster-slim
 
     - name: Restore Nim cache
       uses: actions/cache@v2
@@ -10096,10 +11021,11 @@ jobs:
         pixz -d "tarball" "nim-1.4.2.tar"
         tar xf "nim-1.4.2.tar"
 
+
+
     - name: Run tests
       run: |
         mkdir -p nimcache
-
 
         # Test in emulated container
         docker run \
@@ -10107,7 +11033,7 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          elijahru/build-farm-client:debian-buster-slim \
+          debian:buster \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
@@ -10115,13 +11041,8 @@ jobs:
 
 
 
-    - name: Stop distcc host
-      run: |
-        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+
+
 
 
 

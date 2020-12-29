@@ -169,30 +169,23 @@ _anchors:
       pixz -d "tarball" "nim-{{ nim_version }}.tar"
       tar xf "nim-{{ nim_version }}.tar"
 
-  run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+  {% for image, platform_map in distro.test_targets.items() %}
+  {% if platform in platform_map %}
+  run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}: &run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}
     name: Run tests
     run: |
       mkdir -p nimcache
 
-      {% if platform == "linux/amd64" %}
-      # Test in native container
-      docker run \
-        --platform {{ platform }} \
-        --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-        --mount "type=bind,src=${PWD}/build,dst=/build" \
-        --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-        {{ distro.build_farm_host_image }} \
-        sh /scripts/test-nim.sh /build/nim-{{ nim_version }}
-      {% else %}
       # Test in emulated container
       docker run \
-        --platform {{ platform }} \
+        --platform {{ platform_map[platform] }} \
         --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
         --mount "type=bind,src=${PWD}/build,dst=/build" \
         --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-        {{ distro.build_farm_client_image }} \
+        {{ image }} \
         sh /scripts/test-nim.sh /build/nim-{{ nim_version }}
-      {% endif %}
+  {% endif %}
+  {% endfor %}
 
   {% endfor %}
   {% endfor %}
@@ -254,8 +247,10 @@ jobs:
       {% endif %}
 
   {% if nim_version[0] > "0" %}
-  test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}:
-    name: Test nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
+  {% for image, platform_map in distro.test_targets.items() %}
+  {% if platform in platform_map %}
+  test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}--on-{{ image|slugify }}:
+    name: Test nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz on {{ image }}
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}
@@ -263,21 +258,14 @@ jobs:
     steps:
       - *checkout_repo
       - *install_deps
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
       {% if platform not in ("linux/amd64", "linux/386") %}
       - *configure_qemu
       {% endif %}
-      {% if platform != "linux/amd64" %}
-      - *start_distcc_host_{{ distro.name|slugify }}
-      {% endif %}
       - *restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
       - *download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
-      - *run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
-      {% if platform != "linux/amd64" %}
-      - *stop_distcc_host_{{ distro.name|slugify }}
-      {% endif %}
+      - *run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}
+  {% endif %}
+  {% endfor %}
   {% endif %}
   {% endfor %}
   {% endfor %}

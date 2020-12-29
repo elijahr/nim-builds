@@ -84,6 +84,26 @@ distros = [
             "linux/arm/v7",
             "linux/arm64/v8",
         ],
+        "test_targets": {
+            "alpine:3.12": {
+                "linux/amd64": "linux/amd64",
+                "linux/arm/v6": "linux/arm/v6",
+                "linux/arm/v7": "linux/arm/v7",
+                "linux/arm64/v8": "linux/arm64/v8",
+            },
+            "alpine:3.11": {
+                "linux/amd64": "linux/amd64",
+            },
+            "alpine:3.10": {
+                "linux/amd64": "linux/amd64",
+            },
+            "alpine:3.9": {
+                "linux/amd64": "linux/amd64",
+            },
+            "alpine:3.8": {
+                "linux/amd64": "linux/amd64",
+            },
+        },
     },
     {
         "name": "archlinux",
@@ -96,6 +116,21 @@ distros = [
             "linux/arm/v7",
             "linux/arm64/v8",
         ],
+        "test_targets": {
+            "archlinux": {
+                "linux/amd64": "linux/amd64",
+                "linux/arm/v5": "linux/arm/v5",
+                "linux/arm/v6": "linux/arm/v6",
+                "linux/arm/v7": "linux/arm/v7",
+                "linux/arm64/v8": "linux/arm64/v8",
+            },
+            "abyo/manjaro_aarch64": {
+                "linux/arm64/v8": "linux/arm64",
+            },
+            "jonathonf/manjaro": {
+                "linux/amd64": "linux/amd64",
+            },
+        },
     },
     {
         "name": "debian-buster",
@@ -109,6 +144,22 @@ distros = [
             "linux/arm64/v8",
             "linux/ppc64le",
         ],
+        "test_targets": {
+            "debian:buster": {
+                "linux/amd64": "linux/amd64",
+                "linux/386": "linux/386",
+                "linux/arm/v5": "linux/arm/v5",
+                "linux/arm/v7": "linux/arm/v7",
+                "linux/arm64/v8": "linux/arm64/v8",
+                "linux/ppc64le": "linux/ppc64le",
+            },
+            "ubuntu:bionic": {
+                "linux/amd64": "linux/amd64",
+            },
+            "ubuntu:focal": {
+                "linux/amd64": "linux/amd64",
+            },
+        },
     },
 ]
 
