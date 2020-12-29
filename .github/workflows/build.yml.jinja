@@ -104,7 +104,7 @@ _anchors:
   {% for distro in distros %}
   {% for platform in distro.platforms %}
 
-  restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+  restore_nim_cache_{{ asset_id(nim_version, distro, platform) }}: &restore_nim_cache_{{ asset_id(nim_version, distro, platform) }}
     name: Restore Nim cache
     uses: actions/cache@v2
     with:
@@ -112,7 +112,7 @@ _anchors:
         build/nimcache
       key: "nim-{{ nim_version }}-{{ distro.name }}-{{ platform }}-nimcache"
 
-  build_nim_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &build_nim_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+  build_nim_{{ asset_id(nim_version, distro, platform) }}: &build_nim_{{ asset_id(nim_version, distro, platform) }}
     name: Build Nim
     id: build-nim
     shell: bash
@@ -146,7 +146,7 @@ _anchors:
         sh /scripts/build-nim.sh /build/nim-{{ nim_version }} || (status=$?; dump_logs; exit $status)
       {% endif %}
 
-  add_tarball_to_release_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &add_tarball_to_release_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+  add_tarball_to_release_{{ asset_id(nim_version, distro, platform) }}: &add_tarball_to_release_{{ asset_id(nim_version, distro, platform) }}
     name: Add tarball to release
     uses: actions/upload-release-asset@v1
     env:
@@ -156,24 +156,24 @@ _anchors:
     with:
       upload_url: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.upload_url }}' }}
       asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
-      asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}.tar.xz
+      asset_name: nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz
       asset_content_type: application/x-xz
 
-  download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+  download_released_tarball_{{ asset_id(nim_version, distro, platform) }}: &download_released_tarball_{{ asset_id(nim_version, distro, platform) }}
     name: Download released tarball
     env:
       GITHUB_TOKEN: {{ '${{ secrets.GITHUB_TOKEN }}' }}
     run: |
       cd build
       tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
-      tarball=nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
+      tarball=nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz
       hub release download "$tag" -i "$tarball"
       pixz -d "$tarball" "nim-{{ nim_version }}.tar"
       tar xf "nim-{{ nim_version }}.tar"
 
   {% for image, platform_map in distro.test_targets.items() %}
   {% if platform in platform_map %}
-  run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}: &run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}
+  run_tests_{{ asset_id(nim_version, distro, platform) }}_{{ image|slugify }}: &run_tests_{{ asset_id(nim_version, distro, platform) }}_{{ image|slugify }}
     name: Run tests
     run: |
       mkdir -p nimcache
@@ -221,8 +221,8 @@ jobs:
 
   {% for distro in distros %}
   {% for platform in distro.platforms %}
-  build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}:
-    name: Build nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
+  build-nim-{{ asset_id(nim_version, distro, platform) }}:
+    name: Build nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz
     runs-on: ubuntu-latest
     needs:
       - "create-release-nim-{{ nim_version|slugify }}"
@@ -234,16 +234,16 @@ jobs:
       - *configure_qemu
       {% endif %}
       - *enable_docker_experimental_features
-      - *restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *restore_nim_cache_{{ asset_id(nim_version, distro, platform) }}
       - *setup_dirs
       - *install_deps
       {% if platform != "linux/amd64" %}
       - *start_distcc_host_{{ distro.name|slugify }}
       {% endif %}
       - *download_nim_source_{{ nim_version|slugify }}
-      - *build_nim_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *build_nim_{{ asset_id(nim_version, distro, platform) }}
       - *create_tarball_{{ nim_version|slugify }}
-      - *add_tarball_to_release_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *add_tarball_to_release_{{ asset_id(nim_version, distro, platform) }}
       {% if platform != "linux/amd64" %}
       - *stop_distcc_host_{{ distro.name|slugify }}
       {% endif %}
@@ -251,12 +251,12 @@ jobs:
   {% if nim_version[0] > "0" %}
   {% for image, platform_map in distro.test_targets.items() %}
   {% if platform in platform_map %}
-  test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}--on-{{ image|slugify }}:
-    name: Test nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz on {{ image }}
+  test-nim-{{ asset_id(nim_version, distro, platform) }}--on-{{ image|slugify }}:
+    name: Test nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz on {{ image }}
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}
-      - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}
+      - build-nim-{{ asset_id(nim_version, distro, platform) }}
     steps:
       - *checkout_repo
       {% if platform not in ("linux/amd64", "linux/386") %}
@@ -265,8 +265,8 @@ jobs:
       - *enable_docker_experimental_features
       - *setup_dirs
       - *install_deps
-      - *download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
-      - *run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}_{{ image|slugify }}
+      - *download_released_tarball_{{ asset_id(nim_version, distro, platform) }}
+      - *run_tests_{{ asset_id(nim_version, distro, platform) }}_{{ image|slugify }}
   {% endif %}
   {% endfor %}
   {% endif %}
@@ -284,12 +284,12 @@ jobs:
       {% if nim_version[0] > "0" %}
       {% for image, platform_map in distro.test_targets.items() %}
       {% if platform in platform_map %}
-      - test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}--on-{{ image|slugify }}
+      - test-nim-{{ asset_id(nim_version, distro, platform) }}--on-{{ image|slugify }}
       {% endif %}
       {% endfor %}
       {% else %}
       # Can't run tests for 0.X.X
-      - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}
+      - build-nim-{{ asset_id(nim_version, distro, platform) }}
       {% endif %}
 
       {% endfor %}

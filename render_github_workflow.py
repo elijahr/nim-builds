@@ -73,9 +73,37 @@ def fetch_nim_versions():
     )
 
 
+arch_prefix = {
+    "linux/amd64": "x86_64",
+    "linux/386": "i686",
+    "linux/arm/v5": "armv5",
+    "linux/arm/v6": "armv6",
+    "linux/arm/v7": "armv7",
+    "linux/arm64/v8": "aarch64",
+    "linux/ppc64le": "powerpc64le",
+}
+
+arch_suffix = {
+    "linux/arm/v5": "eabi",
+    "linux/arm/v6": "eabihf",
+    "linux/arm/v7": "eabihf",
+}
+
+
+def machine(distro, platform):
+    return (
+        f'{arch_prefix[platform]}-linux-{distro["libc"]}{arch_suffix.get(platform, "")}'
+    )
+
+
+def asset_id(nim_version, distro, platform):
+    return f"{nim_version}--{machine(distro, platform)}"
+
+
 distros = [
     {
         "name": "alpine-3-12",
+        "libc": "musl",
         "build_farm_host_image": "elijahru/build-farm:alpine-3.12",
         "build_farm_client_image": "elijahru/build-farm-client:alpine-3.12",
         "platforms": [
@@ -106,17 +134,27 @@ distros = [
         },
     },
     {
-        "name": "archlinux",
-        "build_farm_host_image": "elijahru/build-farm:archlinux",
-        "build_farm_client_image": "elijahru/build-farm-client:archlinux",
+        "name": "debian-buster",
+        "libc": "gnu",
+        "build_farm_host_image": "elijahru/build-farm:debian-buster-slim",
+        "build_farm_client_image": "elijahru/build-farm-client:debian-buster-slim",
         "platforms": [
             "linux/amd64",
+            "linux/386",
             "linux/arm/v5",
-            "linux/arm/v6",
             "linux/arm/v7",
             "linux/arm64/v8",
+            "linux/ppc64le",
         ],
         "test_targets": {
+            "debian:buster": {
+                "linux/amd64": "linux/amd64",
+                "linux/386": "linux/386",
+                "linux/arm/v5": "linux/arm/v5",
+                "linux/arm/v7": "linux/arm/v7",
+                "linux/arm64/v8": "linux/arm64/v8",
+                "linux/ppc64le": "linux/ppc64le",
+            },
             "archlinux": {
                 "linux/amd64": "linux/amd64",
                 "linux/arm/v5": "linux/arm/v5",
@@ -141,38 +179,6 @@ distros = [
             },
         },
     },
-    {
-        "name": "debian-buster",
-        "build_farm_host_image": "elijahru/build-farm:debian-buster-slim",
-        "build_farm_client_image": "elijahru/build-farm-client:debian-buster-slim",
-        "platforms": [
-            "linux/amd64",
-            "linux/386",
-            "linux/arm/v5",
-            "linux/arm/v7",
-            "linux/arm64/v8",
-            "linux/ppc64le",
-        ],
-        "test_targets": {
-            "debian:buster": {
-                "linux/amd64": "linux/amd64",
-                "linux/386": "linux/386",
-                "linux/arm/v5": "linux/arm/v5",
-                "linux/arm/v7": "linux/arm/v7",
-                "linux/arm64/v8": "linux/arm64/v8",
-                "linux/ppc64le": "linux/ppc64le",
-            },
-            "ubuntu:bionic": {
-                "linux/amd64": "linux/amd64",
-            },
-            "ubuntu:focal": {
-                "linux/amd64": "linux/amd64",
-            },
-            "archlinux": {
-                "linux/amd64": "linux/amd64",
-            },
-        },
-    },
 ]
 
 
@@ -185,6 +191,7 @@ def render_github_workflow():
             distros=distros,
             nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
             slugify=slugify,
+            asset_id=asset_id,
         )
         build_yml = ".github/workflows/build.yml"
         with open(f"{build_yml}.jinja", "r") as f:
