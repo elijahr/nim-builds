@@ -97,6 +97,10 @@ def machine(distro, platform):
 
 
 def asset_id(nim_version, distro, platform):
+    return slugify(asset_name(nim_version, distro, platform))
+
+
+def asset_name(nim_version, distro, platform):
     return f"{nim_version}--{machine(distro, platform)}"
 
 
@@ -192,6 +196,7 @@ def render_github_workflow():
             nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
             slugify=slugify,
             asset_id=asset_id,
+            asset_name=asset_name,
         )
         build_yml = ".github/workflows/build.yml"
         with open(f"{build_yml}.jinja", "r") as f:

@@ -156,7 +156,7 @@ _anchors:
     with:
       upload_url: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.upload_url }}' }}
       asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
-      asset_name: nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz
+      asset_name: nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz
       asset_content_type: application/x-xz
 
   download_released_tarball_{{ asset_id(nim_version, distro, platform) }}: &download_released_tarball_{{ asset_id(nim_version, distro, platform) }}
@@ -166,7 +166,7 @@ _anchors:
     run: |
       cd build
       tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
-      tarball=nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz
+      tarball=nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz
       hub release download "$tag" -i "$tarball"
       pixz -d "$tarball" "nim-{{ nim_version }}.tar"
       tar xf "nim-{{ nim_version }}.tar"
@@ -222,7 +222,7 @@ jobs:
   {% for distro in distros %}
   {% for platform in distro.platforms %}
   build-nim-{{ asset_id(nim_version, distro, platform) }}:
-    name: Build nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz
+    name: Build nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz
     runs-on: ubuntu-latest
     needs:
       - "create-release-nim-{{ nim_version|slugify }}"
@@ -252,7 +252,7 @@ jobs:
   {% for image, platform_map in distro.test_targets.items() %}
   {% if platform in platform_map %}
   test-nim-{{ asset_id(nim_version, distro, platform) }}--on-{{ image|slugify }}:
-    name: Test nim-{{ asset_id(nim_version, distro, platform) }}.tar.xz on {{ image }}
+    name: Test nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz on {{ image }}
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}
