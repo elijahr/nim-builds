@@ -54,18 +54,14 @@ jobs:
         {% endraw %}
 
   {% for distro in distros %}
-  nim-{{ nim_version|slugify }}-{{ distro.name }}-build:
-    name: {{ nim_version }}, {{ distro.name }}, {{ '${{ matrix.platform }}' }}
+  {% for platform in distro.platforms %}
+  build-nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}:
+    name: {{ nim_version }}, {{ distro.name }}, {{ platform }}
     runs-on: ubuntu-latest
     needs:
       - "nim-{{ nim_version|slugify }}-create-release"
     strategy:
       fail-fast: false
-      matrix:
-        platform:
-          {% for platform in distro.platforms %}
-          - {{ platform }}
-          {% endfor %}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -73,12 +69,13 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
+      {% if platform not in ("linux/amd64", "linux/386") %}
       - name: Configure QEMU
-        if: {% raw %}${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}{% endraw %}
         run: |
           sudo apt-get update -q -y
           sudo apt-get -qq install -y qemu qemu-user-static
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      {% endif %}
 
       - name: Enable Docker experimental features
         run: |
@@ -91,7 +88,7 @@ jobs:
         with:
           path: |
             build/nimcache
-          key: "nim-{{ nim_version }}-{{ distro.name }}-{{ '${{ matrix.platform }}' }}-nimcache"
+          key: "nim-{{ nim_version }}-{{ distro.name }}-{{ platform }}-nimcache"
 
       - name: Install pixz
         run: |
@@ -102,21 +99,20 @@ jobs:
         with:
           node-version: '12'
 
+      {% if platform != "linux/amd64" %}
+      - name: Start distcc host
+        run: |
+          docker run -d \
+            --platform linux/amd64 \
+            -p 3600-3900:3600-3900/tcp \
+            {{ distro.build_farm_host_image }}
+      {% endif %}
+
       - name: Build Nim
         id: build-nim
         shell: bash
         run: |
           set -uexo pipefail
-
-          # Start distcc host
-          docker run -d \
-            --platform linux/amd64 \
-            -p 3600-3900:3600-3900/tcp \
-            {{ distro.build_farm_host_image }}
-
-          dump_logs () {
-            docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
-          }
 
           cd build
           mkdir -p nimcache
@@ -128,17 +124,30 @@ jobs:
           mv "$nim" src
           rm "${nim}.tar.xz" "${nim}.tar"
 
+          {% if platform == "linux/amd64" %}
+          # Build in native container
+          docker run \
+            --platform {{ platform }} \
+            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+            --mount "type=bind,src=${PWD}/,dst=/build" \
+            --workdir /build \
+            {{ distro.build_farm_host_image }} \
+            sh build-nim.sh ${nim}
+
+          {% else %}
+          dump_logs () {
+            docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
+          }
+
           # Build in emulated container
           docker run \
-            --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+            --platform {{ platform }} \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             {{ distro.build_farm_client_image }} \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
-
-          platform_slug=$(echo "{{ '${{ matrix.platform }}' }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
-          echo "::set-output name=platform_slug::${platform_slug}"
+          {% endif %}
 
       - name: Create tarball
         id: create-tarball
@@ -158,7 +167,7 @@ jobs:
         with:
           upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
           asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
-          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.tar.xz
+          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}.tar.xz
           asset_content_type: application/x-xz
 
       {% if nim_version[0] > "0" %}
@@ -169,7 +178,7 @@ jobs:
 
           # Test in emulated container
           docker run \
-            --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+            --platform {{ platform }} \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
@@ -187,10 +196,11 @@ jobs:
         with:
           upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
           asset_path: {{ '${{ steps.run-tests.outputs.test_log_asset_path }}' }}
-          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.test-log.txt
+          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}.test-log.txt
           asset_content_type: text/plain
       {% endif %}
 
+      {% if platform != "linux/amd64" %}
       - name: Stop build host
         run: |
           id=$(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
@@ -198,7 +208,9 @@ jobs:
           then
             docker kill $id
           fi
+      {% endif %}
 
+  {% endfor %}
   {% endfor %}
 
   nim-{{ nim_version|slugify }}-publish-release:
@@ -207,7 +219,9 @@ jobs:
     needs:
       - nim-{{ nim_version|slugify }}-create-release
       {% for distro in distros %}
-      - nim-{{ nim_version|slugify }}-{{ distro.name }}-build
+      {% for platform in distro.platforms %}
+      - build-nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}
+      {% endfor %}
       {% endfor %}
 
     steps:

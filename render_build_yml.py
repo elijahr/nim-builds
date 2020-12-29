@@ -19,6 +19,14 @@ def slugify(string, delim="-", allowed_chars=""):
     return re.sub(r"[^\w%s]" % re.escape(allowed_chars), delim, string).lower()
 
 
+def platform_slug(platform):
+    return (
+        platform.replace("linux/", "")
+        .replace("arm/", "arm32")
+        .replace("arm64/", "arm64")
+    )
+
+
 def find_max_nim_versions(versions):
     versions = (VersionInfo.parse(v.strip()) for v in versions)
     versions = (v for v in versions if v >= min_version)
@@ -83,6 +91,7 @@ distros = [
 def render_build_yml():
     env = Environment(autoescape=False, undefined=StrictUndefined)
     env.filters["slugify"] = slugify
+    env.filters["platform_slug"] = platform_slug
     with project_dir:
         context = dict(
             distros=distros,
