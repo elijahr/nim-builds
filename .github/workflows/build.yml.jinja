@@ -200,7 +200,7 @@ jobs:
   {% endfor %}
 
   nim-{{ nim_version|slugify }}-publish-release:
-    name: Publish release
+    name: Publish release {{ nim_version }}
     runs-on: ubuntu-latest
     needs:
       - nim-{{ nim_version|slugify }}-create-release
