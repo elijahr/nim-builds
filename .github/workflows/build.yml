@@ -1915,6 +1915,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -1967,6 +1969,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2019,6 +2023,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2071,6 +2077,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2123,6 +2131,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2298,6 +2308,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/arm/v6-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2481,6 +2493,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2664,6 +2678,8 @@ jobs:
         key: nim-1.0.10-alpine-3-12-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2819,6 +2835,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -2873,6 +2891,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3048,6 +3068,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/arm/v5-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3227,6 +3249,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/arm/v6-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3406,6 +3430,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3585,6 +3611,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3643,6 +3671,8 @@ jobs:
         key: nim-1.0.10-archlinux-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3792,6 +3822,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3844,6 +3876,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -3896,6 +3930,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -4061,6 +4097,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/386-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -4242,6 +4280,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/arm/v5-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -4423,6 +4463,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -4604,6 +4646,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -4785,6 +4829,8 @@ jobs:
         key: nim-1.0.10-debian-buster-linux/ppc64le-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
@@ -5029,6 +5075,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5081,6 +5129,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5133,6 +5183,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5185,6 +5237,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5237,6 +5291,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5412,6 +5468,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/arm/v6-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5595,6 +5653,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5778,6 +5838,8 @@ jobs:
         key: nim-1.2.8-alpine-3-12-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5933,6 +5995,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -5987,6 +6051,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6162,6 +6228,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/arm/v5-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6341,6 +6409,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/arm/v6-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6520,6 +6590,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6699,6 +6771,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6757,6 +6831,8 @@ jobs:
         key: nim-1.2.8-archlinux-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6906,6 +6982,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -6958,6 +7036,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -7010,6 +7090,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -7175,6 +7257,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/386-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -7356,6 +7440,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/arm/v5-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -7537,6 +7623,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -7718,6 +7806,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -7899,6 +7989,8 @@ jobs:
         key: nim-1.2.8-debian-buster-linux/ppc64le-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
@@ -8143,6 +8235,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8195,6 +8289,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8247,6 +8343,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8299,6 +8397,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8351,6 +8451,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8526,6 +8628,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/arm/v6-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8709,6 +8813,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -8892,6 +8998,8 @@ jobs:
         key: nim-1.4.2-alpine-3-12-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9047,6 +9155,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9101,6 +9211,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9276,6 +9388,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/arm/v5-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9455,6 +9569,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/arm/v6-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9634,6 +9750,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9813,6 +9931,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -9871,6 +9991,8 @@ jobs:
         key: nim-1.4.2-archlinux-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10020,6 +10142,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10072,6 +10196,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10124,6 +10250,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/amd64-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10289,6 +10417,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/386-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10470,6 +10600,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/arm/v5-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10651,6 +10783,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/arm/v7-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -10832,6 +10966,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/arm64/v8-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
@@ -11013,6 +11149,8 @@ jobs:
         key: nim-1.4.2-debian-buster-linux/ppc64le-nimcache
 
     - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}

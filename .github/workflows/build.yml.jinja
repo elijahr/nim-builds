@@ -161,6 +161,8 @@ _anchors:
 
   download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
     name: Download released tarball
+    env:
+      GITHUB_TOKEN: {{ '${{ secrets.GITHUB_TOKEN }}' }}
     run: |
       cd build
       tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
