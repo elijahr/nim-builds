@@ -143,7 +143,7 @@ jobs:
             elijahru/build-farm-client:alpine-3.12 \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -295,7 +295,7 @@ jobs:
             elijahru/build-farm-client:archlinux \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -449,7 +449,7 @@ jobs:
             elijahru/build-farm-client:debian-buster-slim \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -662,7 +662,7 @@ jobs:
             elijahru/build-farm-client:alpine-3.12 \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -814,7 +814,7 @@ jobs:
             elijahru/build-farm-client:archlinux \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -968,7 +968,7 @@ jobs:
             elijahru/build-farm-client:debian-buster-slim \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -1181,7 +1181,7 @@ jobs:
             elijahru/build-farm-client:alpine-3.12 \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -1333,7 +1333,7 @@ jobs:
             elijahru/build-farm-client:archlinux \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -1487,7 +1487,7 @@ jobs:
             elijahru/build-farm-client:debian-buster-slim \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -1700,7 +1700,7 @@ jobs:
             elijahru/build-farm-client:alpine-3.12 \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -1852,7 +1852,7 @@ jobs:
             elijahru/build-farm-client:archlinux \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
@@ -2006,7 +2006,7 @@ jobs:
             elijahru/build-farm-client:debian-buster-slim \
             sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/')
           echo "::set-output name=platform_slug::${platform_slug}"
 
       - name: Create tarball
