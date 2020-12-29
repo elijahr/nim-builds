@@ -1711,39 +1711,114 @@ jobs:
     - create-release-nim-0-20-2
 
 
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--alpine-3-12--amd64
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--alpine-3-12--arm32v6
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--alpine-3-12--arm32v7
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--alpine-3-12--arm64v8
 
 
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--archlinux--amd64
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--archlinux--arm32v5
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--archlinux--arm32v6
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--archlinux--arm32v7
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--archlinux--arm64v8
 
 
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--debian-buster--amd64
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--debian-buster--386
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--debian-buster--arm32v5
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--debian-buster--arm32v7
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--debian-buster--arm64v8
 
+
+
+
+
+      # Can't run tests for 0.X.X
     - build-nim-0-20-2--debian-buster--ppc64le
+
+
 
 
 
@@ -4871,39 +4946,251 @@ jobs:
     - create-release-nim-1-0-10
 
 
-    - build-nim-1-0-10--alpine-3-12--amd64
-
-    - build-nim-1-0-10--alpine-3-12--arm32v6
-
-    - build-nim-1-0-10--alpine-3-12--arm32v7
-
-    - build-nim-1-0-10--alpine-3-12--arm64v8
 
 
 
-    - build-nim-1-0-10--archlinux--amd64
 
-    - build-nim-1-0-10--archlinux--arm32v5
-
-    - build-nim-1-0-10--archlinux--arm32v6
-
-    - build-nim-1-0-10--archlinux--arm32v7
-
-    - build-nim-1-0-10--archlinux--arm64v8
+    - test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-12
 
 
 
-    - build-nim-1-0-10--debian-buster--amd64
+    - test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-11
 
-    - build-nim-1-0-10--debian-buster--386
 
-    - build-nim-1-0-10--debian-buster--arm32v5
 
-    - build-nim-1-0-10--debian-buster--arm32v7
+    - test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-10
 
-    - build-nim-1-0-10--debian-buster--arm64v8
 
-    - build-nim-1-0-10--debian-buster--ppc64le
+
+    - test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-9
+
+
+
+    - test-nim-1-0-10--alpine-3-12--amd64--on-alpine-3-8
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--alpine-3-12--arm32v6--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--alpine-3-12--arm32v7--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--alpine-3-12--arm64v8--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--archlinux--amd64--on-archlinux
+
+
+
+
+
+    - test-nim-1-0-10--archlinux--amd64--on-jonathonf-manjaro
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--archlinux--arm32v5--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--archlinux--arm32v6--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--archlinux--arm32v7--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--archlinux--arm64v8--on-archlinux
+
+
+
+    - test-nim-1-0-10--archlinux--arm64v8--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--debian-buster--amd64--on-debian-buster
+
+
+
+    - test-nim-1-0-10--debian-buster--amd64--on-ubuntu-bionic
+
+
+
+    - test-nim-1-0-10--debian-buster--amd64--on-ubuntu-focal
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--debian-buster--386--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--debian-buster--arm32v5--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--debian-buster--arm32v7--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--debian-buster--arm64v8--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-0-10--debian-buster--ppc64le--on-debian-buster
+
+
+
+
+
+
+
+
 
 
 
@@ -8031,39 +8318,251 @@ jobs:
     - create-release-nim-1-2-8
 
 
-    - build-nim-1-2-8--alpine-3-12--amd64
-
-    - build-nim-1-2-8--alpine-3-12--arm32v6
-
-    - build-nim-1-2-8--alpine-3-12--arm32v7
-
-    - build-nim-1-2-8--alpine-3-12--arm64v8
 
 
 
-    - build-nim-1-2-8--archlinux--amd64
 
-    - build-nim-1-2-8--archlinux--arm32v5
-
-    - build-nim-1-2-8--archlinux--arm32v6
-
-    - build-nim-1-2-8--archlinux--arm32v7
-
-    - build-nim-1-2-8--archlinux--arm64v8
+    - test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-12
 
 
 
-    - build-nim-1-2-8--debian-buster--amd64
+    - test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-11
 
-    - build-nim-1-2-8--debian-buster--386
 
-    - build-nim-1-2-8--debian-buster--arm32v5
 
-    - build-nim-1-2-8--debian-buster--arm32v7
+    - test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-10
 
-    - build-nim-1-2-8--debian-buster--arm64v8
 
-    - build-nim-1-2-8--debian-buster--ppc64le
+
+    - test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-9
+
+
+
+    - test-nim-1-2-8--alpine-3-12--amd64--on-alpine-3-8
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--alpine-3-12--arm32v6--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--alpine-3-12--arm32v7--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--alpine-3-12--arm64v8--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--archlinux--amd64--on-archlinux
+
+
+
+
+
+    - test-nim-1-2-8--archlinux--amd64--on-jonathonf-manjaro
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--archlinux--arm32v5--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--archlinux--arm32v6--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--archlinux--arm32v7--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--archlinux--arm64v8--on-archlinux
+
+
+
+    - test-nim-1-2-8--archlinux--arm64v8--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--debian-buster--amd64--on-debian-buster
+
+
+
+    - test-nim-1-2-8--debian-buster--amd64--on-ubuntu-bionic
+
+
+
+    - test-nim-1-2-8--debian-buster--amd64--on-ubuntu-focal
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--debian-buster--386--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--debian-buster--arm32v5--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--debian-buster--arm32v7--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--debian-buster--arm64v8--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-2-8--debian-buster--ppc64le--on-debian-buster
+
+
+
+
+
+
+
+
 
 
 
@@ -11192,39 +11691,251 @@ jobs:
     - create-release-nim-1-4-2
 
 
-    - build-nim-1-4-2--alpine-3-12--amd64
-
-    - build-nim-1-4-2--alpine-3-12--arm32v6
-
-    - build-nim-1-4-2--alpine-3-12--arm32v7
-
-    - build-nim-1-4-2--alpine-3-12--arm64v8
 
 
 
-    - build-nim-1-4-2--archlinux--amd64
 
-    - build-nim-1-4-2--archlinux--arm32v5
-
-    - build-nim-1-4-2--archlinux--arm32v6
-
-    - build-nim-1-4-2--archlinux--arm32v7
-
-    - build-nim-1-4-2--archlinux--arm64v8
+    - test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-12
 
 
 
-    - build-nim-1-4-2--debian-buster--amd64
+    - test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-11
 
-    - build-nim-1-4-2--debian-buster--386
 
-    - build-nim-1-4-2--debian-buster--arm32v5
 
-    - build-nim-1-4-2--debian-buster--arm32v7
+    - test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-10
 
-    - build-nim-1-4-2--debian-buster--arm64v8
 
-    - build-nim-1-4-2--debian-buster--ppc64le
+
+    - test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-9
+
+
+
+    - test-nim-1-4-2--alpine-3-12--amd64--on-alpine-3-8
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--alpine-3-12--arm32v6--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--alpine-3-12--arm32v7--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--alpine-3-12--arm64v8--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--archlinux--amd64--on-archlinux
+
+
+
+
+
+    - test-nim-1-4-2--archlinux--amd64--on-jonathonf-manjaro
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--archlinux--arm32v5--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--archlinux--arm32v6--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--archlinux--arm32v7--on-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--archlinux--arm64v8--on-archlinux
+
+
+
+    - test-nim-1-4-2--archlinux--arm64v8--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--debian-buster--amd64--on-debian-buster
+
+
+
+    - test-nim-1-4-2--debian-buster--amd64--on-ubuntu-bionic
+
+
+
+    - test-nim-1-4-2--debian-buster--amd64--on-ubuntu-focal
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--debian-buster--386--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--debian-buster--arm32v5--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--debian-buster--arm32v7--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--debian-buster--arm64v8--on-debian-buster
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-1-4-2--debian-buster--ppc64le--on-debian-buster
+
+
+
+
+
+
+
+
 
 
 

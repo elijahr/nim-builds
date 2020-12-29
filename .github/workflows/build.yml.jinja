@@ -279,7 +279,18 @@ jobs:
       - create-release-nim-{{ nim_version|slugify }}
       {% for distro in distros %}
       {% for platform in distro.platforms %}
+
+      {% if nim_version[0] > "0" %}
+      {% for image, platform_map in distro.test_targets.items() %}
+      {% if platform in platform_map %}
+      - test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}--on-{{ image|slugify }}
+      {% endif %}
+      {% endfor %}
+      {% else %}
+      # Can't run tests for 0.X.X
       - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}
+      {% endif %}
+
       {% endfor %}
       {% endfor %}
 
