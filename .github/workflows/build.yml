@@ -55,7 +55,7 @@ jobs:
 
   
   
-  build-nim-0.20.2--alpine-3-12--amd64:
+  build-nim-0-20-2--alpine-3-12--linux-amd64:
     name: 0.20.2, alpine-3-12, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -149,7 +149,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--alpine-3-12--arm32v6:
+  build-nim-0-20-2--alpine-3-12--linux-arm-v6:
     name: 0.20.2, alpine-3-12, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -267,7 +267,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--alpine-3-12--arm32v7:
+  build-nim-0-20-2--alpine-3-12--linux-arm-v7:
     name: 0.20.2, alpine-3-12, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -385,7 +385,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--alpine-3-12--arm64v8:
+  build-nim-0-20-2--alpine-3-12--linux-arm64-v8:
     name: 0.20.2, alpine-3-12, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -505,7 +505,7 @@ jobs:
   
   
   
-  build-nim-0.20.2--archlinux--amd64:
+  build-nim-0-20-2--archlinux--linux-amd64:
     name: 0.20.2, archlinux, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -599,7 +599,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--archlinux--arm32v5:
+  build-nim-0-20-2--archlinux--linux-arm-v5:
     name: 0.20.2, archlinux, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -717,7 +717,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--archlinux--arm32v6:
+  build-nim-0-20-2--archlinux--linux-arm-v6:
     name: 0.20.2, archlinux, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -835,7 +835,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--archlinux--arm32v7:
+  build-nim-0-20-2--archlinux--linux-arm-v7:
     name: 0.20.2, archlinux, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -953,7 +953,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--archlinux--arm64v8:
+  build-nim-0-20-2--archlinux--linux-arm64-v8:
     name: 0.20.2, archlinux, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -1073,7 +1073,7 @@ jobs:
   
   
   
-  build-nim-0.20.2--debian-buster--amd64:
+  build-nim-0-20-2--debian-buster--linux-amd64:
     name: 0.20.2, debian-buster, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -1167,7 +1167,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--debian-buster--386:
+  build-nim-0-20-2--debian-buster--linux-386:
     name: 0.20.2, debian-buster, linux/386
     runs-on: ubuntu-latest
     needs:
@@ -1279,7 +1279,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--debian-buster--arm32v5:
+  build-nim-0-20-2--debian-buster--linux-arm-v5:
     name: 0.20.2, debian-buster, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -1397,7 +1397,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--debian-buster--arm32v7:
+  build-nim-0-20-2--debian-buster--linux-arm-v7:
     name: 0.20.2, debian-buster, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -1515,7 +1515,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--debian-buster--arm64v8:
+  build-nim-0-20-2--debian-buster--linux-arm64-v8:
     name: 0.20.2, debian-buster, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -1633,7 +1633,7 @@ jobs:
       
 
   
-  build-nim-0.20.2--debian-buster--ppc64le:
+  build-nim-0-20-2--debian-buster--linux-ppc64le:
     name: 0.20.2, debian-buster, linux/ppc64le
     runs-on: ubuntu-latest
     needs:
@@ -1760,39 +1760,39 @@ jobs:
       - nim-0-20-2-create-release
       
       
-      - build-nim-0.20.2--alpine-3-12--amd64
+      - build-nim-0-20-2--alpine-3-12--linux-amd64
       
-      - build-nim-0.20.2--alpine-3-12--arm32v6
+      - build-nim-0-20-2--alpine-3-12--linux-arm-v6
       
-      - build-nim-0.20.2--alpine-3-12--arm32v7
+      - build-nim-0-20-2--alpine-3-12--linux-arm-v7
       
-      - build-nim-0.20.2--alpine-3-12--arm64v8
-      
-      
-      
-      - build-nim-0.20.2--archlinux--amd64
-      
-      - build-nim-0.20.2--archlinux--arm32v5
-      
-      - build-nim-0.20.2--archlinux--arm32v6
-      
-      - build-nim-0.20.2--archlinux--arm32v7
-      
-      - build-nim-0.20.2--archlinux--arm64v8
+      - build-nim-0-20-2--alpine-3-12--linux-arm64-v8
       
       
       
-      - build-nim-0.20.2--debian-buster--amd64
+      - build-nim-0-20-2--archlinux--linux-amd64
       
-      - build-nim-0.20.2--debian-buster--386
+      - build-nim-0-20-2--archlinux--linux-arm-v5
       
-      - build-nim-0.20.2--debian-buster--arm32v5
+      - build-nim-0-20-2--archlinux--linux-arm-v6
       
-      - build-nim-0.20.2--debian-buster--arm32v7
+      - build-nim-0-20-2--archlinux--linux-arm-v7
       
-      - build-nim-0.20.2--debian-buster--arm64v8
+      - build-nim-0-20-2--archlinux--linux-arm64-v8
       
-      - build-nim-0.20.2--debian-buster--ppc64le
+      
+      
+      - build-nim-0-20-2--debian-buster--linux-amd64
+      
+      - build-nim-0-20-2--debian-buster--linux-386
+      
+      - build-nim-0-20-2--debian-buster--linux-arm-v5
+      
+      - build-nim-0-20-2--debian-buster--linux-arm-v7
+      
+      - build-nim-0-20-2--debian-buster--linux-arm64-v8
+      
+      - build-nim-0-20-2--debian-buster--linux-ppc64le
       
       
 
@@ -1846,7 +1846,7 @@ jobs:
 
   
   
-  build-nim-1.0.10--alpine-3-12--amd64:
+  build-nim-1-0-10--alpine-3-12--linux-amd64:
     name: 1.0.10, alpine-3-12, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -1968,7 +1968,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--alpine-3-12--arm32v6:
+  build-nim-1-0-10--alpine-3-12--linux-arm-v6:
     name: 1.0.10, alpine-3-12, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -2114,7 +2114,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--alpine-3-12--arm32v7:
+  build-nim-1-0-10--alpine-3-12--linux-arm-v7:
     name: 1.0.10, alpine-3-12, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -2260,7 +2260,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--alpine-3-12--arm64v8:
+  build-nim-1-0-10--alpine-3-12--linux-arm64-v8:
     name: 1.0.10, alpine-3-12, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -2408,7 +2408,7 @@ jobs:
   
   
   
-  build-nim-1.0.10--archlinux--amd64:
+  build-nim-1-0-10--archlinux--linux-amd64:
     name: 1.0.10, archlinux, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -2530,7 +2530,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--archlinux--arm32v5:
+  build-nim-1-0-10--archlinux--linux-arm-v5:
     name: 1.0.10, archlinux, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -2676,7 +2676,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--archlinux--arm32v6:
+  build-nim-1-0-10--archlinux--linux-arm-v6:
     name: 1.0.10, archlinux, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -2822,7 +2822,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--archlinux--arm32v7:
+  build-nim-1-0-10--archlinux--linux-arm-v7:
     name: 1.0.10, archlinux, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -2968,7 +2968,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--archlinux--arm64v8:
+  build-nim-1-0-10--archlinux--linux-arm64-v8:
     name: 1.0.10, archlinux, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -3116,7 +3116,7 @@ jobs:
   
   
   
-  build-nim-1.0.10--debian-buster--amd64:
+  build-nim-1-0-10--debian-buster--linux-amd64:
     name: 1.0.10, debian-buster, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -3238,7 +3238,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--debian-buster--386:
+  build-nim-1-0-10--debian-buster--linux-386:
     name: 1.0.10, debian-buster, linux/386
     runs-on: ubuntu-latest
     needs:
@@ -3378,7 +3378,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--debian-buster--arm32v5:
+  build-nim-1-0-10--debian-buster--linux-arm-v5:
     name: 1.0.10, debian-buster, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -3524,7 +3524,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--debian-buster--arm32v7:
+  build-nim-1-0-10--debian-buster--linux-arm-v7:
     name: 1.0.10, debian-buster, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -3670,7 +3670,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--debian-buster--arm64v8:
+  build-nim-1-0-10--debian-buster--linux-arm64-v8:
     name: 1.0.10, debian-buster, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -3816,7 +3816,7 @@ jobs:
       
 
   
-  build-nim-1.0.10--debian-buster--ppc64le:
+  build-nim-1-0-10--debian-buster--linux-ppc64le:
     name: 1.0.10, debian-buster, linux/ppc64le
     runs-on: ubuntu-latest
     needs:
@@ -3971,39 +3971,39 @@ jobs:
       - nim-1-0-10-create-release
       
       
-      - build-nim-1.0.10--alpine-3-12--amd64
+      - build-nim-1-0-10--alpine-3-12--linux-amd64
       
-      - build-nim-1.0.10--alpine-3-12--arm32v6
+      - build-nim-1-0-10--alpine-3-12--linux-arm-v6
       
-      - build-nim-1.0.10--alpine-3-12--arm32v7
+      - build-nim-1-0-10--alpine-3-12--linux-arm-v7
       
-      - build-nim-1.0.10--alpine-3-12--arm64v8
-      
-      
-      
-      - build-nim-1.0.10--archlinux--amd64
-      
-      - build-nim-1.0.10--archlinux--arm32v5
-      
-      - build-nim-1.0.10--archlinux--arm32v6
-      
-      - build-nim-1.0.10--archlinux--arm32v7
-      
-      - build-nim-1.0.10--archlinux--arm64v8
+      - build-nim-1-0-10--alpine-3-12--linux-arm64-v8
       
       
       
-      - build-nim-1.0.10--debian-buster--amd64
+      - build-nim-1-0-10--archlinux--linux-amd64
       
-      - build-nim-1.0.10--debian-buster--386
+      - build-nim-1-0-10--archlinux--linux-arm-v5
       
-      - build-nim-1.0.10--debian-buster--arm32v5
+      - build-nim-1-0-10--archlinux--linux-arm-v6
       
-      - build-nim-1.0.10--debian-buster--arm32v7
+      - build-nim-1-0-10--archlinux--linux-arm-v7
       
-      - build-nim-1.0.10--debian-buster--arm64v8
+      - build-nim-1-0-10--archlinux--linux-arm64-v8
       
-      - build-nim-1.0.10--debian-buster--ppc64le
+      
+      
+      - build-nim-1-0-10--debian-buster--linux-amd64
+      
+      - build-nim-1-0-10--debian-buster--linux-386
+      
+      - build-nim-1-0-10--debian-buster--linux-arm-v5
+      
+      - build-nim-1-0-10--debian-buster--linux-arm-v7
+      
+      - build-nim-1-0-10--debian-buster--linux-arm64-v8
+      
+      - build-nim-1-0-10--debian-buster--linux-ppc64le
       
       
 
@@ -4057,7 +4057,7 @@ jobs:
 
   
   
-  build-nim-1.2.8--alpine-3-12--amd64:
+  build-nim-1-2-8--alpine-3-12--linux-amd64:
     name: 1.2.8, alpine-3-12, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -4179,7 +4179,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--alpine-3-12--arm32v6:
+  build-nim-1-2-8--alpine-3-12--linux-arm-v6:
     name: 1.2.8, alpine-3-12, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -4325,7 +4325,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--alpine-3-12--arm32v7:
+  build-nim-1-2-8--alpine-3-12--linux-arm-v7:
     name: 1.2.8, alpine-3-12, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -4471,7 +4471,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--alpine-3-12--arm64v8:
+  build-nim-1-2-8--alpine-3-12--linux-arm64-v8:
     name: 1.2.8, alpine-3-12, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -4619,7 +4619,7 @@ jobs:
   
   
   
-  build-nim-1.2.8--archlinux--amd64:
+  build-nim-1-2-8--archlinux--linux-amd64:
     name: 1.2.8, archlinux, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -4741,7 +4741,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--archlinux--arm32v5:
+  build-nim-1-2-8--archlinux--linux-arm-v5:
     name: 1.2.8, archlinux, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -4887,7 +4887,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--archlinux--arm32v6:
+  build-nim-1-2-8--archlinux--linux-arm-v6:
     name: 1.2.8, archlinux, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -5033,7 +5033,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--archlinux--arm32v7:
+  build-nim-1-2-8--archlinux--linux-arm-v7:
     name: 1.2.8, archlinux, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -5179,7 +5179,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--archlinux--arm64v8:
+  build-nim-1-2-8--archlinux--linux-arm64-v8:
     name: 1.2.8, archlinux, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -5327,7 +5327,7 @@ jobs:
   
   
   
-  build-nim-1.2.8--debian-buster--amd64:
+  build-nim-1-2-8--debian-buster--linux-amd64:
     name: 1.2.8, debian-buster, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -5449,7 +5449,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--debian-buster--386:
+  build-nim-1-2-8--debian-buster--linux-386:
     name: 1.2.8, debian-buster, linux/386
     runs-on: ubuntu-latest
     needs:
@@ -5589,7 +5589,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--debian-buster--arm32v5:
+  build-nim-1-2-8--debian-buster--linux-arm-v5:
     name: 1.2.8, debian-buster, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -5735,7 +5735,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--debian-buster--arm32v7:
+  build-nim-1-2-8--debian-buster--linux-arm-v7:
     name: 1.2.8, debian-buster, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -5881,7 +5881,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--debian-buster--arm64v8:
+  build-nim-1-2-8--debian-buster--linux-arm64-v8:
     name: 1.2.8, debian-buster, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -6027,7 +6027,7 @@ jobs:
       
 
   
-  build-nim-1.2.8--debian-buster--ppc64le:
+  build-nim-1-2-8--debian-buster--linux-ppc64le:
     name: 1.2.8, debian-buster, linux/ppc64le
     runs-on: ubuntu-latest
     needs:
@@ -6182,39 +6182,39 @@ jobs:
       - nim-1-2-8-create-release
       
       
-      - build-nim-1.2.8--alpine-3-12--amd64
+      - build-nim-1-2-8--alpine-3-12--linux-amd64
       
-      - build-nim-1.2.8--alpine-3-12--arm32v6
+      - build-nim-1-2-8--alpine-3-12--linux-arm-v6
       
-      - build-nim-1.2.8--alpine-3-12--arm32v7
+      - build-nim-1-2-8--alpine-3-12--linux-arm-v7
       
-      - build-nim-1.2.8--alpine-3-12--arm64v8
-      
-      
-      
-      - build-nim-1.2.8--archlinux--amd64
-      
-      - build-nim-1.2.8--archlinux--arm32v5
-      
-      - build-nim-1.2.8--archlinux--arm32v6
-      
-      - build-nim-1.2.8--archlinux--arm32v7
-      
-      - build-nim-1.2.8--archlinux--arm64v8
+      - build-nim-1-2-8--alpine-3-12--linux-arm64-v8
       
       
       
-      - build-nim-1.2.8--debian-buster--amd64
+      - build-nim-1-2-8--archlinux--linux-amd64
       
-      - build-nim-1.2.8--debian-buster--386
+      - build-nim-1-2-8--archlinux--linux-arm-v5
       
-      - build-nim-1.2.8--debian-buster--arm32v5
+      - build-nim-1-2-8--archlinux--linux-arm-v6
       
-      - build-nim-1.2.8--debian-buster--arm32v7
+      - build-nim-1-2-8--archlinux--linux-arm-v7
       
-      - build-nim-1.2.8--debian-buster--arm64v8
+      - build-nim-1-2-8--archlinux--linux-arm64-v8
       
-      - build-nim-1.2.8--debian-buster--ppc64le
+      
+      
+      - build-nim-1-2-8--debian-buster--linux-amd64
+      
+      - build-nim-1-2-8--debian-buster--linux-386
+      
+      - build-nim-1-2-8--debian-buster--linux-arm-v5
+      
+      - build-nim-1-2-8--debian-buster--linux-arm-v7
+      
+      - build-nim-1-2-8--debian-buster--linux-arm64-v8
+      
+      - build-nim-1-2-8--debian-buster--linux-ppc64le
       
       
 
@@ -6268,7 +6268,7 @@ jobs:
 
   
   
-  build-nim-1.4.2--alpine-3-12--amd64:
+  build-nim-1-4-2--alpine-3-12--linux-amd64:
     name: 1.4.2, alpine-3-12, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -6390,7 +6390,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--alpine-3-12--arm32v6:
+  build-nim-1-4-2--alpine-3-12--linux-arm-v6:
     name: 1.4.2, alpine-3-12, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -6536,7 +6536,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--alpine-3-12--arm32v7:
+  build-nim-1-4-2--alpine-3-12--linux-arm-v7:
     name: 1.4.2, alpine-3-12, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -6682,7 +6682,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--alpine-3-12--arm64v8:
+  build-nim-1-4-2--alpine-3-12--linux-arm64-v8:
     name: 1.4.2, alpine-3-12, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -6830,7 +6830,7 @@ jobs:
   
   
   
-  build-nim-1.4.2--archlinux--amd64:
+  build-nim-1-4-2--archlinux--linux-amd64:
     name: 1.4.2, archlinux, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -6952,7 +6952,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--archlinux--arm32v5:
+  build-nim-1-4-2--archlinux--linux-arm-v5:
     name: 1.4.2, archlinux, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -7098,7 +7098,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--archlinux--arm32v6:
+  build-nim-1-4-2--archlinux--linux-arm-v6:
     name: 1.4.2, archlinux, linux/arm/v6
     runs-on: ubuntu-latest
     needs:
@@ -7244,7 +7244,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--archlinux--arm32v7:
+  build-nim-1-4-2--archlinux--linux-arm-v7:
     name: 1.4.2, archlinux, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -7390,7 +7390,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--archlinux--arm64v8:
+  build-nim-1-4-2--archlinux--linux-arm64-v8:
     name: 1.4.2, archlinux, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -7538,7 +7538,7 @@ jobs:
   
   
   
-  build-nim-1.4.2--debian-buster--amd64:
+  build-nim-1-4-2--debian-buster--linux-amd64:
     name: 1.4.2, debian-buster, linux/amd64
     runs-on: ubuntu-latest
     needs:
@@ -7660,7 +7660,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--debian-buster--386:
+  build-nim-1-4-2--debian-buster--linux-386:
     name: 1.4.2, debian-buster, linux/386
     runs-on: ubuntu-latest
     needs:
@@ -7800,7 +7800,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--debian-buster--arm32v5:
+  build-nim-1-4-2--debian-buster--linux-arm-v5:
     name: 1.4.2, debian-buster, linux/arm/v5
     runs-on: ubuntu-latest
     needs:
@@ -7946,7 +7946,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--debian-buster--arm32v7:
+  build-nim-1-4-2--debian-buster--linux-arm-v7:
     name: 1.4.2, debian-buster, linux/arm/v7
     runs-on: ubuntu-latest
     needs:
@@ -8092,7 +8092,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--debian-buster--arm64v8:
+  build-nim-1-4-2--debian-buster--linux-arm64-v8:
     name: 1.4.2, debian-buster, linux/arm64/v8
     runs-on: ubuntu-latest
     needs:
@@ -8238,7 +8238,7 @@ jobs:
       
 
   
-  build-nim-1.4.2--debian-buster--ppc64le:
+  build-nim-1-4-2--debian-buster--linux-ppc64le:
     name: 1.4.2, debian-buster, linux/ppc64le
     runs-on: ubuntu-latest
     needs:
@@ -8393,39 +8393,39 @@ jobs:
       - nim-1-4-2-create-release
       
       
-      - build-nim-1.4.2--alpine-3-12--amd64
+      - build-nim-1-4-2--alpine-3-12--linux-amd64
       
-      - build-nim-1.4.2--alpine-3-12--arm32v6
+      - build-nim-1-4-2--alpine-3-12--linux-arm-v6
       
-      - build-nim-1.4.2--alpine-3-12--arm32v7
+      - build-nim-1-4-2--alpine-3-12--linux-arm-v7
       
-      - build-nim-1.4.2--alpine-3-12--arm64v8
-      
-      
-      
-      - build-nim-1.4.2--archlinux--amd64
-      
-      - build-nim-1.4.2--archlinux--arm32v5
-      
-      - build-nim-1.4.2--archlinux--arm32v6
-      
-      - build-nim-1.4.2--archlinux--arm32v7
-      
-      - build-nim-1.4.2--archlinux--arm64v8
+      - build-nim-1-4-2--alpine-3-12--linux-arm64-v8
       
       
       
-      - build-nim-1.4.2--debian-buster--amd64
+      - build-nim-1-4-2--archlinux--linux-amd64
       
-      - build-nim-1.4.2--debian-buster--386
+      - build-nim-1-4-2--archlinux--linux-arm-v5
       
-      - build-nim-1.4.2--debian-buster--arm32v5
+      - build-nim-1-4-2--archlinux--linux-arm-v6
       
-      - build-nim-1.4.2--debian-buster--arm32v7
+      - build-nim-1-4-2--archlinux--linux-arm-v7
       
-      - build-nim-1.4.2--debian-buster--arm64v8
+      - build-nim-1-4-2--archlinux--linux-arm64-v8
       
-      - build-nim-1.4.2--debian-buster--ppc64le
+      
+      
+      - build-nim-1-4-2--debian-buster--linux-amd64
+      
+      - build-nim-1-4-2--debian-buster--linux-386
+      
+      - build-nim-1-4-2--debian-buster--linux-arm-v5
+      
+      - build-nim-1-4-2--debian-buster--linux-arm-v7
+      
+      - build-nim-1-4-2--debian-buster--linux-arm64-v8
+      
+      - build-nim-1-4-2--debian-buster--linux-ppc64le
       
       
 

@@ -55,7 +55,7 @@ jobs:
 
   {% for distro in distros %}
   {% for platform in distro.platforms %}
-  build-nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}:
+  build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|slugify }}:
     name: {{ nim_version }}, {{ distro.name }}, {{ platform }}
     runs-on: ubuntu-latest
     needs:
@@ -220,7 +220,7 @@ jobs:
       - nim-{{ nim_version|slugify }}-create-release
       {% for distro in distros %}
       {% for platform in distro.platforms %}
-      - build-nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}
+      - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|slugify }}
       {% endfor %}
       {% endfor %}
 
