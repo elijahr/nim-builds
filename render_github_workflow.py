@@ -161,6 +161,8 @@ distros = [
             },
             "archlinux": {
                 "linux/amd64": "linux/amd64",
+            },
+            "lopsided/archlinux": {
                 "linux/arm/v5": "linux/arm/v5",
                 "linux/arm/v6": "linux/arm/v6",
                 "linux/arm/v7": "linux/arm/v7",
@@ -168,9 +170,6 @@ distros = [
             },
             "abyo/manjaro_aarch64": {
                 "linux/arm64/v8": "linux/arm64",
-            },
-            "jonathonf/manjaro": {
-                "linux/amd64": "linux/amd64",
             },
             "debian:buster": {
                 "linux/amd64": "linux/amd64",
