@@ -13,10 +13,10 @@ then
 
 	for file in ${files[@]}
 	do
-		if [ "$file" == ".github/workflows/build.yml.jinja" ] || [ "$file" == "render_build_yml.py" ]
+		if [ "$file" == ".github/workflows/build.yml.jinja" ] || [ "$file" == "render_github_workflow.py" ]
 		then
 			echo "Change detected, re-rendering GitHub Actions"
-			pipenv run python render_build_yml.py
+			pipenv run python render_github_workflow.py
 			pipenv run yamllint .github/workflows/build.yml
 			git add .github/workflows/*.yml || true
 		fi

@@ -4,16 +4,11 @@ set -uex
 
 SCRIPT_DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-SRC_DIR=${1:-"${SCRIPT_DIR}/src"}
+NIM_DIR=$1
 
-cd "$SRC_DIR"
+cd "$NIM_DIR"
 
-test () {
-  target=$1
-  testament/testament --nim:bin/nim --targets:$target all
-}
-
-main () {
+install_deps () {
   if [ "$(which apk)" != "" ]
   then
     apk add --update --no-cache sfml pcre gc sqlite-dev sqlite
@@ -29,13 +24,20 @@ main () {
   then
     brew install sfml sqlite libgc
   fi
+}
 
-  bin/nim cc --opt:speed testament/testament
+test () {
+  target=$1
+  testament/testament --nim:"${NIM_DIR}/bin/nim" --targets:"$target" all
+}
 
-  # Don't fail if there are test failures
-  test c || true
-  test c++ || true
-  test js || true
+main () {
+  install_deps
+  "${NIM_DIR}/bin/nim" cc --opt:speed testament/testament
+
+  test c
+  test c++
+  test js
 }
 
 main

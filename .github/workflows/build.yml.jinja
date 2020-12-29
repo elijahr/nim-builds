@@ -1,8 +1,202 @@
----
+# yamllint disable rule:document-start
 # yamllint disable rule:line-length
 # yamllint disable rule:empty-lines
 # yamllint disable rule:trailing-spaces
 # yamllint disable rule:new-line-at-end-of-file
+# yamllint disable rule:indentation
+
+_anchors:
+  checkout_repo: &checkout_repo
+    name: Checkout repo
+    uses: actions/checkout@v2
+    with:
+      fetch-depth: 1
+      submodules: recursive
+
+  configure_qemu: &configure_qemu
+    name: Configure QEMU
+    run: |
+      sudo apt-get update -q -y
+      sudo apt-get -qq install -y qemu qemu-user-static
+      docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+  install_deps: &install_deps
+    name: Install deps
+    run: |
+      sudo add-apt-repository ppa:cpick/hub
+      sudo apt-get update -q -y
+      sudo apt-get -qq install -y hub pixz
+
+  enable_docker_experimental_features: &enable_docker_experimental_features
+    name: Enable Docker experimental features
+    run: |
+      echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+      sudo service docker restart
+      docker version -f {% raw %}'{{.Server.Experimental}}'{% endraw %}
+
+  setup_dirs: &setup_dirs
+    name: Setup dirs
+    run: |
+      mkdir -p build
+      mkdir -p nimcache
+
+  {% for distro in distros %}
+  start_distcc_host_{{ distro.name|slugify }}: &start_distcc_host_{{ distro.name|slugify }}
+    name: Start distcc host
+    run: |
+      docker run -d \
+        --platform linux/amd64 \
+        -p 3600-3900:3600-3900/tcp \
+        {{ distro.build_farm_host_image }}}
+
+  stop_distcc_host_{{ distro.name|slugify }}: &stop_distcc_host_{{ distro.name|slugify }}
+    name: Stop distcc host
+    run: |
+      id=$(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
+      if [ "$id" != "" ]
+      then
+        docker kill $id
+      fi
+  {% endfor %}
+
+  {% for nim_version in nim_versions %}
+  download_nim_source_{{ nim_version|slugify }}: &download_nim_source_{{ nim_version|slugify }}
+    name: Download Nim source
+    run: |
+      cd build
+      nim_dir="nim-{{ nim_version }}"
+      wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+      pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+      tar xf "${nim_dir}.tar"
+      rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+  create_tarball_{{ nim_version|slugify }}: &create_tarball_{{ nim_version|slugify }}
+    name: Create tarball
+    id: create-tarball
+    run: |
+      cd build
+      nim_dir="nim-{{ nim_version }}"
+      tarball="${nim_dir}.tar.xz"
+      tar -Ipixz -cf "$tarball" "$nim_dir"
+      echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+  generate_release_name_{{ nim_version|slugify }}: &generate_release_name_{{ nim_version|slugify }}
+    name: Generate release name
+    id: generate-release-name
+    run: |
+      release_name=nim-{{ nim_version }}--$(date '+%Y%m%d%H%M')
+      echo "::set-output name=release_name::${release_name}"
+
+  create_release_{{ nim_version|slugify }}: &create_release_{{ nim_version|slugify }}
+    name: Create release
+    id: create-release
+    uses: actions/create-release@v1
+    {% raw %}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+      draft: true
+      prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+    {% endraw %}
+
+  {% for distro in distros %}
+  {% for platform in distro.platforms %}
+
+  restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+    name: Restore Nim cache
+    uses: actions/cache@v2
+    with:
+      path: |
+        build/nimcache
+      key: "nim-{{ nim_version }}-{{ distro.name }}-{{ platform }}-nimcache"
+
+  build_nim_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &build_nim_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+    name: Build Nim
+    id: build-nim
+    shell: bash
+    run: |
+      set -uexo pipefail
+
+      {% if platform == "linux/amd64" %}
+      # Build in native container
+      docker run \
+        --platform {{ platform }} \
+        --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+        --mount "type=bind,src=${PWD}/build,dst=/build" \
+        --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+        --workdir /build \
+        {{ distro.build_farm_host_image }} \
+        sh /scripts/build-nim.sh /build/nim-{{ nim_version }}
+
+      {% else %}
+      dump_logs () {
+        docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
+      }
+
+      # Build in emulated container
+      docker run \
+        --platform {{ platform }} \
+        --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+        --mount "type=bind,src=${PWD}/build,dst=/build" \
+        --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+        --workdir /build \
+        {{ distro.build_farm_client_image }} \
+        sh /scripts/build-nim.sh /build/nim-{{ nim_version }} || (status=$?; dump_logs; exit $status)
+      {% endif %}
+
+  add_tarball_to_release_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &add_tarball_to_release_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+    name: Add tarball to release
+    uses: actions/upload-release-asset@v1
+    env:
+      {% raw %}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      {% endraw %}
+    with:
+      upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
+      asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
+      asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}.tar.xz
+      asset_content_type: application/x-xz
+
+  download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+    name: Download released tarball
+    run: |
+      cd build
+      tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name' }}
+      tarball=nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
+      hub release download "$tag" -i "$tarball"
+      pixz -d "tarball" "nim-{{ nim_version }}.tar"
+      tar xf "nim-{{ nim_version }}.tar"
+
+  run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}: &run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+    name: Run tests
+    run: |
+      mkdir -p nimcache
+
+      {% if platform == "linux/amd64" %}
+      # Test in native container
+      docker run \
+        --platform {{ platform }} \
+        --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+        --mount "type=bind,src=${PWD}/build,dst=/build" \
+        --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+        {{ distro.build_farm_host_image }} \
+        sh /scripts/test-nim.sh /build/nim-{{ nim_version }}
+      {% else %}
+      # Test in emulated container
+      docker run \
+        --platform {{ platform }} \
+        --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+        --mount "type=bind,src=${PWD}/build,dst=/build" \
+        --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+        {{ distro.build_farm_client_image }} \
+        sh /scripts/test-nim.sh /build/nim-{{ nim_version }}
+      {% endif %}
+
+  {% endfor %}
+  {% endfor %}
+  {% endfor %}
 
 name: "Build"
 on:  # yamllint disable-line rule:truthy
@@ -15,11 +209,9 @@ on:  # yamllint disable-line rule:truthy
 
 jobs:
   {% for nim_version in nim_versions %}
-  nim-{{ nim_version|slugify }}-create-release:
+  create-release-nim-{{ nim_version|slugify }}:
     name: Create release {{ nim_version }}
-
     runs-on: ubuntu-latest
-
     outputs:
       {% raw %}
       id: ${{ steps.create-release.outputs.id }}
@@ -28,196 +220,76 @@ jobs:
       {% endraw %}
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          submodules: recursive
-
-      - name: Generate release name
-        id: generate-release-name
-        run: |
-          release_name=nim-{{ nim_version }}--$(date '+%Y%m%d%H%M')
-          echo "::set-output name=release_name::${release_name}"
-
-      - name: Create release
-        id: create-release
-        uses: actions/create-release@v1
-        {% raw %}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.generate-release-name.outputs.release_name }}
-          release_name: ${{ steps.generate-release-name.outputs.release_name }}
-          draft: true
-          prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
-        {% endraw %}
+      - *checkout_repo
+      - *generate_release_name_{{ nim_version|slugify }}
+      - *create_release_{{ nim_version|slugify }}
 
   {% for distro in distros %}
   {% for platform in distro.platforms %}
-  build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|slugify }}:
-    name: {{ nim_version }}, {{ distro.name }}, {{ platform }}
+  build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}:
+    name: Build nim-{{ nim_version }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}.tar.xz
     runs-on: ubuntu-latest
     needs:
-      - "nim-{{ nim_version|slugify }}-create-release"
+      - "create-release-nim-{{ nim_version|slugify }}"
     strategy:
       fail-fast: false
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          submodules: recursive
-
+      - *checkout_repo
       {% if platform not in ("linux/amd64", "linux/386") %}
-      - name: Configure QEMU
-        run: |
-          sudo apt-get update -q -y
-          sudo apt-get -qq install -y qemu qemu-user-static
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - *configure_qemu
+      {% endif %}
+      - *enable_docker_experimental_features
+      - *restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *setup_dirs
+      - *install_deps
+      {% if platform != "linux/amd64" %}
+      - *start_distcc_host_{{ distro.name|slugify }}
+      {% endif %}
+      - *download_nim_source_{{ nim_version|slugify }}
+      - *build_nim_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *create_tarball_{{ nim_version|slugify }}
+      - *add_tarball_to_release_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      {% if platform != "linux/amd64" %}
+      - *stop_distcc_host_{{ distro.name|slugify }}
       {% endif %}
 
-      - name: Enable Docker experimental features
-        run: |
-          echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
-          sudo service docker restart
-          docker version -f {% raw %}'{{.Server.Experimental}}'{% endraw %}
-
-      - name: Restore Nim cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            build/nimcache
-          key: "nim-{{ nim_version }}-{{ distro.name }}-{{ platform }}-nimcache"
-
-      - name: Install pixz
-        run: |
-          sudo apt-get update -q -y
-          sudo apt-get -qq install -y pixz
-
+  {% if nim_version[0] > "0" %}
+  test-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}:
+    name: Test {{ nim_version }}
+    runs-on: ubuntu-latest
+    needs:
+      - create-release-nim-{{ nim_version|slugify }}
+      - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}
+    steps:
+      - *checkout_repo
+      - *install_deps
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
-
+      {% if platform not in ("linux/amd64", "linux/386") %}
+      - *configure_qemu
+      {% endif %}
       {% if platform != "linux/amd64" %}
-      - name: Start distcc host
-        run: |
-          docker run -d \
-            --platform linux/amd64 \
-            -p 3600-3900:3600-3900/tcp \
-            {{ distro.build_farm_host_image }}
+      - *start_distcc_host_{{ distro.name|slugify }}
       {% endif %}
-
-      - name: Build Nim
-        id: build-nim
-        shell: bash
-        run: |
-          set -uexo pipefail
-
-          cd build
-          mkdir -p nimcache
-
-          nim="nim-{{ nim_version }}"
-          wget "https://nim-lang.org/download/${nim}.tar.xz"
-          pixz -d "${nim}.tar.xz" "${nim}.tar"
-          tar xf "${nim}.tar"
-          mv "$nim" src
-          rm "${nim}.tar.xz" "${nim}.tar"
-
-          {% if platform == "linux/amd64" %}
-          # Build in native container
-          docker run \
-            --platform {{ platform }} \
-            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-            --mount "type=bind,src=${PWD}/,dst=/build" \
-            --workdir /build \
-            {{ distro.build_farm_host_image }} \
-            sh build-nim.sh ${nim}
-
-          {% else %}
-          dump_logs () {
-            docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
-          }
-
-          # Build in emulated container
-          docker run \
-            --platform {{ platform }} \
-            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-            --mount "type=bind,src=${PWD}/,dst=/build" \
-            --workdir /build \
-            {{ distro.build_farm_client_image }} \
-            sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
-          {% endif %}
-
-      - name: Create tarball
-        id: create-tarball
-        run: |
-          cd build
-          nim="nim-{{ nim_version }}"
-          tarball="${nim}.tar.xz"
-          tar -Ipixz -cf "$tarball" "$nim"
-          echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
-
-      - name: Add tarball to release
-        uses: actions/upload-release-asset@v1
-        env:
-          {% raw %}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          {% endraw %}
-        with:
-          upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
-          asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
-          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ platform|platform_slug }}.tar.xz
-          asset_content_type: application/x-xz
-
-      {% if nim_version[0] > "0" %}
-      - name: Run tests
-        id: run-tests
-        run: |
-          cd build
-
-          {% if platform == "linux/amd64" %}
-          # Test in native container
-          docker run \
-            --platform {{ platform }} \
-            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-            --mount "type=bind,src=${PWD}/,dst=/build" \
-            --workdir /build \
-            {{ distro.build_farm_host_image }} \
-            sh test-nim.sh
-          {% else %}
-          # Test in emulated container
-          docker run \
-            --platform {{ platform }} \
-            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-            --mount "type=bind,src=${PWD}/,dst=/build" \
-            --workdir /build \
-            {{ distro.build_farm_client_image }} \
-            sh test-nim.sh
-          {% endif %}
-      {% endif %}
-
+      - *restore_nim_cache_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *download_released_tarball_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
+      - *run_tests_{{ nim_version|slugify }}_{{ distro.name|slugify }}_{{ platform|slugify }}
       {% if platform != "linux/amd64" %}
-      - name: Stop build host
-        run: |
-          id=$(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
-          if [ "$id" != "" ]
-          then
-            docker kill $id
-          fi
+      - *stop_distcc_host_{{ distro.name|slugify }}
       {% endif %}
-
+  {% endif %}
   {% endfor %}
   {% endfor %}
 
-  nim-{{ nim_version|slugify }}-publish-release:
+  publish-release-nim-{{ nim_version|slugify }}:
     name: Publish release {{ nim_version }}
     runs-on: ubuntu-latest
     needs:
-      - nim-{{ nim_version|slugify }}-create-release
+      - create-release-nim-{{ nim_version|slugify }}
       {% for distro in distros %}
       {% for platform in distro.platforms %}
-      - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|slugify }}
+      - build-nim-{{ nim_version|slugify }}--{{ distro.name|slugify }}--{{ platform|platform_slug }}
       {% endfor %}
       {% endfor %}
 

@@ -15,15 +15,18 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+    - name: Install hub
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub
+
     - name: Delete stale draft releases
       shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -uexo pipefail
-        sudo add-apt-repository ppa:cpick/hub
-        sudo apt-get update -q -y
-        sudo apt-get -qq install -y hub
 
         delete_release () {
           echo "Deleting release: $1 ($2)"

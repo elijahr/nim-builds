@@ -6,7 +6,32 @@ import sys
 from itertools import groupby
 from jinja2 import Environment, StrictUndefined
 from path import Path
+from ruamel import yaml
 from semver import VersionInfo
+
+
+class Dumper(yaml.RoundTripDumper):
+    def ignore_aliases(self, data):
+        # Strip aliases
+        return True
+
+
+def interpolate_yaml(yaml_path):
+    with open(yaml_path, "r") as f:
+        rendered = yaml.load(f, Loader=yaml.RoundTripLoader)
+
+    # Remove _anchors section
+    if "_anchors" in rendered:
+        del rendered["_anchors"]
+
+    # Use custom Dumper that replaces aliases with referenced content
+    rendered = yaml.dump(rendered, Dumper=Dumper)
+
+    with open(yaml_path, "w") as f:
+        f.write(rendered)
+
+    print(f"Interpolated {yaml_path}")
+    return yaml_path
 
 
 project_dir = Path(os.path.dirname(os.path.abspath(__file__)))
@@ -88,7 +113,7 @@ distros = [
 ]
 
 
-def render_build_yml():
+def render_github_workflow():
     env = Environment(autoescape=False, undefined=StrictUndefined)
     env.filters["slugify"] = slugify
     env.filters["platform_slug"] = platform_slug
@@ -98,14 +123,16 @@ def render_build_yml():
             nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
             slugify=slugify,
         )
-        with open(project_dir / ".github/workflows/build.yml.jinja", "r") as f:
+        build_yml = ".github/workflows/build.yml"
+        with open(f"{build_yml}.jinja", "r") as f:
             rendered = env.from_string(f.read()).render(**context)
-        with open(project_dir / ".github/workflows/build.yml", "w") as f:
+        with open(build_yml, "w") as f:
             f.write(rendered)
         print(
             "Rendered .github/workflows/build.yml.jinja -> .github/workflows/build.yml"
         )
+        interpolate_yaml(build_yml)
 
 
 if __name__ == "__main__":
-    render_build_yml()
+    render_github_workflow()
