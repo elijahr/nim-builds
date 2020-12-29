@@ -137,6 +137,9 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -144,7 +147,7 @@ jobs:
         nim="nim-0.20.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -154,8 +157,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-0.20.2--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -172,7 +175,7 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -182,8 +185,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-0.20.2--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -286,6 +289,9 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -293,7 +299,7 @@ jobs:
         nim="nim-0.20.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -303,8 +309,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-0.20.2--archlinux--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -321,7 +327,7 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -331,8 +337,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-0.20.2--archlinux--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -437,6 +443,9 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -444,7 +453,7 @@ jobs:
         nim="nim-0.20.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -454,8 +463,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-0.20.2--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -472,7 +481,7 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -482,8 +491,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-0-20-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-0.20.2--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -647,6 +656,9 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -654,7 +666,7 @@ jobs:
         nim="nim-1.0.10"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -664,8 +676,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.0.10--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -682,7 +694,7 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -692,8 +704,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.0.10--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -796,6 +808,9 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -803,7 +818,7 @@ jobs:
         nim="nim-1.0.10"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -813,8 +828,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.0.10--archlinux--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -831,7 +846,7 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -841,8 +856,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.0.10--archlinux--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -947,6 +962,9 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -954,7 +972,7 @@ jobs:
         nim="nim-1.0.10"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -964,8 +982,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.0.10--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -982,7 +1000,7 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -992,8 +1010,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-0-10-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.0.10--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -1157,6 +1175,9 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -1164,7 +1185,7 @@ jobs:
         nim="nim-1.2.8"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -1174,8 +1195,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.8--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -1192,7 +1213,7 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -1202,8 +1223,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.2.8--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -1306,6 +1327,9 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -1313,7 +1337,7 @@ jobs:
         nim="nim-1.2.8"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -1323,8 +1347,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.8--archlinux--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -1341,7 +1365,7 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -1351,8 +1375,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.2.8--archlinux--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -1457,6 +1481,9 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -1464,7 +1491,7 @@ jobs:
         nim="nim-1.2.8"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -1474,8 +1501,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.8--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -1492,7 +1519,7 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -1502,8 +1529,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-2-8-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.2.8--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -1667,6 +1694,9 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -1674,7 +1704,7 @@ jobs:
         nim="nim-1.4.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -1684,8 +1714,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.4.2--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -1702,7 +1732,7 @@ jobs:
           elijahru/build-farm-client:alpine-3.12 \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -1712,8 +1742,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.4.2--alpine-3-12--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -1816,6 +1846,9 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -1823,7 +1856,7 @@ jobs:
         nim="nim-1.4.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -1833,8 +1866,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.4.2--archlinux--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -1851,7 +1884,7 @@ jobs:
           elijahru/build-farm-client:archlinux \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -1861,8 +1894,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.4.2--archlinux--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host
@@ -1967,6 +2000,9 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
+        platform_slug=$(echo "${{ matrix.platform }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+        echo "::set-output name=platform_slug::${platform_slug}"
+
     - name: Create tarball
       id: create-tarball
       run: |
@@ -1974,7 +2010,7 @@ jobs:
         nim="nim-1.4.2"
         tarball="${nim}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=asset_path::${PWD}/${tarball}"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
       uses: actions/upload-release-asset@v1
@@ -1984,8 +2020,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.asset_path }}
-        asset_name: ${{ steps.build-nim.outputs.asset_name }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.4.2--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.tar.xz
         asset_content_type: application/x-xz
 
     - name: Run tests
@@ -2002,7 +2038,7 @@ jobs:
           elijahru/build-farm-client:debian-buster-slim \
           sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_path::${PWD}/test-log.txt"
+        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
     - name: Add test log to release
       uses: actions/upload-release-asset@v1
@@ -2012,8 +2048,8 @@ jobs:
         
       with:
         upload_url: ${{ needs.nim-1-4-2-create-release.outputs.upload_url }}
-        asset_path: ${{ steps.run-tests.outputs.test_log_path }}
-        asset_name: ${{ steps.build-nim.outputs.test_log_name }}
+        asset_path: ${{ steps.run-tests.outputs.test_log_asset_path }}
+        asset_name: nim-1.4.2--debian-buster--${{ steps.build-nim.outputs.platform_slug }}.test-log.txt
         asset_content_type: text/plain
 
     - name: Stop build host

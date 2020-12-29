@@ -19,6 +19,3 @@ for fn in nimble nimsuggest nimgrep
 do
   cp "./bin/${fn}" "../${nim_dir}/nim/bin/"
 done
-
-echo "::set-output name=test_log_name::${nim_dir}-$(gcc -dumpmachine).test-log.txt"
-echo "::set-output name=asset_name::${nim_dir}-$(gcc -dumpmachine).tar.xz"
