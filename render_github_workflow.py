@@ -130,6 +130,15 @@ distros = [
             "jonathonf/manjaro": {
                 "linux/amd64": "linux/amd64",
             },
+            "debian:buster": {
+                "linux/amd64": "linux/amd64",
+            },
+            "ubuntu:bionic": {
+                "linux/amd64": "linux/amd64",
+            },
+            "ubuntu:focal": {
+                "linux/amd64": "linux/amd64",
+            },
         },
     },
     {
@@ -157,6 +166,9 @@ distros = [
                 "linux/amd64": "linux/amd64",
             },
             "ubuntu:focal": {
+                "linux/amd64": "linux/amd64",
+            },
+            "archlinux": {
                 "linux/amd64": "linux/amd64",
             },
         },
