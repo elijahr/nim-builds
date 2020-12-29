@@ -176,6 +176,16 @@ jobs:
         run: |
           cd build
 
+          {% if platform == "linux/amd64" %}
+          # Test in native container
+          docker run \
+            --platform {{ platform }} \
+            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+            --mount "type=bind,src=${PWD}/,dst=/build" \
+            --workdir /build \
+            {{ distro.build_farm_host_image }} \
+            sh test-nim.sh
+          {% else %}
           # Test in emulated container
           docker run \
             --platform {{ platform }} \
@@ -183,7 +193,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             {{ distro.build_farm_client_image }} \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          {% endif %}
       {% endif %}
 
       {% if platform != "linux/amd64" %}

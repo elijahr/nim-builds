@@ -1941,14 +1941,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            elijahru/build-farm:alpine-3.12 \
+            sh test-nim.sh
+          
       
 
       
@@ -2065,6 +2067,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v6 \
@@ -2072,7 +2075,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -2197,6 +2201,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -2204,7 +2209,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -2329,6 +2335,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -2336,7 +2343,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -2447,14 +2455,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            elijahru/build-farm:archlinux \
+            sh test-nim.sh
+          
       
 
       
@@ -2571,6 +2581,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v5 \
@@ -2578,7 +2589,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -2703,6 +2715,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v6 \
@@ -2710,7 +2723,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -2835,6 +2849,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -2842,7 +2857,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -2967,6 +2983,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -2974,7 +2991,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -3085,14 +3103,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            elijahru/build-farm:debian-buster-slim \
+            sh test-nim.sh
+          
       
 
       
@@ -3203,6 +3223,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/386 \
@@ -3210,7 +3231,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -3335,6 +3357,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v5 \
@@ -3342,7 +3365,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -3467,6 +3491,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -3474,7 +3499,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -3599,6 +3625,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -3606,7 +3633,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -3731,6 +3759,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/ppc64le \
@@ -3738,7 +3767,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -3942,14 +3972,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            elijahru/build-farm:alpine-3.12 \
+            sh test-nim.sh
+          
       
 
       
@@ -4066,6 +4098,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v6 \
@@ -4073,7 +4106,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -4198,6 +4232,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -4205,7 +4240,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -4330,6 +4366,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -4337,7 +4374,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -4448,14 +4486,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            elijahru/build-farm:archlinux \
+            sh test-nim.sh
+          
       
 
       
@@ -4572,6 +4612,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v5 \
@@ -4579,7 +4620,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -4704,6 +4746,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v6 \
@@ -4711,7 +4754,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -4836,6 +4880,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -4843,7 +4888,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -4968,6 +5014,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -4975,7 +5022,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -5086,14 +5134,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            elijahru/build-farm:debian-buster-slim \
+            sh test-nim.sh
+          
       
 
       
@@ -5204,6 +5254,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/386 \
@@ -5211,7 +5262,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -5336,6 +5388,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v5 \
@@ -5343,7 +5396,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -5468,6 +5522,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -5475,7 +5530,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -5600,6 +5656,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -5607,7 +5664,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -5732,6 +5790,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/ppc64le \
@@ -5739,7 +5798,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -5943,14 +6003,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            elijahru/build-farm:alpine-3.12 \
+            sh test-nim.sh
+          
       
 
       
@@ -6067,6 +6129,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v6 \
@@ -6074,7 +6137,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -6199,6 +6263,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -6206,7 +6271,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -6331,6 +6397,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -6338,7 +6405,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:alpine-3.12 \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -6449,14 +6517,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            elijahru/build-farm:archlinux \
+            sh test-nim.sh
+          
       
 
       
@@ -6573,6 +6643,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v5 \
@@ -6580,7 +6651,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -6705,6 +6777,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v6 \
@@ -6712,7 +6785,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -6837,6 +6911,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -6844,7 +6919,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -6969,6 +7045,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -6976,7 +7053,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:archlinux \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -7087,14 +7165,16 @@ jobs:
         run: |
           cd build
 
-          # Test in emulated container
+          
+          # Test in native container
           docker run \
             --platform linux/amd64 \
             --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
-            elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            elijahru/build-farm:debian-buster-slim \
+            sh test-nim.sh
+          
       
 
       
@@ -7205,6 +7285,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/386 \
@@ -7212,7 +7293,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -7337,6 +7419,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v5 \
@@ -7344,7 +7427,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -7469,6 +7553,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm/v7 \
@@ -7476,7 +7561,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -7601,6 +7687,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/arm64/v8 \
@@ -7608,7 +7695,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
@@ -7733,6 +7821,7 @@ jobs:
         run: |
           cd build
 
+          
           # Test in emulated container
           docker run \
             --platform linux/ppc64le \
@@ -7740,7 +7829,8 @@ jobs:
             --mount "type=bind,src=${PWD}/,dst=/build" \
             --workdir /build \
             elijahru/build-farm-client:debian-buster-slim \
-            sh test-nim.sh || true
+            sh test-nim.sh
+          
       
 
       
