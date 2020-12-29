@@ -9,21 +9,10 @@ NIM_DIR=$1
 cd "$NIM_DIR"
 
 install_deps () {
-  if [ "$(which apk)" != "" ]
-  then
-    # Alpine
-    apk add --update --no-cache build-base
-  elif [ "$(which apt)" != "" ]
-  then
-    # Debian, Ubuntu
-    apt-get update -q -y
-    apt-get -qq install -y build-essential
-  elif [ "$(which pacman)" != "" ]
-  then
-    # Arch, Manjaro
-    pacman -Syu --noconfirm base-devel
-    pacman -Sc --noconfirm || true
-  fi
+  (apk add --update --no-cache build-base) || \
+  (apt-get update -q -y && apt-get -qq install -y build-essential) || \
+  (pacman -Syu --noconfirm base-devel && pacman -Sc --noconfirm) || \
+  true
 }
 
 test () {
