@@ -17,6 +17,7 @@ then
 		then
 			echo "Change detected, re-rendering GitHub Actions"
 			pipenv run python render_build_yml.py
+			pipenv run yamllint .github/workflows/build.yml
 			git add .github/workflows/*.yml || true
 		fi
 

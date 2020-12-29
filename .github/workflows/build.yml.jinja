@@ -1,5 +1,11 @@
-name: Build
-on:
+---
+# yamllint disable rule:line-length
+# yamllint disable rule:empty-lines
+# yamllint disable rule:trailing-spaces
+# yamllint disable rule:new-line-at-end-of-file
+
+name: "Build"
+on:  # yamllint disable-line rule:truthy
   pull_request:
     paths-ignore:
       - "**.md"
@@ -22,30 +28,30 @@ jobs:
       {% endraw %}
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-        submodules: recursive
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: recursive
 
-    - name: Generate release name
-      id: generate-release-name
-      run: |
-        release_name=nim-{{ nim_version }}--$(date '+%Y%m%d%H%M')
-        echo "::set-output name=release_name::${release_name}"
+      - name: Generate release name
+        id: generate-release-name
+        run: |
+          release_name=nim-{{ nim_version }}--$(date '+%Y%m%d%H%M')
+          echo "::set-output name=release_name::${release_name}"
 
-    - name: Create release
-      id: create-release
-      uses: actions/create-release@v1
-      {% raw %}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
-        release_name: ${{ steps.generate-release-name.outputs.release_name }}
-        draft: true
-        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
-      {% endraw %}
+      - name: Create release
+        id: create-release
+        uses: actions/create-release@v1
+        {% raw %}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+          release_name: ${{ steps.generate-release-name.outputs.release_name }}
+          draft: true
+          prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+        {% endraw %}
 
   {% for distro in distros %}
   nim-{{ nim_version|slugify }}-{{ distro.name }}-build:
@@ -61,135 +67,135 @@ jobs:
           - {{ platform }}
           {% endfor %}
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-        submodules: recursive
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: recursive
 
-    - name: Configure QEMU
-      if: {% raw %}${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}{% endraw %}
-      run: |
-        sudo apt-get update -q -y
-        sudo apt-get -qq install -y qemu qemu-user-static
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Configure QEMU
+        if: {% raw %}${{ matrix.platform != 'linux/amd64' && matrix.platform != 'linux/386' }}{% endraw %}
+        run: |
+          sudo apt-get update -q -y
+          sudo apt-get -qq install -y qemu qemu-user-static
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-    - name: Enable Docker experimental features
-      run: |
-        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
-        sudo service docker restart
-        docker version -f {% raw %}'{{.Server.Experimental}}'{% endraw %}
+      - name: Enable Docker experimental features
+        run: |
+          echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+          sudo service docker restart
+          docker version -f {% raw %}'{{.Server.Experimental}}'{% endraw %}
 
-    - name: Restore Nim cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          build/nimcache
-        key: "nim-{{ nim_version }}-{{ distro.name }}-{{ '${{ matrix.platform }}' }}-nimcache"
+      - name: Restore Nim cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            build/nimcache
+          key: "nim-{{ nim_version }}-{{ distro.name }}-{{ '${{ matrix.platform }}' }}-nimcache"
 
-    - name: Install pixz
-      run: |
-        sudo apt-get update -q -y
-        sudo apt-get -qq install -y pixz
+      - name: Install pixz
+        run: |
+          sudo apt-get update -q -y
+          sudo apt-get -qq install -y pixz
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
 
-    - name: Build Nim
-      id: build-nim
-      shell: bash
-      run: |
-        set -uexo pipefail
+      - name: Build Nim
+        id: build-nim
+        shell: bash
+        run: |
+          set -uexo pipefail
 
-        # Start distcc host
-        docker run -d \
-          --platform linux/amd64 \
-          -p 3600-3900:3600-3900/tcp \
-          {{ distro.build_farm_host_image }}
+          # Start distcc host
+          docker run -d \
+            --platform linux/amd64 \
+            -p 3600-3900:3600-3900/tcp \
+            {{ distro.build_farm_host_image }}
 
-        dump_logs () {
-          docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
-        }
+          dump_logs () {
+            docker logs $(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
+          }
 
-        cd build
-        mkdir -p nimcache
+          cd build
+          mkdir -p nimcache
 
-        nim="nim-{{ nim_version }}"
-        wget "https://nim-lang.org/download/${nim}.tar.xz"
-        pixz -d "${nim}.tar.xz" "${nim}.tar"
-        tar xf "${nim}.tar"
-        mv "$nim" src
-        rm "${nim}.tar.xz" "${nim}.tar"
+          nim="nim-{{ nim_version }}"
+          wget "https://nim-lang.org/download/${nim}.tar.xz"
+          pixz -d "${nim}.tar.xz" "${nim}.tar"
+          tar xf "${nim}.tar"
+          mv "$nim" src
+          rm "${nim}.tar.xz" "${nim}.tar"
 
-        # Build in emulated container
-        docker run \
-          --platform {% raw %}${{ matrix.platform }}{% endraw %} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          {{ distro.build_farm_client_image }} \
-          sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
+          # Build in emulated container
+          docker run \
+            --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+            --mount "type=bind,src=${PWD}/,dst=/build" \
+            --workdir /build \
+            {{ distro.build_farm_client_image }} \
+            sh build-nim.sh ${nim} || (status=$?; dump_logs; exit $status)
 
-        platform_slug=$(echo "{{ '${{ matrix.platform }}' }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
-        echo "::set-output name=platform_slug::${platform_slug}"
+          platform_slug=$(echo "{{ '${{ matrix.platform }}' }}" | sed 's/linux\///' | sed 's/arm\//arm32/' | sed 's/arm64\//arm64/)
+          echo "::set-output name=platform_slug::${platform_slug}"
 
-    - name: Create tarball
-      id: create-tarball
-      run: |
-        cd build
-        nim="nim-{{ nim_version }}"
-        tarball="${nim}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim"
-        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+      - name: Create tarball
+        id: create-tarball
+        run: |
+          cd build
+          nim="nim-{{ nim_version }}"
+          tarball="${nim}.tar.xz"
+          tar -Ipixz -cf "$tarball" "$nim"
+          echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
-    - name: Add tarball to release
-      uses: actions/upload-release-asset@v1
-      env:
-        {% raw %}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        {% endraw %}
-      with:
-        upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
-        asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
-        asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.tar.xz
-        asset_content_type: application/x-xz
+      - name: Add tarball to release
+        uses: actions/upload-release-asset@v1
+        env:
+          {% raw %}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          {% endraw %}
+        with:
+          upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
+          asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
+          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.tar.xz
+          asset_content_type: application/x-xz
 
-    - name: Run tests
-      id: run-tests
-      run: |
-        cd build
+      - name: Run tests
+        id: run-tests
+        run: |
+          cd build
 
-        # Test in emulated container
-        docker run \
-          --platform {% raw %}${{ matrix.platform }}{% endraw %} \
-          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
-          --mount "type=bind,src=${PWD}/,dst=/build" \
-          --workdir /build \
-          {{ distro.build_farm_client_image }} \
-          sh test-nim.sh > test-log.txt 2>&1 || true
+          # Test in emulated container
+          docker run \
+            --platform {% raw %}${{ matrix.platform }}{% endraw %} \
+            --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+            --mount "type=bind,src=${PWD}/,dst=/build" \
+            --workdir /build \
+            {{ distro.build_farm_client_image }} \
+            sh test-nim.sh > test-log.txt 2>&1 || true
 
-        echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
+          echo "::set-output name=test_log_asset_path::${PWD}/test-log.txt"
 
-    - name: Add test log to release
-      uses: actions/upload-release-asset@v1
-      env:
-        {% raw %}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        {% endraw %}
-      with:
-        upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
-        asset_path: {{ '${{ steps.run-tests.outputs.test_log_asset_path }}' }}
-        asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.test-log.txt
-        asset_content_type: text/plain
+      - name: Add test log to release
+        uses: actions/upload-release-asset@v1
+        env:
+          {% raw %}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          {% endraw %}
+        with:
+          upload_url: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.upload_url }}' }}
+          asset_path: {{ '${{ steps.run-tests.outputs.test_log_asset_path }}' }}
+          asset_name: nim-{{ nim_version }}--{{ distro.name }}--{{ '${{ steps.build-nim.outputs.platform_slug }}' }}.test-log.txt
+          asset_content_type: text/plain
 
-    - name: Stop build host
-      run: |
-        id=$(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
-        if [ "$id" != "" ]
-        then
-          docker kill $id
-        fi
+      - name: Stop build host
+        run: |
+          id=$(docker ps --filter ancestor={{ distro.build_farm_host_image }} --format "{{ '{{.ID}}' }}")
+          if [ "$id" != "" ]
+          then
+            docker kill $id
+          fi
 
   {% endfor %}
 
@@ -203,12 +209,12 @@ jobs:
       {% endfor %}
 
     steps:
-    - uses: eregon/publish-release@v1
-      env:
-        {% raw %}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        {% endraw %}
-      with:
-        release_id: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.id }}' }}
+      - uses: eregon/publish-release@v1
+        env:
+          {% raw %}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          {% endraw %}
+        with:
+          release_id: {{ '${{ needs.nim-' + slugify(nim_version) + '-create-release.outputs.id }}' }}
 
   {% endfor %}
