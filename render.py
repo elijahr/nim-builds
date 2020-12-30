@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import re
@@ -235,11 +236,17 @@ def render_github_workflow():
 
 
 def render_readme():
-    releases = github.repos.list_releases("elijahr", "nim-builds")
+    releases = [
+        release
+        for release in github.repos.list_releases("elijahr", "nim-builds")
+        if not release.draft and len(release.assets)
+    ]
     releases = [
         {
             "nim_version": release.tag_name.split("--")[0].replace("nim-", ""),
-            "timestamp": release.tag_name.split("--")[1],
+            "date": datetime.datetime.strptime(
+                release.tag_name.split("--")[1][:8], "%Y%m%d"
+            ).date(),
             "page_url": f"https://github.com/elijahr/nim-builds/releases/tag/{release.tag_name}",
             "assets": [
                 {"name": asset.name, "browser_download_url": asset.browser_download_url}
@@ -248,7 +255,7 @@ def render_readme():
         }
         for release in releases
     ]
-    releases = sorted(releases, key=lambda r: r["timestamp"])
+    releases = sorted(releases, key=lambda r: (r["nim_version"], r["date"]))
     releases = [
         list(rls)[0]
         for nim_version, rls in groupby(releases, lambda r: r["nim_version"])
