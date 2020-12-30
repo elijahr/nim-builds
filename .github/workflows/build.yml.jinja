@@ -23,7 +23,7 @@ _anchors:
   install_deps_macos: &install_deps_macos
     name: Install deps
     run: |
-      brew install xz
+      brew install pixz
 
   enable_docker_experimental_features: &enable_docker_experimental_features
     name: Enable Docker experimental features
@@ -79,7 +79,7 @@ _anchors:
       cd build
       nim_dir="nim-{{ nim_version }}"
       wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-      pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
+      pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
       tar -xf "${nim_dir}.tar"
       rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
@@ -90,7 +90,8 @@ _anchors:
       cd build
       nim_dir="nim-{{ nim_version }}"
       tarball="${nim_dir}.tar.xz"
-      tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
+      tar -cf "${nim_dir}.tar" "$nim_dir"
+      pixz "${nim_dir}.tar" "$tarball"
       echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
   generate_release_name_{{ nim_version|slugify }}: &generate_release_name_{{ nim_version|slugify }}
@@ -242,9 +243,10 @@ _anchors:
     run: |
       cd build
       tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
+      tar=nim-{{ asset_name(nim_version, distro, arch) }}.tar
       tarball=nim-{{ asset_name(nim_version, distro, arch) }}.tar.xz
       hub release download "$tag" -i "$tarball"
-      xz -d "nim-{{ nim_version }}.tar"
+      pixz -d "$tarball" "nim-{{ nim_version }}.tar"
       tar -xf "nim-{{ nim_version }}.tar"
 
   run_tests_{{ id(distro, arch) }}: &run_tests_{{ id(distro, arch) }}

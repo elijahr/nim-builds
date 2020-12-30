@@ -86,14 +86,14 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install xz
+        brew install pixz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
         rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
@@ -112,7 +112,8 @@ jobs:
         cd build
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
+        tar -cf "${nim_dir}.tar" "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -150,7 +151,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install xz
+        brew install pixz
 
     - name: Download released tarball
       env:
@@ -158,9 +159,10 @@ jobs:
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tar=nim-1.4.2--x86_64-macos-catalina.tar
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        xz -d "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.4.2.tar"
         tar -xf "nim-1.4.2.tar"
 
     - name: Run tests
@@ -191,7 +193,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install xz
+        brew install pixz
 
     - name: Download released tarball
       env:
@@ -199,9 +201,10 @@ jobs:
       run: |
         cd build
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tar=nim-1.4.2--x86_64-macos-catalina.tar
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        xz -d "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.4.2.tar"
         tar -xf "nim-1.4.2.tar"
 
     - name: Run tests
