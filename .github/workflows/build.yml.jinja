@@ -97,6 +97,7 @@ _anchors:
     run: |
       cd build
       if [ -d "/usr/local/opt/pixz/bin" ]
+      then
         export PATH="/usr/local/opt/pixz/bin:$PATH"
       fi
       nim_dir="nim-{{ nim_version }}"
