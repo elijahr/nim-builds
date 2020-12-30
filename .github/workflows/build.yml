@@ -93,16 +93,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-0.20.2"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -117,14 +117,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-0.20.2"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -172,16 +167,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-0.20.2"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -196,14 +191,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-0.20.2"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -361,16 +351,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.0.10"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -385,14 +375,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-1.0.10"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -430,7 +415,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -440,8 +425,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.0.10.tar"
-        tar xf "nim-1.0.10.tar"
+        tar -xJf "nim-1.0.10.tar.xz"
 
     - name: Run tests
       run: |
@@ -471,7 +455,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -481,8 +465,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.0.10.tar"
-        tar xf "nim-1.0.10.tar"
+        tar -xJf "nim-1.0.10.tar.xz"
 
     - name: Run tests
       run: |
@@ -520,16 +503,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.0.10"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -544,14 +527,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-1.0.10"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -589,7 +567,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -599,8 +577,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--x86_64-macos-big-sur.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.0.10.tar"
-        tar xf "nim-1.0.10.tar"
+        tar -xJf "nim-1.0.10.tar.xz"
 
     - name: Run tests
       run: |
@@ -630,7 +607,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -640,8 +617,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
         tarball=nim-1.0.10--x86_64-macos-big-sur.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.0.10.tar"
-        tar xf "nim-1.0.10.tar"
+        tar -xJf "nim-1.0.10.tar.xz"
 
     - name: Run tests
       run: |
@@ -796,16 +772,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -820,14 +796,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -865,7 +836,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -875,8 +846,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.2.8.tar"
-        tar xf "nim-1.2.8.tar"
+        tar -xJf "nim-1.2.8.tar.xz"
 
     - name: Run tests
       run: |
@@ -906,7 +876,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -916,8 +886,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.2.8.tar"
-        tar xf "nim-1.2.8.tar"
+        tar -xJf "nim-1.2.8.tar.xz"
 
     - name: Run tests
       run: |
@@ -955,16 +924,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -979,14 +948,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -1024,7 +988,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -1034,8 +998,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--x86_64-macos-big-sur.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.2.8.tar"
-        tar xf "nim-1.2.8.tar"
+        tar -xJf "nim-1.2.8.tar.xz"
 
     - name: Run tests
       run: |
@@ -1065,7 +1028,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -1075,8 +1038,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
         tarball=nim-1.2.8--x86_64-macos-big-sur.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.2.8.tar"
-        tar xf "nim-1.2.8.tar"
+        tar -xJf "nim-1.2.8.tar.xz"
 
     - name: Run tests
       run: |
@@ -1231,16 +1193,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -1255,14 +1217,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -1300,7 +1257,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -1310,8 +1267,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar xf "nim-1.4.2.tar"
+        tar -xJf "nim-1.4.2.tar.xz"
 
     - name: Run tests
       run: |
@@ -1341,7 +1297,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -1351,8 +1307,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar xf "nim-1.4.2.tar"
+        tar -xJf "nim-1.4.2.tar.xz"
 
     - name: Run tests
       run: |
@@ -1390,16 +1345,16 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download Nim source
       run: |
         cd build
         nim_dir="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
         tar xf "${nim_dir}.tar"
-        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
       id: build-nim
@@ -1414,14 +1369,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        if [ -d "/usr/local/opt/pixz/bin" ]
-        then
-          # Ensure pixz is in PATH on macOS
-          export PATH="/usr/local/opt/pixz/bin:$PATH"
-        fi
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir"
+        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
     - name: Add tarball to release
@@ -1459,7 +1409,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -1469,8 +1419,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--x86_64-macos-big-sur.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar xf "nim-1.4.2.tar"
+        tar -xJf "nim-1.4.2.tar.xz"
 
     - name: Run tests
       run: |
@@ -1501,7 +1450,7 @@ jobs:
 
     - name: Install deps
       run: |
-        brew install hub pixz
+        brew install xz
 
     - name: Download released tarball
       env:
@@ -1511,8 +1460,7 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--x86_64-macos-big-sur.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar xf "nim-1.4.2.tar"
+        tar -xJf "nim-1.4.2.tar.xz"
 
     - name: Run tests
       run: |
