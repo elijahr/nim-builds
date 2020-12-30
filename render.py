@@ -194,7 +194,7 @@ linux_distros = [
             "linux/ppc64le",
         ],
         "test_targets": {
-            "debian:buster": {
+            "debian:buster-slim": {
                 "linux/amd64": "linux/amd64",
                 "linux/386": "linux/386",
                 "linux/arm/v5": "linux/arm/v5",
@@ -213,9 +213,6 @@ linux_distros = [
             },
             "abyo/manjaro_aarch64": {
                 "linux/arm64/v8": "linux/arm64",
-            },
-            "debian:buster": {
-                "linux/amd64": "linux/amd64",
             },
             "ubuntu:bionic": {
                 "linux/amd64": "linux/amd64",

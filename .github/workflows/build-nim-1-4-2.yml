@@ -1084,8 +1084,8 @@ jobs:
 
   
   
-  test-nim-debian-buster-linux-amd64--on-debian-buster:
-    name: Test on debian:buster
+  test-nim-debian-buster-linux-amd64--on-debian-buster-slim:
+    name: Test on debian:buster-slim
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -1136,7 +1136,7 @@ jobs:
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
-          debian:buster \
+          debian:buster-slim \
           sh /scripts/test-nim.sh /build/nim-1.4.2
 
 
@@ -1598,24 +1598,80 @@ jobs:
 
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  test-nim-debian-buster-linux-386--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-debian-buster-linux-386
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--i686-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/386 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   build-nim-debian-buster-linux-arm-v5:
     name: Build nim-1.4.2--armv5-linux-gnueabi.tar.xz
     runs-on: ubuntu-latest
@@ -1732,12 +1788,8 @@ jobs:
 
   
   
-  
-  
-  
-  
-  test-nim-debian-buster-linux-arm-v5--on-lopsided-archlinux:
-    name: Test on lopsided/archlinux
+  test-nim-debian-buster-linux-arm-v5--on-debian-buster-slim:
+    name: Test on debian:buster-slim
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -1786,7 +1838,68 @@ jobs:
 
 
 
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm/v5 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
 
+
+
+
+
+  test-nim-debian-buster-linux-arm-v5--on-lopsided-archlinux:
+    name: Test on lopsided/archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-debian-buster-linux-arm-v5
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--armv5-linux-gnueabi.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
 
 
 
@@ -1932,12 +2045,8 @@ jobs:
 
   
   
-  
-  
-  
-  
-  test-nim-debian-buster-linux-arm-v7--on-lopsided-archlinux:
-    name: Test on lopsided/archlinux
+  test-nim-debian-buster-linux-arm-v7--on-debian-buster-slim:
+    name: Test on debian:buster-slim
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -1986,7 +2095,68 @@ jobs:
 
 
 
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm/v7 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
 
+
+
+
+
+  test-nim-debian-buster-linux-arm-v7--on-lopsided-archlinux:
+    name: Test on lopsided/archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-debian-buster-linux-arm-v7
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--armv7-linux-gnueabihf.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
 
 
 
@@ -2132,12 +2302,8 @@ jobs:
 
   
   
-  
-  
-  
-  
-  test-nim-debian-buster-linux-arm64-v8--on-lopsided-archlinux:
-    name: Test on lopsided/archlinux
+  test-nim-debian-buster-linux-arm64-v8--on-debian-buster-slim:
+    name: Test on debian:buster-slim
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
@@ -2186,7 +2352,68 @@ jobs:
 
 
 
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64/v8 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
 
+
+
+
+
+  test-nim-debian-buster-linux-arm64-v8--on-lopsided-archlinux:
+    name: Test on lopsided/archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-debian-buster-linux-arm64-v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--aarch64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
 
 
 
@@ -2250,10 +2477,6 @@ jobs:
         hub release download "$tag" -i "$tarball"
         pixz -d "$tarball" "nim-1.4.2.tar"
         tar -xf "nim-1.4.2.tar"
-
-
-
-
 
 
 
@@ -2397,25 +2620,90 @@ jobs:
 
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  test-nim-debian-buster-linux-ppc64le--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-debian-buster-linux-ppc64le
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--powerpc64le-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/ppc64le \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
   
@@ -2611,7 +2899,7 @@ jobs:
 
 
 
-    - test-nim-debian-buster-linux-amd64--on-debian-buster
+    - test-nim-debian-buster-linux-amd64--on-debian-buster-slim
 
 
 
@@ -2645,6 +2933,7 @@ jobs:
 
 
 
+    - test-nim-debian-buster-linux-386--on-debian-buster-slim
 
 
 
@@ -2664,6 +2953,9 @@ jobs:
 
 
 
+
+
+    - test-nim-debian-buster-linux-arm-v5--on-debian-buster-slim
 
 
 
@@ -2687,6 +2979,8 @@ jobs:
 
 
 
+    - test-nim-debian-buster-linux-arm-v7--on-debian-buster-slim
+
 
 
 
@@ -2708,6 +3002,8 @@ jobs:
 
 
 
+
+    - test-nim-debian-buster-linux-arm64-v8--on-debian-buster-slim
 
 
 
@@ -2732,6 +3028,8 @@ jobs:
 
 
 
+
+    - test-nim-debian-buster-linux-ppc64le--on-debian-buster-slim
 
 
 
