@@ -98,6 +98,7 @@ _anchors:
       cd build
       if [ -d "/usr/local/opt/pixz/bin" ]
       then
+        # Ensure pixz is in PATH on macOS
         export PATH="/usr/local/opt/pixz/bin:$PATH"
       fi
       nim_dir="nim-{{ nim_version }}"

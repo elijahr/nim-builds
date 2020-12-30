@@ -119,6 +119,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-0.20.2"
@@ -197,6 +198,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-0.20.2"
@@ -385,6 +387,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-1.0.10"
@@ -543,6 +546,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-1.0.10"
@@ -818,6 +822,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-1.2.8"
@@ -976,6 +981,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-1.2.8"
@@ -1251,6 +1257,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-1.4.2"
@@ -1409,6 +1416,7 @@ jobs:
         cd build
         if [ -d "/usr/local/opt/pixz/bin" ]
         then
+          # Ensure pixz is in PATH on macOS
           export PATH="/usr/local/opt/pixz/bin:$PATH"
         fi
         nim_dir="nim-1.4.2"
