@@ -18,6 +18,9 @@ on:  # yamllint disable-line rule:truthy
 
 jobs:
   create-release-nim-0-20-2:
+    if: ${{ github.event_name == 'push' && contains(toJson(github.event.commits),
+      '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]')
+      == false && contains(toJson(github.event.commits), '[skip ci]') == false }}
     name: Create release 0.20.2
     runs-on: ubuntu-latest
     outputs:
@@ -1267,6 +1270,9 @@ jobs:
 
   
   create-release-nim-1-0-10:
+    if: ${{ github.event_name == 'push' && contains(toJson(github.event.commits),
+      '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]')
+      == false && contains(toJson(github.event.commits), '[skip ci]') == false }}
     name: Create release 1.0.10
     runs-on: ubuntu-latest
     outputs:
@@ -3744,6 +3750,9 @@ jobs:
 
   
   create-release-nim-1-2-8:
+    if: ${{ github.event_name == 'push' && contains(toJson(github.event.commits),
+      '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]')
+      == false && contains(toJson(github.event.commits), '[skip ci]') == false }}
     name: Create release 1.2.8
     runs-on: ubuntu-latest
     outputs:
@@ -6221,6 +6230,9 @@ jobs:
 
   
   create-release-nim-1-4-2:
+    if: ${{ github.event_name == 'push' && contains(toJson(github.event.commits),
+      '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]')
+      == false && contains(toJson(github.event.commits), '[skip ci]') == false }}
     name: Create release 1.4.2
     runs-on: ubuntu-latest
     outputs:

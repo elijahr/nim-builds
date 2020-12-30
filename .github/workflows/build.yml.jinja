@@ -222,6 +222,7 @@ on:  # yamllint disable-line rule:truthy
 jobs:
   {% for nim_version in nim_versions %}
   create-release-nim-{{ nim_version|slugify }}:
+    if: {{ "${{ github.event_name == 'push' && contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false }}" }}
     name: Create release {{ nim_version }}
     runs-on: ubuntu-latest
     outputs:
