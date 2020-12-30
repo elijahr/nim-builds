@@ -2587,6 +2587,180 @@ jobs:
 
 
 
+  test-nim-1-0-10--x86_64-linux-gnu--on-fedora-31:
+    name: Test on fedora:31
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:31 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--x86_64-linux-gnu--on-fedora-32:
+    name: Test on fedora:32
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:32 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+  test-nim-1-0-10--x86_64-linux-gnu--on-fedora-33:
+    name: Test on fedora:33
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:33 \
+          sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
 
 
   build-nim-1-0-10--i686-linux-gnu:
@@ -2696,6 +2870,12 @@ jobs:
 
 
 
+  
+  
+  
+  
+  
+  
   
   
   
@@ -2908,6 +3088,12 @@ jobs:
 
 
 
+
+
+
+
+
+
   build-nim-1-0-10--armv7-linux-gnueabihf:
     name: Build nim-1.0.10--armv7-linux-gnueabihf.tar.xz
     runs-on: ubuntu-latest
@@ -3093,6 +3279,12 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
+
+
+
+
+
+
 
 
 
@@ -3366,6 +3558,12 @@ jobs:
 
 
 
+
+
+
+
+
+
   build-nim-1-0-10--powerpc64le-linux-gnu:
     name: Build nim-1.0.10--powerpc64le-linux-gnu.tar.xz
     runs-on: ubuntu-latest
@@ -3479,6 +3677,12 @@ jobs:
 
 
 
+  
+  
+  
+  
+  
+  
   
   
   
@@ -3611,6 +3815,24 @@ jobs:
 
 
 
+    - test-nim-1-0-10--x86_64-linux-gnu--on-fedora-31
+
+
+
+    - test-nim-1-0-10--x86_64-linux-gnu--on-fedora-32
+
+
+
+    - test-nim-1-0-10--x86_64-linux-gnu--on-fedora-33
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3659,7 +3881,19 @@ jobs:
 
 
 
+
+
+
+
+
+
     - test-nim-1-0-10--armv7-linux-gnueabihf--on-lopsided-archlinux
+
+
+
+
+
+
 
 
 
@@ -3684,6 +3918,18 @@ jobs:
 
 
     - test-nim-1-0-10--aarch64-linux-gnu--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5067,6 +5313,180 @@ jobs:
 
 
 
+  test-nim-1-2-8--x86_64-linux-gnu--on-fedora-31:
+    name: Test on fedora:31
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:31 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--x86_64-linux-gnu--on-fedora-32:
+    name: Test on fedora:32
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:32 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+  test-nim-1-2-8--x86_64-linux-gnu--on-fedora-33:
+    name: Test on fedora:33
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:33 \
+          sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
 
 
   build-nim-1-2-8--i686-linux-gnu:
@@ -5176,6 +5596,12 @@ jobs:
 
 
 
+  
+  
+  
+  
+  
+  
   
   
   
@@ -5388,6 +5814,12 @@ jobs:
 
 
 
+
+
+
+
+
+
   build-nim-1-2-8--armv7-linux-gnueabihf:
     name: Build nim-1.2.8--armv7-linux-gnueabihf.tar.xz
     runs-on: ubuntu-latest
@@ -5573,6 +6005,12 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
+
+
+
+
+
+
 
 
 
@@ -5846,6 +6284,12 @@ jobs:
 
 
 
+
+
+
+
+
+
   build-nim-1-2-8--powerpc64le-linux-gnu:
     name: Build nim-1.2.8--powerpc64le-linux-gnu.tar.xz
     runs-on: ubuntu-latest
@@ -5959,6 +6403,12 @@ jobs:
 
 
 
+  
+  
+  
+  
+  
+  
   
   
   
@@ -6091,6 +6541,24 @@ jobs:
 
 
 
+    - test-nim-1-2-8--x86_64-linux-gnu--on-fedora-31
+
+
+
+    - test-nim-1-2-8--x86_64-linux-gnu--on-fedora-32
+
+
+
+    - test-nim-1-2-8--x86_64-linux-gnu--on-fedora-33
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6139,7 +6607,19 @@ jobs:
 
 
 
+
+
+
+
+
+
     - test-nim-1-2-8--armv7-linux-gnueabihf--on-lopsided-archlinux
+
+
+
+
+
+
 
 
 
@@ -6164,6 +6644,18 @@ jobs:
 
 
     - test-nim-1-2-8--aarch64-linux-gnu--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7547,6 +8039,180 @@ jobs:
 
 
 
+  test-nim-1-4-2--x86_64-linux-gnu--on-fedora-31:
+    name: Test on fedora:31
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:31 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--x86_64-linux-gnu--on-fedora-32:
+    name: Test on fedora:32
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:32 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+  test-nim-1-4-2--x86_64-linux-gnu--on-fedora-33:
+    name: Test on fedora:33
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-linux-gnu
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+
+    - name: Install deps
+      run: |
+        sudo add-apt-repository ppa:cpick/hub
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+
+
+    - name: Run tests
+      run: |
+        mkdir -p nimcache
+
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:33 \
+          sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
 
 
   build-nim-1-4-2--i686-linux-gnu:
@@ -7656,6 +8322,12 @@ jobs:
 
 
 
+  
+  
+  
+  
+  
+  
   
   
   
@@ -7868,6 +8540,12 @@ jobs:
 
 
 
+
+
+
+
+
+
   build-nim-1-4-2--armv7-linux-gnueabihf:
     name: Build nim-1.4.2--armv7-linux-gnueabihf.tar.xz
     runs-on: ubuntu-latest
@@ -8053,6 +8731,12 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
+
+
+
+
+
+
 
 
 
@@ -8326,6 +9010,12 @@ jobs:
 
 
 
+
+
+
+
+
+
   build-nim-1-4-2--powerpc64le-linux-gnu:
     name: Build nim-1.4.2--powerpc64le-linux-gnu.tar.xz
     runs-on: ubuntu-latest
@@ -8439,6 +9129,12 @@ jobs:
 
 
 
+  
+  
+  
+  
+  
+  
   
   
   
@@ -8571,6 +9267,24 @@ jobs:
 
 
 
+    - test-nim-1-4-2--x86_64-linux-gnu--on-fedora-31
+
+
+
+    - test-nim-1-4-2--x86_64-linux-gnu--on-fedora-32
+
+
+
+    - test-nim-1-4-2--x86_64-linux-gnu--on-fedora-33
+
+
+
+
+
+
+
+
+
 
 
 
@@ -8619,7 +9333,19 @@ jobs:
 
 
 
+
+
+
+
+
+
     - test-nim-1-4-2--armv7-linux-gnueabihf--on-lopsided-archlinux
+
+
+
+
+
+
 
 
 
@@ -8644,6 +9370,18 @@ jobs:
 
 
     - test-nim-1-4-2--aarch64-linux-gnu--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

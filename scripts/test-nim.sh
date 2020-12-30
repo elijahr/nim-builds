@@ -12,10 +12,11 @@ install_deps () {
   (apk add --update --no-cache build-base) || \
   (apt-get update -q -y && apt-get -qq install -y build-essential) || \
   (pacman -Syu --noconfirm base-devel && pacman -Sc --noconfirm) || \
+  (dnf install -y make automake gcc gcc-c++ kernel-devel) || \
   true
 }
 
-test () {
+test_nim () {
   target=$1
   category=$2
   PATH="${NIM_DIR}/bin:$PATH" \
@@ -29,9 +30,13 @@ main () {
   "${NIM_DIR}/bin/nim" cc --opt:speed testament/testament
 
   # Run a small handful of tests
-  test c compiler
-  test c nimble
-  test c++ compiler
+  test_nim c compiler
+  test_nim c++ compiler
+  test_nim c compilerapi
+  test_nim c compilerfeatures
+  test_nim c dll
+  test_nim c nimble
+  test_nim c threads
 }
 
 main

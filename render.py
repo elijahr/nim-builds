@@ -84,7 +84,7 @@ docker_arch_by_toolchain_arch = {v: k for k, v in toolchain_arch_by_docker_arch.
 
 toolchain_arch_aliases = {
     "x86_64": "amd64",
-    "i686": "i386/i586",
+    "i686": "x86",
     "armv5": "armel",
     "armv7": "armhf",
     "aarch64": "arm64",
@@ -97,7 +97,7 @@ def asset_blurb(asset):
     arch, _, libc = toolchain.split("-")
     if libc.startswith("gnu"):
         libc_name = "GNU"
-        libc_distros = "Debian, Ubuntu, Arch Linux, and Manjaro"
+        libc_distros = "Debian, Ubuntu, Fedora, Arch Linux, and Manjaro"
     elif libc.startswith("musl"):
         libc_name = "musl"
         libc_distros = "Alpine Linux"
@@ -203,6 +203,15 @@ distros = [
                 "linux/amd64": "linux/amd64",
             },
             "ubuntu:focal": {
+                "linux/amd64": "linux/amd64",
+            },
+            "fedora:31": {
+                "linux/amd64": "linux/amd64",
+            },
+            "fedora:32": {
+                "linux/amd64": "linux/amd64",
+            },
+            "fedora:33": {
                 "linux/amd64": "linux/amd64",
             },
         },
