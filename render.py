@@ -140,8 +140,8 @@ def machine(distro, platform):
     raise ValueError(f'Invalid distro type {distro["type"]}')
 
 
-def asset_id(nim_version, distro, platform):
-    return slugify(asset_name(nim_version, distro, platform))
+def id(distro, platform):
+    return slugify(f"{distro['name']}-{platform}")
 
 
 def asset_name(nim_version, distro, platform):
@@ -292,7 +292,7 @@ def render_github_workflow(nim_version):
             macos_distros=macos_distros,
             nim_version=nim_version,
             slugify=slugify,
-            asset_id=asset_id,
+            id=id,
             asset_name=asset_name,
         ),
     )
