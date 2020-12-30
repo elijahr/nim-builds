@@ -229,7 +229,7 @@ _anchors:
     shell: bash
     run: |
       set -uexo pipefail
-      mv nimcache ~/.cache/nim
+      ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
       sh ./scripts/build-nim.sh ./build/nim-{{ nim_version }}
 

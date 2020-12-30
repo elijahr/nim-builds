@@ -109,7 +109,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-0.20.2
 
@@ -186,7 +186,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-0.20.2
 
@@ -373,7 +373,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-1.0.10
 
@@ -530,7 +530,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-1.0.10
 
@@ -804,7 +804,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-1.2.8
 
@@ -961,7 +961,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-1.2.8
 
@@ -1235,7 +1235,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-1.4.2
 
@@ -1392,7 +1392,7 @@ jobs:
       shell: bash
       run: |
         set -uexo pipefail
-        mv nimcache ~/.cache/nim
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
         sh ./scripts/build-nim.sh ./build/nim-1.4.2
 
