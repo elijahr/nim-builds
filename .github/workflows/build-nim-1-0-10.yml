@@ -1,4 +1,4 @@
-name: Build
+name: Build 1.0.10
 on:
   pull_request:
     paths-ignore:
