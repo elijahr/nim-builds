@@ -4,7 +4,7 @@ set -uex
 
 SCRIPT_DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-NIM_DIR=$1
+NIM_DIR="$( cd "$(dirname "$1")" >/dev/null 2>&1 ; pwd -P )/$(basename $1)"
 
 cd "$NIM_DIR"
 
