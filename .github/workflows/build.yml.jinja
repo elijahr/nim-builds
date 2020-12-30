@@ -307,4 +307,28 @@ jobs:
         with:
           release_id: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.id }}' }}
 
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Update README
+        shell: bash
+        run: |
+          set -uexo pipefail
+
+          pip install -r requirements.txt
+          python3.9 render.py
+          git add README.md || true
+          if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
+          then
+            git commit -m "Re-rendered README.md"
+          fi
+          git push || true
+
   {% endfor %}
