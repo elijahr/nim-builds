@@ -20,12 +20,17 @@ _anchors:
       sudo apt-get -qq install -y qemu qemu-user-static
       docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-  install_deps: &install_deps
+  install_deps_ubuntu: &install_deps_ubuntu
     name: Install deps
     run: |
       sudo add-apt-repository ppa:cpick/hub
       sudo apt-get update -q -y
       sudo apt-get -qq install -y hub pixz
+
+  install_deps_macos: &install_deps_macos
+    name: Install deps
+    run: |
+      brew install hub pixz
 
   enable_docker_experimental_features: &enable_docker_experimental_features
     name: Enable Docker experimental features
@@ -39,6 +44,7 @@ _anchors:
     run: |
       mkdir -p build
       mkdir -p nimcache
+      mkdir -p ~/.cache/
 
   update_readme: &update_readme
     name: Update README
@@ -55,7 +61,7 @@ _anchors:
           git push || (git pull origin && git push || true)
       fi
 
-  {% for distro in distros %}
+  {% for distro in linux_distros %}
   start_distcc_host_{{ distro.name|slugify }}: &start_distcc_host_{{ distro.name|slugify }}
     name: Start distcc host
     run: |
@@ -116,16 +122,15 @@ _anchors:
       prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
     {% endraw %}
 
-  {% for distro in distros %}
+  {% for distro in linux_distros %}
   {% for platform in distro.platforms %}
-
   restore_nim_cache_{{ asset_id(nim_version, distro, platform) }}: &restore_nim_cache_{{ asset_id(nim_version, distro, platform) }}
     name: Restore Nim cache
     uses: actions/cache@v2
     with:
       path: |
-        build/nimcache
-      key: "nim-{{ nim_version }}-{{ distro.name }}-{{ platform }}-nimcache"
+        nimcache
+      key: "cache-{{ asset_id(nim_version, distro, platform) }}"
 
   build_nim_{{ asset_id(nim_version, distro, platform) }}: &build_nim_{{ asset_id(nim_version, distro, platform) }}
     name: Build Nim
@@ -191,8 +196,6 @@ _anchors:
   run_tests_{{ asset_id(nim_version, distro, platform) }}_{{ image|slugify }}: &run_tests_{{ asset_id(nim_version, distro, platform) }}_{{ image|slugify }}
     name: Run tests
     run: |
-      mkdir -p nimcache
-
       # Test in emulated container
       docker run \
         --platform {{ platform_map[platform] }} \
@@ -203,6 +206,59 @@ _anchors:
         sh /scripts/test-nim.sh /build/nim-{{ nim_version }}
   {% endif %}
   {% endfor %}
+
+  {% endfor %}
+  {% endfor %}
+
+  {% for distro in macos_distros %}
+  {% for arch in distro.archs %}
+  restore_nim_cache_{{ asset_id(nim_version, distro, arch) }}: &restore_nim_cache_{{ asset_id(nim_version, distro, arch) }}
+    name: Restore Nim cache
+    uses: actions/cache@v2
+    with:
+      path: |
+        nimcache
+      key: "cache-{{ asset_id(nim_version, distro, arch) }}"
+
+  build_nim_{{ asset_id(nim_version, distro, arch) }}: &build_nim_{{ asset_id(nim_version, distro, arch) }}
+    name: Build Nim
+    id: build-nim
+    shell: bash
+    run: |
+      set -uexo pipefail
+      mv nimcache ~/.cache/nim
+
+      sh ./scripts/build-nim.sh ./build/nim-{{ nim_version }}
+
+  add_tarball_to_release_{{ asset_id(nim_version, distro, arch) }}: &add_tarball_to_release_{{ asset_id(nim_version, distro, arch) }}
+    name: Add tarball to release
+    uses: actions/upload-release-asset@v1
+    env:
+      {% raw %}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      {% endraw %}
+    with:
+      upload_url: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.upload_url }}' }}
+      asset_path: {{ '${{ steps.create-tarball.outputs.tarball_asset_path }}' }}
+      asset_name: nim-{{ asset_name(nim_version, distro, arch) }}.tar.xz
+      asset_content_type: application/x-xz
+
+  download_released_tarball_{{ asset_id(nim_version, distro, arch) }}: &download_released_tarball_{{ asset_id(nim_version, distro, arch) }}
+    name: Download released tarball
+    env:
+      GITHUB_TOKEN: {{ '${{ secrets.GITHUB_TOKEN }}' }}
+    run: |
+      cd build
+      tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
+      tarball=nim-{{ asset_name(nim_version, distro, arch) }}.tar.xz
+      hub release download "$tag" -i "$tarball"
+      pixz -d "$tarball" "nim-{{ nim_version }}.tar"
+      tar xf "nim-{{ nim_version }}.tar"
+
+  run_tests_{{ asset_id(nim_version, distro, arch) }}: &run_tests_{{ asset_id(nim_version, distro, arch) }}
+    name: Run tests
+    run: |
+      sh ./scripts/test-nim.sh ./build/nim-{{ nim_version }}
 
   {% endfor %}
   {% endfor %}
@@ -237,7 +293,7 @@ jobs:
       - *generate_release_name_{{ nim_version|slugify }}
       - *create_release_{{ nim_version|slugify }}
 
-  {% for distro in distros %}
+  {% for distro in linux_distros %}
   {% for platform in distro.platforms %}
   build-nim-{{ asset_id(nim_version, distro, platform) }}:
     name: Build nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz
@@ -254,7 +310,7 @@ jobs:
       - *enable_docker_experimental_features
       - *restore_nim_cache_{{ asset_id(nim_version, distro, platform) }}
       - *setup_dirs
-      - *install_deps
+      - *install_deps_ubuntu
       {% if platform != "linux/amd64" %}
       - *start_distcc_host_{{ distro.name|slugify }}
       {% endif %}
@@ -282,10 +338,48 @@ jobs:
       {% endif %}
       - *enable_docker_experimental_features
       - *setup_dirs
-      - *install_deps
+      - *install_deps_ubuntu
       - *download_released_tarball_{{ asset_id(nim_version, distro, platform) }}
       - *run_tests_{{ asset_id(nim_version, distro, platform) }}_{{ image|slugify }}
   {% endif %}
+  {% endfor %}
+  {% endif %}
+  {% endfor %}
+  {% endfor %}
+
+  {% for distro in macos_distros %}
+  {% for arch in distro.archs %}
+  build-nim-{{ asset_id(nim_version, distro, arch) }}:
+    name: Build nim-{{ asset_name(nim_version, distro, arch) }}.tar.xz
+    runs-on: {{ distro.runner }}
+    needs:
+      - "create-release-nim-{{ nim_version|slugify }}"
+    strategy:
+      fail-fast: false
+    steps:
+      - *checkout_repo
+      - *restore_nim_cache_{{ asset_id(nim_version, distro, arch) }}
+      - *setup_dirs
+      - *install_deps_macos
+      - *download_nim_source_{{ nim_version|slugify }}
+      - *build_nim_{{ asset_id(nim_version, distro, arch) }}
+      - *create_tarball_{{ nim_version|slugify }}
+      - *add_tarball_to_release_{{ asset_id(nim_version, distro, arch) }}
+
+  {% if nim_version[0] > "0" %}
+  {% for runner in distro.test_runners %}
+  test-nim-{{ asset_id(nim_version, distro, arch) }}--on-{{ runner|slugify }}:
+    name: Test on {{ runner }}
+    runs-on: {{ runner }}
+    needs:
+      - create-release-nim-{{ nim_version|slugify }}
+      - build-nim-{{ asset_id(nim_version, distro, arch) }}
+    steps:
+      - *checkout_repo
+      - *setup_dirs
+      - *install_deps_macos
+      - *download_released_tarball_{{ asset_id(nim_version, distro, arch) }}
+      - *run_tests_{{ asset_id(nim_version, distro, arch) }}
   {% endfor %}
   {% endif %}
   {% endfor %}
@@ -297,9 +391,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}
-      {% for distro in distros %}
+      {% for distro in linux_distros %}
       {% for platform in distro.platforms %}
-
       {% if nim_version[0] > "0" %}
       {% for image, platform_map in distro.test_targets.items() %}
       {% if platform in platform_map %}
@@ -310,7 +403,19 @@ jobs:
       {# Can't run tests for 0.X.X #}
       - build-nim-{{ asset_id(nim_version, distro, platform) }}
       {% endif %}
+      {% endfor %}
+      {% endfor %}
 
+      {% for distro in macos_distros %}
+      {% for arch in distro.archs %}
+      {% if nim_version[0] > "0" %}
+      {% for runner in distro.test_runners %}
+      - test-nim-{{ asset_id(nim_version, distro, arch) }}--on-{{ runner|slugify }}
+      {% endfor %}
+      {% else %}
+      {# Can't run tests for 0.X.X #}
+      - build-nim-{{ asset_id(nim_version, distro, arch) }}
+      {% endif %}
       {% endfor %}
       {% endfor %}
 

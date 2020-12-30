@@ -94,31 +94,49 @@ toolchain_arch_aliases = {
 
 def asset_blurb(asset):
     toolchain = asset["name"].split("--")[1]
-    arch, _, libc = toolchain.split("-")
-    if libc.startswith("gnu"):
-        libc_name = "GNU"
-        libc_distros = "Debian, Ubuntu, Fedora, Arch Linux, and Manjaro"
-    elif libc.startswith("musl"):
-        libc_name = "musl"
-        libc_distros = "Alpine Linux"
-    else:
-        raise ValueError(f"Unknown libc {libc}")
+    arch, os_type, tail = toolchain.split("-")
+    if os_type == "linux":
+        if tail.startswith("gnu"):
+            libc_name = "GNU"
+            libc_distros = "Debian, Ubuntu, Fedora, Arch Linux, and Manjaro"
+        elif tail.startswith("musl"):
+            libc_name = "musl"
+            libc_distros = "Alpine Linux"
+        else:
+            raise ValueError(f"Unknown libc {tail}")
 
-    if arch in toolchain_arch_aliases:
-        aka = f" aka `{toolchain_arch_aliases[arch]}`"
-    else:
-        aka = ""
+        if arch in toolchain_arch_aliases:
+            aka = f" aka `{toolchain_arch_aliases[arch]}`"
+        else:
+            aka = ""
 
-    blurb = f"This was compiled for the `{arch}`{aka} architecture, "
-    blurb += f"for distros using the {libc_name} implementation of "
-    blurb += f"the C standard library, such as {libc_distros}. "
-    blurb += "It can be used with Docker images targeting the "
-    blurb += f"`{docker_arch_by_toolchain_arch[arch]}` platform."
-    return blurb
+        blurb = f"This was compiled for the `{arch}`{aka} architecture, "
+        blurb += f"for distros using the {libc_name} implementation of "
+        blurb += f"the C standard library, such as {libc_distros}. "
+        blurb += "It can be used with Docker images targeting the "
+        blurb += f"`{docker_arch_by_toolchain_arch[arch]}` platform."
+        return blurb
+
+    elif os_type == "macos":
+        release_name = {
+            "big-sur": "Big Sur 11.0",
+            "catalina": "Catalina 10.15",
+        }[tail]
+        blurb = f"This was compiled on macOS {release_name}."
+        return blurb
+
+    else:
+        raise ValueError(f"Unknown OS {os_type}")
 
 
 def machine(distro, platform):
-    return f'{toolchain_arch_by_docker_arch[platform]}-linux-{distro["libc"]}{toolchain_suffix_by_docker_arch.get(platform, "")}'
+    if distro["type"] == "linux":
+        prefix = toolchain_arch_by_docker_arch[platform]
+        suffix = toolchain_suffix_by_docker_arch.get(platform, "")
+        return f'{prefix}-linux-{distro["libc"]}{suffix}'
+    elif distro["type"] == "macos":
+        return f"{platform}-macos-{distro['name']}"
+    raise ValueError(f'Invalid distro type {distro["type"]}')
 
 
 def asset_id(nim_version, distro, platform):
@@ -129,9 +147,10 @@ def asset_name(nim_version, distro, platform):
     return f"{nim_version}--{machine(distro, platform)}"
 
 
-distros = [
+linux_distros = [
     {
         "name": "alpine-3-12",
+        "type": "linux",
         "libc": "musl",
         "build_farm_host_image": "elijahru/build-farm:alpine-3.12",
         "build_farm_client_image": "elijahru/build-farm-client:alpine-3.12",
@@ -164,6 +183,7 @@ distros = [
     },
     {
         "name": "debian-buster",
+        "type": "linux",
         "libc": "gnu",
         "build_farm_host_image": "elijahru/build-farm:debian-buster-slim",
         "build_farm_client_image": "elijahru/build-farm-client:debian-buster-slim",
@@ -218,6 +238,33 @@ distros = [
     },
 ]
 
+macos_distros = [
+    {
+        "name": "catalina",
+        "type": "macos",
+        "runner": "macos-10.15",
+        "archs": [
+            "x86_64",
+        ],
+        "test_runners": [
+            "macos-11.0",
+            "macos-10.15",
+        ],
+    },
+    {
+        "name": "big-sur",
+        "type": "macos",
+        "runner": "macos-11.0",
+        "archs": [
+            "x86_64",
+        ],
+        "test_runners": [
+            "macos-11.0",
+            "macos-10.15",
+        ],
+    },
+]
+
 
 env = Environment(autoescape=False, undefined=StrictUndefined)
 env.filters["slugify"] = slugify
@@ -239,7 +286,8 @@ def render_github_workflow():
     render(
         ".github/workflows/build.yml",
         dict(
-            distros=distros,
+            linux_distros=linux_distros,
+            macos_distros=macos_distros,
             nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
             slugify=slugify,
             asset_id=asset_id,

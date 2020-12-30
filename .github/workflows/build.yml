@@ -58,7 +58,6 @@ jobs:
 
 
 
-
   
   
   build-nim-0-20-2--x86_64-linux-musl:
@@ -85,13 +84,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-alpine-3-12-linux/amd64-nimcache
+          nimcache
+        key: cache-0-20-2--x86_64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -180,13 +180,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-alpine-3-12-linux/arm/v6-nimcache
+          nimcache
+        key: cache-0-20-2--armv6-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -293,13 +294,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-alpine-3-12-linux/arm/v7-nimcache
+          nimcache
+        key: cache-0-20-2--armv7-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -406,13 +408,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-alpine-3-12-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-0-20-2--aarch64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -515,13 +518,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-debian-buster-linux/amd64-nimcache
+          nimcache
+        key: cache-0-20-2--x86_64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -604,13 +608,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-debian-buster-linux/386-nimcache
+          nimcache
+        key: cache-0-20-2--i686-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -719,13 +724,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-debian-buster-linux/arm/v5-nimcache
+          nimcache
+        key: cache-0-20-2--armv5-linux-gnueabi
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -834,13 +840,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-debian-buster-linux/arm/v7-nimcache
+          nimcache
+        key: cache-0-20-2--armv7-linux-gnueabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -949,13 +956,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-debian-buster-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-0-20-2--aarch64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1064,13 +1072,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-0.20.2-debian-buster-linux/ppc64le-nimcache
+          nimcache
+        key: cache-0-20-2--powerpc64le-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1151,6 +1160,156 @@ jobs:
   
   
 
+  
+  
+  build-nim-0-20-2--x86_64-macos-catalina:
+    name: Build nim-0.20.2--x86_64-macos-catalina.tar.xz
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-0-20-2
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-0-20-2--x86_64-macos-catalina
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-0.20.2"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-0.20.2
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-0.20.2"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-0.20.2--x86_64-macos-catalina.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  
+  
+  build-nim-0-20-2--x86_64-macos-big-sur:
+    name: Build nim-0.20.2--x86_64-macos-big-sur.tar.xz
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-0-20-2
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-0-20-2--x86_64-macos-big-sur
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-0.20.2"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-0.20.2
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-0.20.2"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-0-20-2.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-0.20.2--x86_64-macos-big-sur.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  
+
   publish-release-nim-0-20-2:
     name: Publish release 0.20.2
     if: ${{ !github.event.issue.pull_request }}
@@ -1161,10 +1320,7 @@ jobs:
 
 
 
-
     - build-nim-0-20-2--x86_64-linux-musl
-
-
 
 
 
@@ -1174,11 +1330,7 @@ jobs:
 
 
 
-
-
     - build-nim-0-20-2--armv7-linux-musleabihf
-
-
 
 
 
@@ -1190,11 +1342,7 @@ jobs:
 
 
 
-
-
     - build-nim-0-20-2--x86_64-linux-gnu
-
-
 
 
 
@@ -1204,11 +1352,7 @@ jobs:
 
 
 
-
-
     - build-nim-0-20-2--armv5-linux-gnueabi
-
-
 
 
 
@@ -1218,17 +1362,28 @@ jobs:
 
 
 
-
-
     - build-nim-0-20-2--aarch64-linux-gnu
-
-
 
 
 
 
     - build-nim-0-20-2--powerpc64le-linux-gnu
 
+
+
+
+
+
+
+
+    - build-nim-0-20-2--x86_64-macos-catalina
+
+
+
+
+
+
+    - build-nim-0-20-2--x86_64-macos-big-sur
 
 
 
@@ -1310,7 +1465,6 @@ jobs:
 
 
 
-
   
   
   build-nim-1-0-10--x86_64-linux-musl:
@@ -1337,13 +1491,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-alpine-3-12-linux/amd64-nimcache
+          nimcache
+        key: cache-1-0-10--x86_64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1426,6 +1581,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1448,8 +1604,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -1484,6 +1638,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1506,8 +1661,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -1542,6 +1695,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1564,8 +1718,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -1600,6 +1752,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1622,8 +1775,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -1658,6 +1809,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1680,8 +1832,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -1690,7 +1840,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.8 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -1725,13 +1874,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-alpine-3-12-linux/arm/v6-nimcache
+          nimcache
+        key: cache-1-0-10--armv6-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1838,6 +1988,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -1860,8 +2011,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v6 \
@@ -1870,7 +2019,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -1913,13 +2061,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-alpine-3-12-linux/arm/v7-nimcache
+          nimcache
+        key: cache-1-0-10--armv7-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2026,6 +2175,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2048,8 +2198,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v7 \
@@ -2058,7 +2206,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -2101,13 +2248,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-alpine-3-12-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-1-0-10--aarch64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2214,6 +2362,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2236,8 +2385,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64/v8 \
@@ -2246,7 +2393,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -2285,13 +2431,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-debian-buster-linux/amd64-nimcache
+          nimcache
+        key: cache-1-0-10--x86_64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2374,6 +2521,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2396,8 +2544,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2432,6 +2578,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2454,8 +2601,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2494,6 +2639,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2516,8 +2662,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2552,6 +2696,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2574,8 +2719,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2610,6 +2753,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2632,8 +2776,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2668,6 +2810,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2690,8 +2833,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2726,6 +2867,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2748,8 +2890,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -2758,7 +2898,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           fedora:33 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -2787,13 +2926,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-debian-buster-linux/386-nimcache
+          nimcache
+        key: cache-1-0-10--i686-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -2922,13 +3062,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-debian-buster-linux/arm/v5-nimcache
+          nimcache
+        key: cache-1-0-10--armv5-linux-gnueabi
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3041,6 +3182,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3067,8 +3209,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v5 \
@@ -3077,7 +3217,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -3124,13 +3263,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-debian-buster-linux/arm/v7-nimcache
+          nimcache
+        key: cache-1-0-10--armv7-linux-gnueabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3243,6 +3383,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3269,8 +3410,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v7 \
@@ -3279,7 +3418,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -3326,13 +3464,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-debian-buster-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-1-0-10--aarch64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3445,6 +3584,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3471,8 +3611,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64/v8 \
@@ -3513,6 +3651,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3539,8 +3678,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64 \
@@ -3549,7 +3686,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           abyo/manjaro_aarch64 \
           sh /scripts/test-nim.sh /build/nim-1.0.10
-
 
 
 
@@ -3594,13 +3730,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.0.10-debian-buster-linux/ppc64le-nimcache
+          nimcache
+        key: cache-1-0-10--powerpc64le-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -3701,13 +3838,323 @@ jobs:
   
   
 
+  
+  
+  build-nim-1-0-10--x86_64-macos-catalina:
+    name: Build nim-1.0.10--x86_64-macos-catalina.tar.xz
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-0-10
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1-0-10--x86_64-macos-catalina
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.0.10"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-1.0.10
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-1.0.10"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.0.10--x86_64-macos-catalina.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-1-0-10--x86_64-macos-catalina--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-macos-catalina
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.0.10
+
+
+
+
+  test-nim-1-0-10--x86_64-macos-catalina--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-macos-catalina
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.0.10
+
+
+
+
+  build-nim-1-0-10--x86_64-macos-big-sur:
+    name: Build nim-1.0.10--x86_64-macos-big-sur.tar.xz
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-0-10
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1-0-10--x86_64-macos-big-sur
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.0.10"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-1.0.10
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-1.0.10"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-0-10.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.0.10--x86_64-macos-big-sur.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-1-0-10--x86_64-macos-big-sur--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-macos-big-sur
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-macos-big-sur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.0.10
+
+
+
+
+  test-nim-1-0-10--x86_64-macos-big-sur--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-0-10
+    - build-nim-1-0-10--x86_64-macos-big-sur
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-0-10.outputs.release_name }}
+        tarball=nim-1.0.10--x86_64-macos-big-sur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.0.10.tar"
+        tar xf "nim-1.0.10.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.0.10
+
+
+
+
+
   publish-release-nim-1-0-10:
     name: Publish release 1.0.10
     if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
-
 
 
 
@@ -3737,11 +4184,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-0-10--armv6-linux-musleabihf--on-alpine-3-12
-
-
 
 
 
@@ -3773,11 +4216,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-0-10--aarch64-linux-musl--on-alpine-3-12
-
-
 
 
 
@@ -3857,10 +4296,6 @@ jobs:
 
 
 
-
-
-
-
     - test-nim-1-0-10--armv5-linux-gnueabi--on-lopsided-archlinux
 
 
@@ -3885,11 +4320,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-0-10--armv7-linux-gnueabihf--on-lopsided-archlinux
-
-
 
 
 
@@ -3954,6 +4385,25 @@ jobs:
 
 
 
+
+
+
+
+
+
+    - test-nim-1-0-10--x86_64-macos-catalina--on-macos-11-0
+
+    - test-nim-1-0-10--x86_64-macos-catalina--on-macos-10-15
+
+
+
+
+
+
+
+    - test-nim-1-0-10--x86_64-macos-big-sur--on-macos-11-0
+
+    - test-nim-1-0-10--x86_64-macos-big-sur--on-macos-10-15
 
 
 
@@ -4036,7 +4486,6 @@ jobs:
 
 
 
-
   
   
   build-nim-1-2-8--x86_64-linux-musl:
@@ -4063,13 +4512,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-alpine-3-12-linux/amd64-nimcache
+          nimcache
+        key: cache-1-2-8--x86_64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4152,6 +4602,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4174,8 +4625,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -4210,6 +4659,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4232,8 +4682,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -4268,6 +4716,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4290,8 +4739,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -4326,6 +4773,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4348,8 +4796,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -4384,6 +4830,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4406,8 +4853,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -4416,7 +4861,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.8 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -4451,13 +4895,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-alpine-3-12-linux/arm/v6-nimcache
+          nimcache
+        key: cache-1-2-8--armv6-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4564,6 +5009,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4586,8 +5032,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v6 \
@@ -4596,7 +5040,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -4639,13 +5082,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-alpine-3-12-linux/arm/v7-nimcache
+          nimcache
+        key: cache-1-2-8--armv7-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4752,6 +5196,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4774,8 +5219,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v7 \
@@ -4784,7 +5227,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -4827,13 +5269,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-alpine-3-12-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-1-2-8--aarch64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4940,6 +5383,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -4962,8 +5406,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64/v8 \
@@ -4972,7 +5414,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -5011,13 +5452,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-debian-buster-linux/amd64-nimcache
+          nimcache
+        key: cache-1-2-8--x86_64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5100,6 +5542,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5122,8 +5565,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5158,6 +5599,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5180,8 +5622,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5220,6 +5660,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5242,8 +5683,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5278,6 +5717,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5300,8 +5740,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5336,6 +5774,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5358,8 +5797,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5394,6 +5831,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5416,8 +5854,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5452,6 +5888,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5474,8 +5911,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -5484,7 +5919,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           fedora:33 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -5513,13 +5947,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-debian-buster-linux/386-nimcache
+          nimcache
+        key: cache-1-2-8--i686-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5648,13 +6083,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-debian-buster-linux/arm/v5-nimcache
+          nimcache
+        key: cache-1-2-8--armv5-linux-gnueabi
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5767,6 +6203,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5793,8 +6230,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v5 \
@@ -5803,7 +6238,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -5850,13 +6284,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-debian-buster-linux/arm/v7-nimcache
+          nimcache
+        key: cache-1-2-8--armv7-linux-gnueabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5969,6 +6404,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -5995,8 +6431,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v7 \
@@ -6005,7 +6439,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -6052,13 +6485,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-debian-buster-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-1-2-8--aarch64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6171,6 +6605,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6197,8 +6632,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64/v8 \
@@ -6239,6 +6672,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6265,8 +6699,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64 \
@@ -6275,7 +6707,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           abyo/manjaro_aarch64 \
           sh /scripts/test-nim.sh /build/nim-1.2.8
-
 
 
 
@@ -6320,13 +6751,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.2.8-debian-buster-linux/ppc64le-nimcache
+          nimcache
+        key: cache-1-2-8--powerpc64le-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6427,13 +6859,323 @@ jobs:
   
   
 
+  
+  
+  build-nim-1-2-8--x86_64-macos-catalina:
+    name: Build nim-1.2.8--x86_64-macos-catalina.tar.xz
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-2-8
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1-2-8--x86_64-macos-catalina
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.8"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-1.2.8
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-1.2.8"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.8--x86_64-macos-catalina.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-1-2-8--x86_64-macos-catalina--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-macos-catalina
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.8
+
+
+
+
+  test-nim-1-2-8--x86_64-macos-catalina--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-macos-catalina
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.8
+
+
+
+
+  build-nim-1-2-8--x86_64-macos-big-sur:
+    name: Build nim-1.2.8--x86_64-macos-big-sur.tar.xz
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-2-8
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1-2-8--x86_64-macos-big-sur
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.8"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-1.2.8
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-1.2.8"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.8--x86_64-macos-big-sur.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-1-2-8--x86_64-macos-big-sur--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-macos-big-sur
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-macos-big-sur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.8
+
+
+
+
+  test-nim-1-2-8--x86_64-macos-big-sur--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-2-8
+    - build-nim-1-2-8--x86_64-macos-big-sur
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-macos-big-sur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar xf "nim-1.2.8.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.8
+
+
+
+
+
   publish-release-nim-1-2-8:
     name: Publish release 1.2.8
     if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
-
 
 
 
@@ -6463,11 +7205,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-2-8--armv6-linux-musleabihf--on-alpine-3-12
-
-
 
 
 
@@ -6499,11 +7237,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-2-8--aarch64-linux-musl--on-alpine-3-12
-
-
 
 
 
@@ -6583,10 +7317,6 @@ jobs:
 
 
 
-
-
-
-
     - test-nim-1-2-8--armv5-linux-gnueabi--on-lopsided-archlinux
 
 
@@ -6611,11 +7341,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-2-8--armv7-linux-gnueabihf--on-lopsided-archlinux
-
-
 
 
 
@@ -6680,6 +7406,25 @@ jobs:
 
 
 
+
+
+
+
+
+
+    - test-nim-1-2-8--x86_64-macos-catalina--on-macos-11-0
+
+    - test-nim-1-2-8--x86_64-macos-catalina--on-macos-10-15
+
+
+
+
+
+
+
+    - test-nim-1-2-8--x86_64-macos-big-sur--on-macos-11-0
+
+    - test-nim-1-2-8--x86_64-macos-big-sur--on-macos-10-15
 
 
 
@@ -6762,7 +7507,6 @@ jobs:
 
 
 
-
   
   
   build-nim-1-4-2--x86_64-linux-musl:
@@ -6789,13 +7533,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-alpine-3-12-linux/amd64-nimcache
+          nimcache
+        key: cache-1-4-2--x86_64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6878,6 +7623,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6900,8 +7646,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -6936,6 +7680,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -6958,8 +7703,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -6994,6 +7737,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7016,8 +7760,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -7052,6 +7794,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7074,8 +7817,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -7110,6 +7851,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7132,8 +7874,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -7142,7 +7882,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.8 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -7177,13 +7916,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-alpine-3-12-linux/arm/v6-nimcache
+          nimcache
+        key: cache-1-4-2--armv6-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7290,6 +8030,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7312,8 +8053,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v6 \
@@ -7322,7 +8061,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -7365,13 +8103,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-alpine-3-12-linux/arm/v7-nimcache
+          nimcache
+        key: cache-1-4-2--armv7-linux-musleabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7478,6 +8217,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7500,8 +8240,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v7 \
@@ -7510,7 +8248,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -7553,13 +8290,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-alpine-3-12-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-1-4-2--aarch64-linux-musl
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7666,6 +8404,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7688,8 +8427,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64/v8 \
@@ -7698,7 +8435,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -7737,13 +8473,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-debian-buster-linux/amd64-nimcache
+          nimcache
+        key: cache-1-4-2--x86_64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7826,6 +8563,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7848,8 +8586,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -7884,6 +8620,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7906,8 +8643,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -7946,6 +8681,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -7968,8 +8704,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -8004,6 +8738,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8026,8 +8761,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -8062,6 +8795,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8084,8 +8818,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -8120,6 +8852,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8142,8 +8875,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -8178,6 +8909,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8200,8 +8932,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/amd64 \
@@ -8210,7 +8940,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           fedora:33 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -8239,13 +8968,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-debian-buster-linux/386-nimcache
+          nimcache
+        key: cache-1-4-2--i686-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8374,13 +9104,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-debian-buster-linux/arm/v5-nimcache
+          nimcache
+        key: cache-1-4-2--armv5-linux-gnueabi
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8493,6 +9224,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8519,8 +9251,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v5 \
@@ -8529,7 +9259,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -8576,13 +9305,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-debian-buster-linux/arm/v7-nimcache
+          nimcache
+        key: cache-1-4-2--armv7-linux-gnueabihf
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8695,6 +9425,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8721,8 +9452,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm/v7 \
@@ -8731,7 +9460,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -8778,13 +9506,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-debian-buster-linux/arm64/v8-nimcache
+          nimcache
+        key: cache-1-4-2--aarch64-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8897,6 +9626,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8923,8 +9653,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64/v8 \
@@ -8965,6 +9693,7 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -8991,8 +9720,6 @@ jobs:
 
     - name: Run tests
       run: |
-        mkdir -p nimcache
-
         # Test in emulated container
         docker run \
           --platform linux/arm64 \
@@ -9001,7 +9728,6 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           abyo/manjaro_aarch64 \
           sh /scripts/test-nim.sh /build/nim-1.4.2
-
 
 
 
@@ -9046,13 +9772,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          build/nimcache
-        key: nim-1.4.2-debian-buster-linux/ppc64le-nimcache
+          nimcache
+        key: cache-1-4-2--powerpc64le-linux-gnu
 
     - name: Setup dirs
       run: |
         mkdir -p build
         mkdir -p nimcache
+        mkdir -p ~/.cache/
 
     - name: Install deps
       run: |
@@ -9153,13 +9880,325 @@ jobs:
   
   
 
+  
+  
+  build-nim-1-4-2--x86_64-macos-catalina:
+    name: Build nim-1.4.2--x86_64-macos-catalina.tar.xz
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-4-2
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1-4-2--x86_64-macos-catalina
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.4.2"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-1.4.2
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-1.4.2"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.4.2--x86_64-macos-catalina.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-1-4-2--x86_64-macos-catalina--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-macos-catalina
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+
+
+
+
+  test-nim-1-4-2--x86_64-macos-catalina--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-macos-catalina
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+
+
+
+
+  build-nim-1-4-2--x86_64-macos-big-sur:
+    name: Build nim-1.4.2--x86_64-macos-big-sur.tar.xz
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-4-2
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1-4-2--x86_64-macos-big-sur
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.4.2"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar xf "${nim_dir}.tar"
+        rm "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        mv nimcache ~/.cache/nim
+
+        sh ./scripts/build-nim.sh ./build/nim-1.4.2
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        nim_dir="nim-1.4.2"
+        tarball="${nim_dir}.tar.xz"
+        tar -Ipixz -cf "$tarball" "$nim_dir"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.4.2--x86_64-macos-big-sur.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-1-4-2--x86_64-macos-big-sur--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-macos-big-sur
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-macos-big-sur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+
+
+
+
+
+  test-nim-1-4-2--x86_64-macos-big-sur--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-1-4-2--x86_64-macos-big-sur
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tarball=nim-1.4.2--x86_64-macos-big-sur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar xf "nim-1.4.2.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+
+
+
+
+
+
   publish-release-nim-1-4-2:
     name: Publish release 1.4.2
     if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2
-
 
 
 
@@ -9189,11 +10228,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-4-2--armv6-linux-musleabihf--on-alpine-3-12
-
-
 
 
 
@@ -9225,11 +10260,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-4-2--aarch64-linux-musl--on-alpine-3-12
-
-
 
 
 
@@ -9309,10 +10340,6 @@ jobs:
 
 
 
-
-
-
-
     - test-nim-1-4-2--armv5-linux-gnueabi--on-lopsided-archlinux
 
 
@@ -9337,11 +10364,7 @@ jobs:
 
 
 
-
-
     - test-nim-1-4-2--armv7-linux-gnueabihf--on-lopsided-archlinux
-
-
 
 
 
@@ -9406,6 +10429,25 @@ jobs:
 
 
 
+
+
+
+
+
+
+    - test-nim-1-4-2--x86_64-macos-catalina--on-macos-11-0
+
+    - test-nim-1-4-2--x86_64-macos-catalina--on-macos-10-15
+
+
+
+
+
+
+
+    - test-nim-1-4-2--x86_64-macos-big-sur--on-macos-11-0
+
+    - test-nim-1-4-2--x86_64-macos-big-sur--on-macos-10-15
 
 
 
