@@ -123,7 +123,7 @@ _anchors:
     with:
       path: |
         nimcache
-      key: "cache-{{ nim_version }}-{{ id(distro, arch) }}"
+      key: "cache-{{ nim_version }}-{{ id(distro, platform) }}"
 
   build_nim_{{ id(distro, platform) }}: &build_nim_{{ id(distro, platform) }}
     name: Build Nim
@@ -314,7 +314,6 @@ jobs:
       - *stop_distcc_host_{{ distro.name|slugify }}
       {% endif %}
 
-  {% if nim_version[0] > "0" %}
   {% for image, platform_map in distro.test_targets.items() %}
   {% if platform in platform_map %}
   test-nim-{{ id(distro, platform) }}--on-{{ image|slugify }}:
@@ -335,7 +334,6 @@ jobs:
       - *run_tests_{{ id(distro, platform) }}_{{ image|slugify }}
   {% endif %}
   {% endfor %}
-  {% endif %}
   {% endfor %}
   {% endfor %}
 
@@ -358,7 +356,6 @@ jobs:
       - *create_tarball_{{ nim_version|slugify }}
       - *add_tarball_to_release_{{ id(distro, arch) }}
 
-  {% if nim_version[0] > "0" %}
   {% for runner in distro.test_runners %}
   test-nim-{{ id(distro, arch) }}--on-{{ runner|slugify }}:
     name: Test on {{ runner }}
@@ -373,7 +370,6 @@ jobs:
       - *download_released_tarball_{{ id(distro, arch) }}
       - *run_tests_{{ id(distro, arch) }}
   {% endfor %}
-  {% endif %}
   {% endfor %}
   {% endfor %}
 
@@ -385,29 +381,19 @@ jobs:
       - create-release-nim-{{ nim_version|slugify }}
       {% for distro in linux_distros %}
       {% for platform in distro.platforms %}
-      {% if nim_version[0] > "0" %}
       {% for image, platform_map in distro.test_targets.items() %}
       {% if platform in platform_map %}
       - test-nim-{{ id(distro, platform) }}--on-{{ image|slugify }}
       {% endif %}
       {% endfor %}
-      {% else %}
-      {# Can't run tests for 0.X.X #}
-      - build-nim-{{ id(distro, platform) }}
-      {% endif %}
       {% endfor %}
       {% endfor %}
 
       {% for distro in macos_distros %}
       {% for arch in distro.archs %}
-      {% if nim_version[0] > "0" %}
       {% for runner in distro.test_runners %}
       - test-nim-{{ id(distro, arch) }}--on-{{ runner|slugify }}
       {% endfor %}
-      {% else %}
-      {# Can't run tests for 0.X.X #}
-      - build-nim-{{ id(distro, arch) }}
-      {% endif %}
       {% endfor %}
       {% endfor %}
 

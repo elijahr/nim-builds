@@ -10,11 +10,11 @@ on:
     - '**.jinja'
 
 jobs:
-  create-release-nim-1-4-2:
+  create-release-nim-1-2-8:
     if: ${{ github.event_name == 'push' && contains(toJson(github.event.commits),
       '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]')
       == false && contains(toJson(github.event.commits), '[skip ci]') == false }}
-    name: Create release 1.4.2
+    name: Create release 1.2.8
     runs-on: ubuntu-latest
     outputs:
       id: ${{ steps.create-release.outputs.id }}
@@ -32,7 +32,7 @@ jobs:
     - name: Generate release name
       id: generate-release-name
       run: |
-        release_name=nim-1.4.2--$(date '+%Y%m%d%H%M')
+        release_name=nim-1.2.8--$(date '+%Y%m%d%H%M')
         echo "::set-output name=release_name::${release_name}"
 
     - name: Create release
@@ -54,10 +54,10 @@ jobs:
   
   
   build-nim-alpine-3-12-linux-amd64:
-    name: Build nim-1.4.2--x86_64-linux-musl.tar.xz
+    name: Build nim-1.2.8--x86_64-linux-musl.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -78,7 +78,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-alpine-3-12-linux-amd64
+        key: cache-1.2.8-alpine-3-12-linux-amd64
 
     - name: Setup dirs
       run: |
@@ -95,7 +95,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -116,7 +116,7 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm:alpine-3.12 \
-          sh /scripts/build-nim.sh /build/nim-1.4.2
+          sh /scripts/build-nim.sh /build/nim-1.2.8
 
 
 
@@ -124,7 +124,7 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -136,9 +136,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--x86_64-linux-musl.tar.xz
+        asset_name: nim-1.2.8--x86_64-linux-musl.tar.xz
         asset_content_type: application/x-xz
 
 
@@ -148,7 +148,7 @@ jobs:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-amd64
     steps:
     - name: Checkout repo
@@ -180,11 +180,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-musl.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-musl.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -197,7 +197,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -205,7 +205,7 @@ jobs:
     name: Test on alpine:3.11
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-amd64
     steps:
     - name: Checkout repo
@@ -237,11 +237,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-musl.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-musl.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -254,7 +254,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.11 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -262,7 +262,7 @@ jobs:
     name: Test on alpine:3.10
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-amd64
     steps:
     - name: Checkout repo
@@ -294,11 +294,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-musl.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-musl.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -311,7 +311,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.10 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -319,7 +319,7 @@ jobs:
     name: Test on alpine:3.9
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-amd64
     steps:
     - name: Checkout repo
@@ -351,11 +351,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-musl.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-musl.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -368,7 +368,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.9 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -376,7 +376,7 @@ jobs:
     name: Test on alpine:3.8
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-amd64
     steps:
     - name: Checkout repo
@@ -408,11 +408,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-musl.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-musl.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -425,16 +425,16 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.8 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
   build-nim-alpine-3-12-linux-arm-v6:
-    name: Build nim-1.4.2--armv6-linux-musleabihf.tar.xz
+    name: Build nim-1.2.8--armv6-linux-musleabihf.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -461,7 +461,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-alpine-3-12-linux-arm-v6
+        key: cache-1.2.8-alpine-3-12-linux-arm-v6
 
     - name: Setup dirs
       run: |
@@ -485,7 +485,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -510,14 +510,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -529,9 +529,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--armv6-linux-musleabihf.tar.xz
+        asset_name: nim-1.2.8--armv6-linux-musleabihf.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -549,7 +549,7 @@ jobs:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-arm-v6
     steps:
     - name: Checkout repo
@@ -587,11 +587,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--armv6-linux-musleabihf.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--armv6-linux-musleabihf.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -604,7 +604,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -618,10 +618,10 @@ jobs:
 
 
   build-nim-alpine-3-12-linux-arm-v7:
-    name: Build nim-1.4.2--armv7-linux-musleabihf.tar.xz
+    name: Build nim-1.2.8--armv7-linux-musleabihf.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -648,7 +648,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-alpine-3-12-linux-arm-v7
+        key: cache-1.2.8-alpine-3-12-linux-arm-v7
 
     - name: Setup dirs
       run: |
@@ -672,7 +672,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -697,14 +697,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -716,9 +716,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--armv7-linux-musleabihf.tar.xz
+        asset_name: nim-1.2.8--armv7-linux-musleabihf.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -736,7 +736,7 @@ jobs:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-arm-v7
     steps:
     - name: Checkout repo
@@ -774,11 +774,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--armv7-linux-musleabihf.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--armv7-linux-musleabihf.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -791,7 +791,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -805,10 +805,10 @@ jobs:
 
 
   build-nim-alpine-3-12-linux-arm64-v8:
-    name: Build nim-1.4.2--aarch64-linux-musl.tar.xz
+    name: Build nim-1.2.8--aarch64-linux-musl.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -835,7 +835,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-alpine-3-12-linux-arm64-v8
+        key: cache-1.2.8-alpine-3-12-linux-arm64-v8
 
     - name: Setup dirs
       run: |
@@ -859,7 +859,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -884,14 +884,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:alpine-3.12 \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -903,9 +903,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--aarch64-linux-musl.tar.xz
+        asset_name: nim-1.2.8--aarch64-linux-musl.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -923,7 +923,7 @@ jobs:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-alpine-3-12-linux-arm64-v8
     steps:
     - name: Checkout repo
@@ -961,11 +961,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--aarch64-linux-musl.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--aarch64-linux-musl.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -978,7 +978,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           alpine:3.12 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -994,10 +994,10 @@ jobs:
 
 
   build-nim-debian-buster-linux-amd64:
-    name: Build nim-1.4.2--x86_64-linux-gnu.tar.xz
+    name: Build nim-1.2.8--x86_64-linux-gnu.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -1018,7 +1018,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-debian-buster-linux-amd64
+        key: cache-1.2.8-debian-buster-linux-amd64
 
     - name: Setup dirs
       run: |
@@ -1035,7 +1035,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -1056,7 +1056,7 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm:debian-buster-slim \
-          sh /scripts/build-nim.sh /build/nim-1.4.2
+          sh /scripts/build-nim.sh /build/nim-1.2.8
 
 
 
@@ -1064,7 +1064,7 @@ jobs:
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -1076,9 +1076,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--x86_64-linux-gnu.tar.xz
+        asset_name: nim-1.2.8--x86_64-linux-gnu.tar.xz
         asset_content_type: application/x-xz
 
 
@@ -1088,7 +1088,7 @@ jobs:
     name: Test on debian:buster
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1120,11 +1120,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1137,7 +1137,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           debian:buster \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1145,7 +1145,7 @@ jobs:
     name: Test on archlinux
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1177,11 +1177,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1194,7 +1194,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           archlinux \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1206,7 +1206,7 @@ jobs:
     name: Test on ubuntu:bionic
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1238,11 +1238,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1255,7 +1255,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           ubuntu:bionic \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1263,7 +1263,7 @@ jobs:
     name: Test on ubuntu:focal
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1295,11 +1295,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1312,7 +1312,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           ubuntu:focal \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1320,7 +1320,7 @@ jobs:
     name: Test on fedora:31
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1352,11 +1352,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1369,7 +1369,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           fedora:31 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1377,7 +1377,7 @@ jobs:
     name: Test on fedora:32
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1409,11 +1409,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1426,7 +1426,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           fedora:32 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1434,7 +1434,7 @@ jobs:
     name: Test on fedora:33
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-amd64
     steps:
     - name: Checkout repo
@@ -1466,11 +1466,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--x86_64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1483,16 +1483,16 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           fedora:33 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
 
   build-nim-debian-buster-linux-386:
-    name: Build nim-1.4.2--i686-linux-gnu.tar.xz
+    name: Build nim-1.2.8--i686-linux-gnu.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -1513,7 +1513,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-debian-buster-linux-386
+        key: cache-1.2.8-debian-buster-linux-386
 
     - name: Setup dirs
       run: |
@@ -1537,7 +1537,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -1562,14 +1562,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -1581,9 +1581,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--i686-linux-gnu.tar.xz
+        asset_name: nim-1.2.8--i686-linux-gnu.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -1617,10 +1617,10 @@ jobs:
   
   
   build-nim-debian-buster-linux-arm-v5:
-    name: Build nim-1.4.2--armv5-linux-gnueabi.tar.xz
+    name: Build nim-1.2.8--armv5-linux-gnueabi.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -1647,7 +1647,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-debian-buster-linux-arm-v5
+        key: cache-1.2.8-debian-buster-linux-arm-v5
 
     - name: Setup dirs
       run: |
@@ -1671,7 +1671,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -1696,14 +1696,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -1715,9 +1715,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--armv5-linux-gnueabi.tar.xz
+        asset_name: nim-1.2.8--armv5-linux-gnueabi.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -1740,7 +1740,7 @@ jobs:
     name: Test on lopsided/archlinux
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-arm-v5
     steps:
     - name: Checkout repo
@@ -1778,11 +1778,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--armv5-linux-gnueabi.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--armv5-linux-gnueabi.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1799,7 +1799,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -1817,10 +1817,10 @@ jobs:
 
 
   build-nim-debian-buster-linux-arm-v7:
-    name: Build nim-1.4.2--armv7-linux-gnueabihf.tar.xz
+    name: Build nim-1.2.8--armv7-linux-gnueabihf.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -1847,7 +1847,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-debian-buster-linux-arm-v7
+        key: cache-1.2.8-debian-buster-linux-arm-v7
 
     - name: Setup dirs
       run: |
@@ -1871,7 +1871,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -1896,14 +1896,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -1915,9 +1915,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--armv7-linux-gnueabihf.tar.xz
+        asset_name: nim-1.2.8--armv7-linux-gnueabihf.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -1940,7 +1940,7 @@ jobs:
     name: Test on lopsided/archlinux
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-arm-v7
     steps:
     - name: Checkout repo
@@ -1978,11 +1978,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--armv7-linux-gnueabihf.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--armv7-linux-gnueabihf.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -1999,7 +1999,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -2017,10 +2017,10 @@ jobs:
 
 
   build-nim-debian-buster-linux-arm64-v8:
-    name: Build nim-1.4.2--aarch64-linux-gnu.tar.xz
+    name: Build nim-1.2.8--aarch64-linux-gnu.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -2047,7 +2047,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-debian-buster-linux-arm64-v8
+        key: cache-1.2.8-debian-buster-linux-arm64-v8
 
     - name: Setup dirs
       run: |
@@ -2071,7 +2071,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -2096,14 +2096,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -2115,9 +2115,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--aarch64-linux-gnu.tar.xz
+        asset_name: nim-1.2.8--aarch64-linux-gnu.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -2140,7 +2140,7 @@ jobs:
     name: Test on lopsided/archlinux
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-arm64-v8
     steps:
     - name: Checkout repo
@@ -2178,11 +2178,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--aarch64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--aarch64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -2199,7 +2199,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           lopsided/archlinux \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -2207,7 +2207,7 @@ jobs:
     name: Test on abyo/manjaro_aarch64
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-debian-buster-linux-arm64-v8
     steps:
     - name: Checkout repo
@@ -2245,11 +2245,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--aarch64-linux-gnu.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tarball=nim-1.2.8--aarch64-linux-gnu.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
 
 
@@ -2266,7 +2266,7 @@ jobs:
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           abyo/manjaro_aarch64 \
-          sh /scripts/test-nim.sh /build/nim-1.4.2
+          sh /scripts/test-nim.sh /build/nim-1.2.8
 
 
 
@@ -2282,10 +2282,10 @@ jobs:
 
 
   build-nim-debian-buster-linux-ppc64le:
-    name: Build nim-1.4.2--powerpc64le-linux-gnu.tar.xz
+    name: Build nim-1.2.8--powerpc64le-linux-gnu.tar.xz
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -2312,7 +2312,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-debian-buster-linux-ppc64le
+        key: cache-1.2.8-debian-buster-linux-ppc64le
 
     - name: Setup dirs
       run: |
@@ -2336,7 +2336,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -2361,14 +2361,14 @@ jobs:
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
           --workdir /build \
           elijahru/build-farm-client:debian-buster-slim \
-          sh /scripts/build-nim.sh /build/nim-1.4.2 || (status=$?; dump_logs; exit $status)
+          sh /scripts/build-nim.sh /build/nim-1.2.8 || (status=$?; dump_logs; exit $status)
 
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -2380,9 +2380,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--powerpc64le-linux-gnu.tar.xz
+        asset_name: nim-1.2.8--powerpc64le-linux-gnu.tar.xz
         asset_content_type: application/x-xz
 
     - name: Stop distcc host
@@ -2420,10 +2420,10 @@ jobs:
   
   
   build-nim-catalina-x86_64:
-    name: Build nim-1.4.2--x86_64-macos-catalina.tar.xz
+    name: Build nim-1.2.8--x86_64-macos-catalina.tar.xz
     runs-on: macos-10.15
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     strategy:
       fail-fast: false
     steps:
@@ -2438,7 +2438,7 @@ jobs:
       with:
         path: |
           nimcache
-        key: cache-1.4.2-catalina-x86_64
+        key: cache-1.2.8-catalina-x86_64
 
     - name: Setup dirs
       run: |
@@ -2453,7 +2453,7 @@ jobs:
     - name: Download Nim source
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
         tar -xf "${nim_dir}.tar"
@@ -2466,13 +2466,13 @@ jobs:
         set -uexo pipefail
         ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
 
-        sh ./scripts/build-nim.sh ./build/nim-1.4.2
+        sh ./scripts/build-nim.sh ./build/nim-1.2.8
 
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
-        nim_dir="nim-1.4.2"
+        nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
@@ -2484,9 +2484,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        upload_url: ${{ needs.create-release-nim-1-2-8.outputs.upload_url }}
         asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--x86_64-macos-catalina.tar.xz
+        asset_name: nim-1.2.8--x86_64-macos-catalina.tar.xz
         asset_content_type: application/x-xz
 
 
@@ -2495,7 +2495,7 @@ jobs:
     name: Test on macos-10.15
     runs-on: macos-10.15
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
     - build-nim-catalina-x86_64
     steps:
     - name: Checkout repo
@@ -2519,28 +2519,28 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tar=nim-1.4.2--x86_64-macos-catalina.tar
-        tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
+        tag=${{ needs.create-release-nim-1-2-8.outputs.release_name }}
+        tar=nim-1.2.8--x86_64-macos-catalina.tar
+        tarball=nim-1.2.8--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        pixz -d "$tarball" "nim-1.4.2.tar"
-        tar -xf "nim-1.4.2.tar"
+        pixz -d "$tarball" "nim-1.2.8.tar"
+        tar -xf "nim-1.2.8.tar"
 
     - name: Run tests
       run: |
-        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+        sh ./scripts/test-nim.sh ./build/nim-1.2.8
 
 
 
 
 
-  publish-release-nim-1-4-2:
-    name: Publish release 1.4.2
+  publish-release-nim-1-2-8:
+    name: Publish release 1.2.8
     if: ${{ github.ref == 'refs/heads/devel' || startsWith(github.ref, 'refs/tags/')
       }}
     runs-on: ubuntu-latest
     needs:
-    - create-release-nim-1-4-2
+    - create-release-nim-1-2-8
 
 
 
@@ -2767,7 +2767,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       with:
-        release_id: ${{ needs.create-release-nim-1-4-2.outputs.id }}
+        release_id: ${{ needs.create-release-nim-1-2-8.outputs.id }}
 
     - name: Checkout repo
       uses: actions/checkout@v2
