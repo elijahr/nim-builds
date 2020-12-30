@@ -4,32 +4,39 @@ set -ue
 
 PATH="/usr/local/bin:$PATH"
 
-echo "Checking for .github/workflows/build.yml.jinja changes..."
-
 if [ "$(git diff-index --cached HEAD --name-only)" != "" ]
 then
 
-	files=( $(git diff-index --cached HEAD --name-only) )
+  files=( $(git diff-index --cached HEAD --name-only) )
 
-	for file in ${files[@]}
-	do
-		if [ "$file" = ".github/workflows/build.yml.jinja" ] || [ "$file" = "render.py" ] || [ "$file" = "README.md.jinja" ]
-		then
-			echo "Change detected, re-rendering"
-			pipenv run python render.py
-			pipenv run yamllint .github/workflows/build.yml
-			git add .github/workflows/*.yml || true
-			git add README.md || true
-		fi
+  render_readme=no
+  render_github_workflow=no
+  for file in ${files[@]}
+  do
+    case $file in
+      *.yml.jinja) render_github_workflow=yes;;
+      *.md.jinja) render_readme=yes;;
+      *.py)
+        render_readme=yes
+        render_github_workflow=yes
+        pipenv run black $file
+        git add $file
+    esac
+  done
 
-		case $file in
-			*.py)
-				if [ -f "$file" ]
-				then
-					pipenv run black $file
-					git add $file
-				fi
-				;;
-		esac
-	done
+  build_yml=.github/workflows/build.yml
+
+  case $render_github_workflow in
+    yes)
+      pipenv run ./render.py github-workflow
+      pipenv run yamllint $build_yml
+      git add $build_yml
+      ;;
+  esac
+  case $render_readme in
+    yes)
+      pipenv run ./render.py readme
+      git add README.md
+      ;;
+  esac
 fi

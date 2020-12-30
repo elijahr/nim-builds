@@ -90,7 +90,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -185,7 +184,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -300,7 +298,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -414,7 +411,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -524,7 +520,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -613,7 +608,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -730,7 +724,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -845,7 +838,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -962,7 +954,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -1078,7 +1069,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -1168,28 +1158,28 @@ jobs:
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--x86_64-linux-musl
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--armv6-linux-musleabihf
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--armv7-linux-musleabihf
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--aarch64-linux-musl
 
 
@@ -1198,42 +1188,42 @@ jobs:
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--x86_64-linux-gnu
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--i686-linux-gnu
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--armv5-linux-gnueabi
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--armv7-linux-gnueabihf
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--aarch64-linux-gnu
 
 
 
 
 
-      # Can't run tests for 0.X.X
+
     - build-nim-0-20-2--powerpc64le-linux-gnu
 
 
@@ -1254,6 +1244,7 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
@@ -1264,15 +1255,17 @@ jobs:
         set -uexo pipefail
 
         pip install -r requirements.txt
-        python3.9 render.py
+        python3.9 render.py readme
         git add README.md || true
         if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
         then
           git commit -m "Re-rendered README.md"
+            git push || (git pull origin && git push || true)
         fi
-        git push || true
 
 
+
+  
   create-release-nim-1-0-10:
     name: Create release 1.0.10
     runs-on: ubuntu-latest
@@ -1345,7 +1338,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -1429,7 +1421,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -1487,7 +1478,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -1547,7 +1537,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -1606,7 +1595,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -1664,7 +1652,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -1739,7 +1726,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -1847,7 +1833,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -1929,7 +1914,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -2037,7 +2021,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -2119,7 +2102,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -2227,7 +2209,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -2305,7 +2286,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -2389,7 +2369,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -2447,7 +2426,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -2511,7 +2489,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -2569,7 +2546,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -2638,7 +2614,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -2769,7 +2744,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -2882,7 +2856,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -2966,7 +2939,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -3080,7 +3052,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -3164,7 +3135,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -3278,7 +3248,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -3346,7 +3315,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -3429,7 +3397,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -3754,6 +3721,7 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
@@ -3764,15 +3732,17 @@ jobs:
         set -uexo pipefail
 
         pip install -r requirements.txt
-        python3.9 render.py
+        python3.9 render.py readme
         git add README.md || true
         if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
         then
           git commit -m "Re-rendered README.md"
+            git push || (git pull origin && git push || true)
         fi
-        git push || true
 
 
+
+  
   create-release-nim-1-2-8:
     name: Create release 1.2.8
     runs-on: ubuntu-latest
@@ -3845,7 +3815,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -3929,7 +3898,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -3987,7 +3955,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -4047,7 +4014,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -4106,7 +4072,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -4164,7 +4129,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -4239,7 +4203,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -4347,7 +4310,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -4429,7 +4391,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -4537,7 +4498,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -4619,7 +4579,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -4727,7 +4686,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -4805,7 +4763,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -4889,7 +4846,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -4947,7 +4903,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -5011,7 +4966,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -5069,7 +5023,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -5138,7 +5091,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -5269,7 +5221,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -5382,7 +5333,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -5466,7 +5416,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -5580,7 +5529,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -5664,7 +5612,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -5778,7 +5725,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -5846,7 +5792,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -5929,7 +5874,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -6254,6 +6198,7 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
@@ -6264,15 +6209,17 @@ jobs:
         set -uexo pipefail
 
         pip install -r requirements.txt
-        python3.9 render.py
+        python3.9 render.py readme
         git add README.md || true
         if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
         then
           git commit -m "Re-rendered README.md"
+            git push || (git pull origin && git push || true)
         fi
-        git push || true
 
 
+
+  
   create-release-nim-1-4-2:
     name: Create release 1.4.2
     runs-on: ubuntu-latest
@@ -6345,7 +6292,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -6429,7 +6375,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -6487,7 +6432,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -6547,7 +6491,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -6606,7 +6549,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -6664,7 +6606,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -6739,7 +6680,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -6847,7 +6787,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -6929,7 +6868,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -7037,7 +6975,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -7119,7 +7056,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -7227,7 +7163,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -7305,7 +7240,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -7389,7 +7323,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -7447,7 +7380,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -7511,7 +7443,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -7569,7 +7500,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -7638,7 +7568,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -7769,7 +7698,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -7882,7 +7810,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -7966,7 +7893,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -8080,7 +8006,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -8164,7 +8089,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -8278,7 +8202,6 @@ jobs:
         mkdir -p build
         mkdir -p nimcache
 
-
     - name: Install deps
       run: |
         sudo add-apt-repository ppa:cpick/hub
@@ -8346,7 +8269,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -8429,7 +8351,6 @@ jobs:
       run: |
         mkdir -p build
         mkdir -p nimcache
-
 
     - name: Install deps
       run: |
@@ -8754,6 +8675,7 @@ jobs:
         fetch-depth: 1
         submodules: recursive
 
+
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
@@ -8764,11 +8686,13 @@ jobs:
         set -uexo pipefail
 
         pip install -r requirements.txt
-        python3.9 render.py
+        python3.9 render.py readme
         git add README.md || true
         if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
         then
           git commit -m "Re-rendered README.md"
+            git push || (git pull origin && git push || true)
         fi
-        git push || true
+
+
 

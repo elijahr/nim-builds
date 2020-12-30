@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+import argparse
 import datetime
 import json
 import os
@@ -61,7 +64,7 @@ def fetch_nim_versions():
     return [tag.name[1:] for tag in tags if tag.name.startswith("v")]
 
 
-arch_prefix = {
+toolchain_arch_by_docker_arch = {
     "linux/amd64": "x86_64",
     "linux/386": "i686",
     "linux/arm/v5": "armv5",
@@ -71,19 +74,18 @@ arch_prefix = {
     "linux/ppc64le": "powerpc64le",
 }
 
-arch_suffix = {
+toolchain_suffix_by_docker_arch = {
     "linux/arm/v5": "eabi",
     "linux/arm/v6": "eabihf",
     "linux/arm/v7": "eabihf",
 }
 
-toolchain_arch_to_docker_arch = {v: k for k, v in arch_prefix.items()}
+docker_arch_by_toolchain_arch = {v: k for k, v in toolchain_arch_by_docker_arch.items()}
 
 toolchain_arch_aliases = {
     "x86_64": "amd64",
     "i686": "i386/i586",
     "armv5": "armel",
-    "armv6": "armhf",
     "armv7": "armhf",
     "aarch64": "arm64",
     "powerpc64le": "ppc64le",
@@ -102,19 +104,21 @@ def asset_blurb(asset):
     else:
         raise ValueError(f"Unknown libc {libc}")
 
-    blurb = f"This was compiled for the `{arch}` aka "
-    blurb += f"`{toolchain_arch_aliases[arch]}` architecture, "
+    if arch in toolchain_arch_aliases:
+        aka = f" aka `{toolchain_arch_aliases[arch]}`"
+    else:
+        aka = ""
+
+    blurb = f"This was compiled for the `{arch}`{aka} architecture, "
     blurb += f"for distros using the {libc_name} implementation of "
     blurb += f"the C standard library, such as {libc_distros}. "
     blurb += "It can be used with Docker images targeting the "
-    blurb += f"`{toolchain_arch_to_docker_arch[arch]}` platform."
+    blurb += f"`{docker_arch_by_toolchain_arch[arch]}` platform."
     return blurb
 
 
 def machine(distro, platform):
-    return (
-        f'{arch_prefix[platform]}-linux-{distro["libc"]}{arch_suffix.get(platform, "")}'
-    )
+    return f'{toolchain_arch_by_docker_arch[platform]}-linux-{distro["libc"]}{toolchain_suffix_by_docker_arch.get(platform, "")}'
 
 
 def asset_id(nim_version, distro, platform):
@@ -266,6 +270,19 @@ def render_readme():
     render("README.md", dict(releases=releases))
 
 
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers.add_parser("github-workflow")
+    subparsers.add_parser("readme")
+    args = parser.parse_args()
+
+    if args.subcommand == "github-workflow":
+        render_github_workflow()
+
+    elif args.subcommand == "readme":
+        render_readme()
+
+
 if __name__ == "__main__":
-    render_github_workflow()
-    render_readme()
+    main()
