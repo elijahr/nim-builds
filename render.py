@@ -147,96 +147,96 @@ def asset_name(nim_version, distro, platform):
     return f"{nim_version}--{machine(distro, platform)}"
 
 
-linux_distros = [
-    {
-        "name": "alpine-3-12",
-        "type": "linux",
-        "libc": "musl",
-        "build_farm_host_image": "elijahru/build-farm:alpine-3.12",
-        "build_farm_client_image": "elijahru/build-farm-client:alpine-3.12",
-        "platforms": [
-            "linux/amd64",
-            "linux/arm/v6",
-            "linux/arm/v7",
-            "linux/arm64/v8",
-        ],
-        "test_targets": {
-            "alpine:3.12": {
-                "linux/amd64": "linux/amd64",
-                "linux/arm/v6": "linux/arm/v6",
-                "linux/arm/v7": "linux/arm/v7",
-                "linux/arm64/v8": "linux/arm64/v8",
-            },
-            "alpine:3.11": {
-                "linux/amd64": "linux/amd64",
-            },
-            "alpine:3.10": {
-                "linux/amd64": "linux/amd64",
-            },
-            "alpine:3.9": {
-                "linux/amd64": "linux/amd64",
-            },
-            "alpine:3.8": {
-                "linux/amd64": "linux/amd64",
-            },
-        },
-    },
-    {
-        "name": "debian-buster",
-        "type": "linux",
-        "libc": "gnu",
-        "build_farm_host_image": "elijahru/build-farm:debian-buster-slim",
-        "build_farm_client_image": "elijahru/build-farm-client:debian-buster-slim",
-        "platforms": [
-            "linux/amd64",
-            "linux/386",
-            "linux/arm/v5",
-            "linux/arm/v7",
-            "linux/arm64/v8",
-            "linux/ppc64le",
-        ],
-        "test_targets": {
-            "debian:buster": {
-                "linux/amd64": "linux/amd64",
-                "linux/386": "linux/386",
-                "linux/arm/v5": "linux/arm/v5",
-                "linux/arm/v7": "linux/arm/v7",
-                "linux/arm64/v8": "linux/arm64/v8",
-                "linux/ppc64le": "linux/ppc64le",
-            },
-            "archlinux": {
-                "linux/amd64": "linux/amd64",
-            },
-            "lopsided/archlinux": {
-                "linux/arm/v5": "linux/arm/v5",
-                "linux/arm/v6": "linux/arm/v6",
-                "linux/arm/v7": "linux/arm/v7",
-                "linux/arm64/v8": "linux/arm64/v8",
-            },
-            "abyo/manjaro_aarch64": {
-                "linux/arm64/v8": "linux/arm64",
-            },
-            "debian:buster": {
-                "linux/amd64": "linux/amd64",
-            },
-            "ubuntu:bionic": {
-                "linux/amd64": "linux/amd64",
-            },
-            "ubuntu:focal": {
-                "linux/amd64": "linux/amd64",
-            },
-            "fedora:31": {
-                "linux/amd64": "linux/amd64",
-            },
-            "fedora:32": {
-                "linux/amd64": "linux/amd64",
-            },
-            "fedora:33": {
-                "linux/amd64": "linux/amd64",
-            },
-        },
-    },
-]
+linux_distros = []
+#     {
+#         "name": "alpine-3-12",
+#         "type": "linux",
+#         "libc": "musl",
+#         "build_farm_host_image": "elijahru/build-farm:alpine-3.12",
+#         "build_farm_client_image": "elijahru/build-farm-client:alpine-3.12",
+#         "platforms": [
+#             "linux/amd64",
+#             "linux/arm/v6",
+#             "linux/arm/v7",
+#             "linux/arm64/v8",
+#         ],
+#         "test_targets": {
+#             "alpine:3.12": {
+#                 "linux/amd64": "linux/amd64",
+#                 "linux/arm/v6": "linux/arm/v6",
+#                 "linux/arm/v7": "linux/arm/v7",
+#                 "linux/arm64/v8": "linux/arm64/v8",
+#             },
+#             "alpine:3.11": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "alpine:3.10": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "alpine:3.9": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "alpine:3.8": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#         },
+#     },
+#     {
+#         "name": "debian-buster",
+#         "type": "linux",
+#         "libc": "gnu",
+#         "build_farm_host_image": "elijahru/build-farm:debian-buster-slim",
+#         "build_farm_client_image": "elijahru/build-farm-client:debian-buster-slim",
+#         "platforms": [
+#             "linux/amd64",
+#             "linux/386",
+#             "linux/arm/v5",
+#             "linux/arm/v7",
+#             "linux/arm64/v8",
+#             "linux/ppc64le",
+#         ],
+#         "test_targets": {
+#             "debian:buster": {
+#                 "linux/amd64": "linux/amd64",
+#                 "linux/386": "linux/386",
+#                 "linux/arm/v5": "linux/arm/v5",
+#                 "linux/arm/v7": "linux/arm/v7",
+#                 "linux/arm64/v8": "linux/arm64/v8",
+#                 "linux/ppc64le": "linux/ppc64le",
+#             },
+#             "archlinux": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "lopsided/archlinux": {
+#                 "linux/arm/v5": "linux/arm/v5",
+#                 "linux/arm/v6": "linux/arm/v6",
+#                 "linux/arm/v7": "linux/arm/v7",
+#                 "linux/arm64/v8": "linux/arm64/v8",
+#             },
+#             "abyo/manjaro_aarch64": {
+#                 "linux/arm64/v8": "linux/arm64",
+#             },
+#             "debian:buster": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "ubuntu:bionic": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "ubuntu:focal": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "fedora:31": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "fedora:32": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#             "fedora:33": {
+#                 "linux/amd64": "linux/amd64",
+#             },
+#         },
+#     },
+# ]
 
 macos_distros = [
     {
