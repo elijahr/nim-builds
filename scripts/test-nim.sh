@@ -42,7 +42,6 @@ main () {
   test_nim c++ compiler
   test_nim c compilerapi
   test_nim c compilerfeatures
-  test_nim c dll
   test_nim c nimble
   test_nim c threads
 }
