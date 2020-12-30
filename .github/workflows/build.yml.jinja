@@ -198,9 +198,11 @@ on:  # yamllint disable-line rule:truthy
   pull_request:
     paths-ignore:
       - "**.md"
+      - "**.jinja"
   push:
     paths-ignore:
       - "**.md"
+      - "**.jinja"
 
 jobs:
   {% for nim_version in nim_versions %}
@@ -275,6 +277,7 @@ jobs:
 
   publish-release-nim-{{ nim_version|slugify }}:
     name: Publish release {{ nim_version }}
+    if: {{ '${{ !github.event.issue.pull_request }}' }}
     runs-on: ubuntu-latest
     needs:
       - create-release-nim-{{ nim_version|slugify }}

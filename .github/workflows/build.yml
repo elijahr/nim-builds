@@ -10,9 +10,11 @@ on:  # yamllint disable-line rule:truthy
   pull_request:
     paths-ignore:
     - '**.md'
+    - '**.jinja'
   push:
     paths-ignore:
     - '**.md'
+    - '**.jinja'
 
 jobs:
   create-release-nim-0-20-2:
@@ -1158,6 +1160,7 @@ jobs:
 
   publish-release-nim-0-20-2:
     name: Publish release 0.20.2
+    if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-0-20-2
@@ -3499,6 +3502,7 @@ jobs:
 
   publish-release-nim-1-0-10:
     name: Publish release 1.0.10
+    if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-0-10
@@ -5974,6 +5978,7 @@ jobs:
 
   publish-release-nim-1-2-8:
     name: Publish release 1.2.8
+    if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-2-8
@@ -8449,6 +8454,7 @@ jobs:
 
   publish-release-nim-1-4-2:
     name: Publish release 1.4.2
+    if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     needs:
     - create-release-nim-1-4-2

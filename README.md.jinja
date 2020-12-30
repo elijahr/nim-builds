@@ -1,0 +1,18 @@
+This repository contains **unofficial** builds of the Nim compiler for various Linux distributions and CPU architectures.
+
+The builds are tested against a very small subset of the Nim test suite.
+
+The GNU builds are tested against Debian Buster, Ubuntu Bionic, Ubuntu Focal, Arch Linux, and Manjaro Linux.
+
+The musl builds are tested on Alpine Linux 3.8, 3.9, 3.10, 3.11, and 3.12.
+
+Pull requests targetting other architectures are welcome!
+
+{% for release in releases %}
+## [Nim {{ release.nim_version }}]({{ release.page_url }})
+{% for asset in release.assets %}
+- [{{ asset.name }}]({{ asset.browser_download_url }})
+
+  {{ asset|asset_blurb }}
+{% endfor %}
+{% endfor %}

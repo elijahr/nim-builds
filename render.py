@@ -3,11 +3,15 @@ import os
 import re
 import sys
 
+from ghapi.all import GhApi
 from itertools import groupby
 from jinja2 import Environment, StrictUndefined
 from path import Path
 from ruamel import yaml
 from semver import VersionInfo
+
+
+github = GhApi()
 
 
 class Dumper(yaml.RoundTripDumper):
@@ -44,14 +48,6 @@ def slugify(string, delim="-", allowed_chars=""):
     return re.sub(r"[^\w%s]" % re.escape(allowed_chars), delim, string).lower()
 
 
-def platform_slug(platform):
-    return (
-        platform.replace("linux/", "")
-        .replace("arm/", "arm32")
-        .replace("arm64/", "arm64")
-    )
-
-
 def find_max_nim_versions(versions):
     versions = (VersionInfo.parse(v.strip()) for v in versions)
     versions = (v for v in versions if v >= min_version)
@@ -60,17 +56,8 @@ def find_max_nim_versions(versions):
 
 
 def fetch_nim_versions():
-    return (
-        v.strip()
-        for v in os.popen(
-            "git ls-remote --tags --refs https://github.com/nim-lang/Nim "
-            "| grep -o 'refs/tags/.*' "
-            "| cut -d/ -f3- | sed 's/^v//'"
-        )
-        .read()
-        .split("\n")
-        if v
-    )
+    tags = github.repos.list_tags("nim-lang", "Nim")
+    return [tag.name[1:] for tag in tags if tag.name.startswith("v")]
 
 
 arch_prefix = {
@@ -88,6 +75,39 @@ arch_suffix = {
     "linux/arm/v6": "eabihf",
     "linux/arm/v7": "eabihf",
 }
+
+toolchain_arch_to_docker_arch = {v: k for k, v in arch_prefix.items()}
+
+toolchain_arch_aliases = {
+    "x86_64": "amd64",
+    "i686": "i386/i586",
+    "armv5": "armel",
+    "armv6": "armhf",
+    "armv7": "armhf",
+    "aarch64": "arm64",
+    "powerpc64le": "ppc64le",
+}
+
+
+def asset_blurb(asset):
+    toolchain = asset["name"].split("--")[1]
+    arch, _, libc = toolchain.split("-")
+    if libc.startswith("gnu"):
+        libc_name = "GNU"
+        libc_distros = "Debian, Ubuntu, Arch Linux, and Manjaro"
+    elif libc.startswith("musl"):
+        libc_name = "musl"
+        libc_distros = "Alpine Linux"
+    else:
+        raise ValueError(f"Unknown libc {libc}")
+
+    blurb = f"This was compiled for the `{arch}` aka "
+    blurb += f"`{toolchain_arch_aliases[arch]}` architecture, "
+    blurb += f"for distros using the {libc_name} implementation of "
+    blurb += f"the C standard library, such as {libc_distros}. "
+    blurb += "It can be used with Docker images targeting the "
+    blurb += f"`{toolchain_arch_to_docker_arch[arch]}` platform."
+    return blurb
 
 
 def machine(distro, platform):
@@ -185,28 +205,60 @@ distros = [
 ]
 
 
-def render_github_workflow():
-    env = Environment(autoescape=False, undefined=StrictUndefined)
-    env.filters["slugify"] = slugify
-    env.filters["platform_slug"] = platform_slug
+env = Environment(autoescape=False, undefined=StrictUndefined)
+env.filters["slugify"] = slugify
+env.filters["asset_blurb"] = asset_blurb
+
+
+def render(path, context):
     with project_dir:
-        context = dict(
+        with open(f"{path}.jinja", "r") as f:
+            rendered = env.from_string(f.read()).render(**context)
+        with open(path, "w") as f:
+            f.write(rendered)
+        print(f"Rendered {path}.jinja -> {path}")
+        if path.endswith(".yml"):
+            interpolate_yaml(path)
+
+
+def render_github_workflow():
+    render(
+        ".github/workflows/build.yml",
+        dict(
             distros=distros,
             nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
             slugify=slugify,
             asset_id=asset_id,
             asset_name=asset_name,
-        )
-        build_yml = ".github/workflows/build.yml"
-        with open(f"{build_yml}.jinja", "r") as f:
-            rendered = env.from_string(f.read()).render(**context)
-        with open(build_yml, "w") as f:
-            f.write(rendered)
-        print(
-            "Rendered .github/workflows/build.yml.jinja -> .github/workflows/build.yml"
-        )
-        interpolate_yaml(build_yml)
+        ),
+    )
+
+
+def render_readme():
+    releases = github.repos.list_releases("elijahr", "nim-builds")
+    releases = [
+        {
+            "nim_version": release.tag_name.split("--")[0].replace("nim-", ""),
+            "timestamp": release.tag_name.split("--")[1],
+            "page_url": f"https://github.com/elijahr/nim-builds/releases/tag/{release.tag_name}",
+            "assets": [
+                {"name": asset.name, "browser_download_url": asset.browser_download_url}
+                for asset in sorted(release.assets, key=lambda a: a.name)
+            ],
+        }
+        for release in releases
+    ]
+    releases = sorted(releases, key=lambda r: r["timestamp"])
+    releases = [
+        list(rls)[0]
+        for nim_version, rls in groupby(releases, lambda r: r["nim_version"])
+    ]
+    releases = sorted(
+        releases, reverse=True, key=lambda r: VersionInfo.parse(r["nim_version"])
+    )
+    render("README.md", dict(releases=releases))
 
 
 if __name__ == "__main__":
     render_github_workflow()
+    render_readme()

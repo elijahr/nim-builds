@@ -25,11 +25,16 @@ jobs:
           set -uexo pipefail
 
           pip install -r requirements.txt
-          python3.9 render_github_workflow.py
+          python3.9 render.py
           git add .github/workflows/build.yml || true
+          git add README.md || true
           if [ "$(git diff --name-only --cached | grep .github/workflows/build.yml)" != "" ]
           then
             yamllint .github/workflows/build.yml
             git commit -m "Re-rendered build.yml"
-            git push
           fi
+          if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
+          then
+            git commit -m "Re-rendered README.md"
+          fi
+          git push || true
