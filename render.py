@@ -272,29 +272,35 @@ env.filters["slugify"] = slugify
 env.filters["asset_blurb"] = asset_blurb
 
 
-def render(path, context):
+def render(template, path, context):
     with project_dir:
-        with open(f"{path}.jinja", "r") as f:
+        with open(template, "r") as f:
             rendered = env.from_string(f.read()).render(**context)
         with open(path, "w") as f:
             f.write(rendered)
-        print(f"Rendered {path}.jinja -> {path}")
+        print(f"Rendered {template} -> {path}")
         if path.endswith(".yml"):
             interpolate_yaml(path)
 
 
-def render_github_workflow():
+def render_github_workflow(nim_version):
     render(
-        ".github/workflows/build.yml",
+        ".github/workflows/build.yml.jinja",
+        f".github/workflows/build-nim-{slugify(nim_version)}.yml",
         dict(
             linux_distros=linux_distros,
             macos_distros=macos_distros,
-            nim_versions=list(find_max_nim_versions(fetch_nim_versions())),
+            nim_version=nim_version,
             slugify=slugify,
             asset_id=asset_id,
             asset_name=asset_name,
         ),
     )
+
+
+def render_github_workflows():
+    for nim_version in find_max_nim_versions(fetch_nim_versions()):
+        render_github_workflow(nim_version)
 
 
 def render_readme():
@@ -325,18 +331,18 @@ def render_readme():
     releases = sorted(
         releases, reverse=True, key=lambda r: VersionInfo.parse(r["nim_version"])
     )
-    render("README.md", dict(releases=releases))
+    render("README.md.jinja", "README.md", dict(releases=releases))
 
 
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="subcommand")
-    subparsers.add_parser("github-workflow")
+    subparsers.add_parser("github-workflows")
     subparsers.add_parser("readme")
     args = parser.parse_args()
 
-    if args.subcommand == "github-workflow":
-        render_github_workflow()
+    if args.subcommand == "github-workflows":
+        render_github_workflows()
 
     elif args.subcommand == "readme":
         render_readme()

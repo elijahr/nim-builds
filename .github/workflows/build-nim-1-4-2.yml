@@ -1,12 +1,5 @@
-# yamllint disable rule:document-start
-# yamllint disable rule:line-length
-# yamllint disable rule:empty-lines
-# yamllint disable rule:trailing-spaces
-# yamllint disable rule:new-line-at-end-of-file
-# yamllint disable rule:indentation
-
 name: Build
-on:  # yamllint disable-line rule:truthy
+on:
   pull_request:
     paths-ignore:
     - '**.md'
@@ -328,7 +321,6 @@ jobs:
 
 
 
-
   test-nim-1-4-2--x86_64-macos-big-sur--on-macos-10-15:
     name: Test on macos-10.15
     runs-on: macos-10.15
@@ -365,7 +357,6 @@ jobs:
     - name: Run tests
       run: |
         sh ./scripts/test-nim.sh ./build/nim-1.4.2
-
 
 
 
@@ -434,8 +425,6 @@ jobs:
           git commit -m "Re-rendered README.md"
             git push || (git pull origin && git push || true)
         fi
-
-
 
 
 

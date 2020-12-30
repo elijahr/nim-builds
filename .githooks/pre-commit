@@ -24,13 +24,10 @@ then
     esac
   done
 
-  build_yml=.github/workflows/build.yml
-
   case $render_github_workflow in
     yes)
-      pipenv run ./render.py github-workflow
-      pipenv run yamllint $build_yml
-      git add $build_yml
+      pipenv run ./render.py github-workflows
+      git add .github/workflows/*.yml
       ;;
   esac
   case $render_readme in

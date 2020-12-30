@@ -1,10 +1,3 @@
-# yamllint disable rule:document-start
-# yamllint disable rule:line-length
-# yamllint disable rule:empty-lines
-# yamllint disable rule:trailing-spaces
-# yamllint disable rule:new-line-at-end-of-file
-# yamllint disable rule:indentation
-
 _anchors:
   checkout_repo: &checkout_repo
     name: Checkout repo
@@ -80,7 +73,6 @@ _anchors:
       fi
   {% endfor %}
 
-  {% for nim_version in nim_versions %}
   download_nim_source_{{ nim_version|slugify }}: &download_nim_source_{{ nim_version|slugify }}
     name: Download Nim source
     run: |
@@ -261,10 +253,9 @@ _anchors:
 
   {% endfor %}
   {% endfor %}
-  {% endfor %}
 
 name: "Build"
-on:  # yamllint disable-line rule:truthy
+on:
   pull_request:
     paths-ignore:
       - "**.md"
@@ -275,7 +266,6 @@ on:  # yamllint disable-line rule:truthy
       - "**.jinja"
 
 jobs:
-  {% for nim_version in nim_versions %}
   create-release-nim-{{ nim_version|slugify }}:
     if: {{ "${{ github.event_name == 'push' && contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false }}" }}
     name: Create release {{ nim_version }}
@@ -434,5 +424,3 @@ jobs:
           python-version: '3.9'
 
       - *update_readme
-
-  {% endfor %}
