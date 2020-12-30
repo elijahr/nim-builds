@@ -80,7 +80,7 @@ _anchors:
       nim_dir="nim-{{ nim_version }}"
       wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
       pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
-      tar xf "${nim_dir}.tar"
+      tar -xf "${nim_dir}.tar"
       rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
   create_tarball_{{ nim_version|slugify }}: &create_tarball_{{ nim_version|slugify }}
@@ -181,7 +181,7 @@ _anchors:
       tarball=nim-{{ asset_name(nim_version, distro, platform) }}.tar.xz
       hub release download "$tag" -i "$tarball"
       pixz -d "$tarball" "nim-{{ nim_version }}.tar"
-      tar xf "nim-{{ nim_version }}.tar"
+      tar -xf "nim-{{ nim_version }}.tar"
 
   {% for image, platform_map in distro.test_targets.items() %}
   {% if platform in platform_map %}
@@ -244,7 +244,8 @@ _anchors:
       tag={{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.release_name }}' }}
       tarball=nim-{{ asset_name(nim_version, distro, arch) }}.tar.xz
       hub release download "$tag" -i "$tarball"
-      tar -xJf "nim-{{ nim_version }}.tar.xz"
+      xz -d "nim-{{ nim_version }}.tar"
+      tar -xf "nim-{{ nim_version }}.tar"
 
   run_tests_{{ asset_id(nim_version, distro, arch) }}: &run_tests_{{ asset_id(nim_version, distro, arch) }}
     name: Run tests

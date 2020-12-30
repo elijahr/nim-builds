@@ -252,18 +252,18 @@ macos_distros = [
             "macos-10.15",
         ],
     },
-    {
-        "name": "bigsur",
-        "type": "macos",
-        "runner": "macos-11.0",
-        "archs": [
-            "x86_64",
-        ],
-        "test_runners": [
-            "macos-11.0",
-            "macos-10.15",
-        ],
-    },
+    # {
+    #     "name": "bigsur",
+    #     "type": "macos",
+    #     "runner": "macos-11.0",
+    #     "archs": [
+    #         "x86_64",
+    #     ],
+    #     "test_runners": [
+    #         "macos-11.0",
+    #         "macos-10.15",
+    #     ],
+    # },
 ]
 
 

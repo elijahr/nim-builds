@@ -94,7 +94,7 @@ jobs:
         nim_dir="nim-1.4.2"
         wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
         pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
-        tar xf "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
         rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
 
     - name: Build Nim
@@ -160,7 +160,8 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        tar -xJf "nim-1.4.2.tar.xz"
+        xz -d "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
 
     - name: Run tests
       run: |
@@ -200,159 +201,8 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
         hub release download "$tag" -i "$tarball"
-        tar -xJf "nim-1.4.2.tar.xz"
-
-    - name: Run tests
-      run: |
-        sh ./scripts/test-nim.sh ./build/nim-1.4.2
-
-
-
-
-  build-nim-1-4-2--x86_64-macos-bigsur:
-    name: Build nim-1.4.2--x86_64-macos-bigsur.tar.xz
-    runs-on: macos-11.0
-    needs:
-    - create-release-nim-1-4-2
-    strategy:
-      fail-fast: false
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-        submodules: recursive
-
-    - name: Restore Nim cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          nimcache
-        key: cache-1-4-2--x86_64-macos-bigsur
-
-    - name: Setup dirs
-      run: |
-        mkdir -p build
-        mkdir -p nimcache
-        mkdir -p ~/.cache/
-
-    - name: Install deps
-      run: |
-        brew install xz
-
-    - name: Download Nim source
-      run: |
-        cd build
-        nim_dir="nim-1.4.2"
-        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
-        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar" || xz -d "${nim_dir}.tar.xz"
-        tar xf "${nim_dir}.tar"
-        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
-
-    - name: Build Nim
-      id: build-nim
-      shell: bash
-      run: |
-        set -uexo pipefail
-        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
-
-        sh ./scripts/build-nim.sh ./build/nim-1.4.2
-
-    - name: Create tarball
-      id: create-tarball
-      run: |
-        cd build
-        nim_dir="nim-1.4.2"
-        tarball="${nim_dir}.tar.xz"
-        tar -Ipixz -cf "$tarball" "$nim_dir" || tar -cJf "$tarball" "$nim_dir"
-        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
-
-    - name: Add tarball to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      with:
-        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
-        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
-        asset_name: nim-1.4.2--x86_64-macos-bigsur.tar.xz
-        asset_content_type: application/x-xz
-
-
-  
-  
-  test-nim-1-4-2--x86_64-macos-bigsur--on-macos-11-0:
-    name: Test on macos-11.0
-    runs-on: macos-11.0
-    needs:
-    - create-release-nim-1-4-2
-    - build-nim-1-4-2--x86_64-macos-bigsur
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-        submodules: recursive
-
-    - name: Setup dirs
-      run: |
-        mkdir -p build
-        mkdir -p nimcache
-        mkdir -p ~/.cache/
-
-    - name: Install deps
-      run: |
-        brew install xz
-
-    - name: Download released tarball
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-macos-bigsur.tar.xz
-        hub release download "$tag" -i "$tarball"
-        tar -xJf "nim-1.4.2.tar.xz"
-
-    - name: Run tests
-      run: |
-        sh ./scripts/test-nim.sh ./build/nim-1.4.2
-
-
-
-
-  test-nim-1-4-2--x86_64-macos-bigsur--on-macos-10-15:
-    name: Test on macos-10.15
-    runs-on: macos-10.15
-    needs:
-    - create-release-nim-1-4-2
-    - build-nim-1-4-2--x86_64-macos-bigsur
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-        submodules: recursive
-
-    - name: Setup dirs
-      run: |
-        mkdir -p build
-        mkdir -p nimcache
-        mkdir -p ~/.cache/
-
-    - name: Install deps
-      run: |
-        brew install xz
-
-    - name: Download released tarball
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        cd build
-        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
-        tarball=nim-1.4.2--x86_64-macos-bigsur.tar.xz
-        hub release download "$tag" -i "$tarball"
-        tar -xJf "nim-1.4.2.tar.xz"
+        xz -d "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
 
     - name: Run tests
       run: |
@@ -378,16 +228,6 @@ jobs:
     - test-nim-1-4-2--x86_64-macos-catalina--on-macos-11-0
 
     - test-nim-1-4-2--x86_64-macos-catalina--on-macos-10-15
-
-
-
-
-
-
-
-    - test-nim-1-4-2--x86_64-macos-bigsur--on-macos-11-0
-
-    - test-nim-1-4-2--x86_64-macos-bigsur--on-macos-10-15
 
 
 
