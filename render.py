@@ -60,6 +60,7 @@ def find_max_nim_versions(versions):
 
 
 def fetch_nim_versions():
+    return ["1.4.2"]
     tags = github.repos.list_tags("nim-lang", "Nim")
     return [tag.name[1:] for tag in tags if tag.name.startswith("v")]
 
