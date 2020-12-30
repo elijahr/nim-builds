@@ -120,7 +120,7 @@ def asset_blurb(asset):
 
     elif os_type == "macos":
         release_name = {
-            "big-sur": "Big Sur 11.0",
+            "bigsur": "Big Sur 11.0",
             "catalina": "Catalina 10.15",
         }[tail]
         blurb = f"This was compiled on macOS {release_name}."
@@ -253,7 +253,7 @@ macos_distros = [
         ],
     },
     {
-        "name": "big-sur",
+        "name": "bigsur",
         "type": "macos",
         "runner": "macos-11.0",
         "archs": [
