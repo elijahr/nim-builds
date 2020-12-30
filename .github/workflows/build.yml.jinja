@@ -96,6 +96,9 @@ _anchors:
     id: create-tarball
     run: |
       cd build
+      if [ -d "/usr/local/opt/pixz/bin" ]
+        export PATH="/usr/local/opt/pixz/bin:$PATH"
+      fi
       nim_dir="nim-{{ nim_version }}"
       tarball="${nim_dir}.tar.xz"
       tar -Ipixz -cf "$tarball" "$nim_dir"

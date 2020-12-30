@@ -117,6 +117,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-0.20.2"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -191,6 +194,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-0.20.2"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -375,6 +381,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-1.0.10"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -529,6 +538,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-1.0.10"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -800,6 +812,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -954,6 +969,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-1.2.8"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -1225,6 +1243,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
@@ -1379,6 +1400,9 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        if [ -d "/usr/local/opt/pixz/bin" ]
+          export PATH="/usr/local/opt/pixz/bin:$PATH"
+        fi
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -Ipixz -cf "$tarball" "$nim_dir"
