@@ -38,5 +38,5 @@ jobs:
         }
 
         now=$(date +%s)
-        three_days=2400
+        three_days=259200
         eval "$(hub release -L 200 --include-drafts -f "([ \"\$(expr $now - %ct)\" -ge '$three_days' ] && [ '%S' = 'draft' ] && delete_release '%t' '%T' || keep_release '%t' '%T') ; ")"
