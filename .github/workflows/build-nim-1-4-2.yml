@@ -2,12 +2,10 @@ name: Build 1.4.2
 on:
   pull_request:
     paths-ignore:
-    - '*'
     - '**.md'
     - '**.jinja'
   push:
     paths-ignore:
-    - '*'
     - '**.md'
     - '**.jinja'
 
