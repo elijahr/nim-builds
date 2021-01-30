@@ -43,7 +43,8 @@ def interpolate_yaml(yaml_path):
 
 
 project_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-min_version = VersionInfo.parse("0.20.2")
+# min_version = VersionInfo.parse("0.20.2")
+min_version = VersionInfo.parse("1.4.2")
 
 
 def slugify(string, delim="-", allowed_chars=""):
@@ -242,22 +243,23 @@ macos_distros = [
             "x86_64",
         ],
         "test_runners": [
-            # "macos-11.0",
+            "macos-11.0",
             "macos-10.15",
         ],
     },
-    # {
-    #     "name": "bigsur",
-    #     "type": "macos",
-    #     "runner": "macos-11.0",
-    #     "archs": [
-    #         "x86_64",
-    #     ],
-    #     "test_runners": [
-    #         "macos-11.0",
-    #         "macos-10.15",
-    #     ],
-    # },
+    {
+        "name": "bigsur",
+        "type": "macos",
+        "runner": "macos-11.0",
+        "archs": [
+            # "x86_64",
+            "arm64",
+        ],
+        "test_runners": [
+            "macos-11.0",
+            # "macos-10.15",
+        ],
+    },
 ]
 
 
@@ -282,7 +284,7 @@ def render_github_workflow(nim_version):
         ".github/workflows/build.yml.jinja",
         f".github/workflows/build-nim-{slugify(nim_version)}.yml",
         dict(
-            linux_distros=linux_distros,
+            linux_distros=[],
             macos_distros=macos_distros,
             nim_version=nim_version,
             slugify=slugify,

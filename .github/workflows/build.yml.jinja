@@ -51,7 +51,7 @@ _anchors:
       if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
       then
         git commit -m "Re-rendered README.md"
-          git push || (git pull origin && git push || true)
+        git push || (git pull origin && git push || true)
       fi
 
   {% for distro in linux_distros %}
@@ -82,6 +82,15 @@ _anchors:
       pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
       tar -xf "${nim_dir}.tar"
       rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+  clone_nim_source_{{ nim_version|slugify }}: &clone_nim_source_{{ nim_version|slugify }}
+    name: Clone Nim source
+    run: |
+      cd build
+      nim_dir="nim-{{ nim_version }}"
+      git clone --single-branch v{{ nim_version }} --depth 1 https://github.com/nim-lang/Nim.git "$nim_dir"
+      cd "$nim_dir"
+      git clone -q --depth 1 https://github.com/nim-lang/csources_v1.git csources
 
   create_tarball_{{ nim_version|slugify }}: &create_tarball_{{ nim_version|slugify }}
     name: Create tarball
@@ -220,8 +229,11 @@ _anchors:
     run: |
       set -uexo pipefail
       ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
-
+      {% if arch == 'arm64' %}
+      sh ./scripts/build-nim.sh ./build/nim-{{ nim_version }} '--cpu arm64' '--cpu:arm64'
+      {% else %}
       sh ./scripts/build-nim.sh ./build/nim-{{ nim_version }}
+      {% endif %}
 
   add_tarball_to_release_{{ id(distro, arch) }}: &add_tarball_to_release_{{ id(distro, arch) }}
     name: Add tarball to release
@@ -351,11 +363,16 @@ jobs:
       - *restore_nim_cache_{{ id(distro, arch) }}
       - *setup_dirs
       - *install_deps_macos
+      {% if arch == 'arm64' %}
+      - *clone_nim_source_{{ nim_version|slugify }}
+      {% else %}
       - *download_nim_source_{{ nim_version|slugify }}
+      {% endif %}
       - *build_nim_{{ id(distro, arch) }}
       - *create_tarball_{{ nim_version|slugify }}
       - *add_tarball_to_release_{{ id(distro, arch) }}
 
+  {% if arch == 'x86_64' %}
   {% for runner in distro.test_runners %}
   test-nim-{{ id(distro, arch) }}--on-{{ runner|slugify }}:
     name: Test on {{ runner }}
@@ -370,6 +387,7 @@ jobs:
       - *download_released_tarball_{{ id(distro, arch) }}
       - *run_tests_{{ id(distro, arch) }}
   {% endfor %}
+  {% endif %}
   {% endfor %}
   {% endfor %}
 
@@ -391,9 +409,11 @@ jobs:
 
       {% for distro in macos_distros %}
       {% for arch in distro.archs %}
+      {% if arch == 'x86_64' %}
       {% for runner in distro.test_runners %}
       - test-nim-{{ id(distro, arch) }}--on-{{ runner|slugify }}
       {% endfor %}
+      {% endif %}
       {% endfor %}
       {% endfor %}
 
