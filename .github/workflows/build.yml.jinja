@@ -88,7 +88,7 @@ _anchors:
     run: |
       cd build
       nim_dir="nim-{{ nim_version }}"
-      git clone --single-branch v{{ nim_version }} --depth 1 https://github.com/nim-lang/Nim.git "$nim_dir"
+      git clone --branch v{{ nim_version }} --depth 1 https://github.com/nim-lang/Nim.git "$nim_dir"
       cd "$nim_dir"
       git clone -q --depth 1 https://github.com/nim-lang/csources_v1.git csources
 

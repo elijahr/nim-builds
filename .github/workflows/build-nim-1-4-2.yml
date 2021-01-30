@@ -250,7 +250,7 @@ jobs:
       run: |
         cd build
         nim_dir="nim-1.4.2"
-        git clone --single-branch v1.4.2 --depth 1 https://github.com/nim-lang/Nim.git "$nim_dir"
+        git clone --branch v1.4.2 --depth 1 https://github.com/nim-lang/Nim.git "$nim_dir"
         cd "$nim_dir"
         git clone -q --depth 1 https://github.com/nim-lang/csources_v1.git csources
 

@@ -13,7 +13,7 @@ if [ -f "build.sh" ]; then
 else
   rm -rf csources
   # latest csources - macOS arm64 compatible
-  git clone -q --depth 1 https://github.com/nim-lang/csources_v1.git csources
+  git clone --depth 1 https://github.com/nim-lang/csources_v1.git csources
   (
     cd csources
     sh build.sh $build_args
