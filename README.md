@@ -16,7 +16,8 @@ The builds are tested against a very small subset of Nim's test suite.
 
 ## macOS
 
-The macOS builds are tested on Big Sur 11.0 and Catalina 10.15.
+The x86_64 macOS builds are tested on Big Sur 11.0 and Catalina 10.15.
+The arm64 macOS builds are untested.
 
 
 ## [Nim 1.4.2](https://github.com/elijahr/nim-builds/releases/tag/nim-1.4.2--202012292139)
