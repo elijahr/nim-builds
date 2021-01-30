@@ -124,6 +124,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -517,6 +519,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -704,6 +708,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -891,6 +897,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -1064,6 +1072,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -1569,6 +1579,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -1759,6 +1771,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -2016,6 +2030,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -2273,6 +2289,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -2591,6 +2609,8 @@ jobs:
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -2756,10 +2776,13 @@ jobs:
 
         sh ./scripts/build-nim.sh ./build/nim-1.4.2
 
+
     - name: Create tarball
       id: create-tarball
       run: |
         cd build
+        rm -rf .git
+        rm -rf csources
         nim_dir="nim-1.4.2"
         tarball="${nim_dir}.tar.xz"
         tar -cf "${nim_dir}.tar" "$nim_dir"
@@ -2779,6 +2802,49 @@ jobs:
 
 
   
+  
+  test-nim-catalina-x86_64--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-catalina-x86_64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tar=nim-1.4.2--x86_64-macos-catalina.tar
+        tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+
+
+
+
   test-nim-catalina-x86_64--on-macos-10-15:
     name: Test on macos-10.15
     runs-on: macos-10.15
@@ -2810,6 +2876,124 @@ jobs:
         tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
         tar=nim-1.4.2--x86_64-macos-catalina.tar
         tarball=nim-1.4.2--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.4.2.tar"
+        tar -xf "nim-1.4.2.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.4.2
+
+
+
+
+  build-nim-bigsur-x86_64:
+    name: Build nim-1.4.2--x86_64-macos-bigsur.tar.xz
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-4-2
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.4.2-bigsur-x86_64
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.4.2"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
+
+        sh ./scripts/build-nim.sh ./build/nim-1.4.2
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.4.2"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-4-2.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.4.2--x86_64-macos-bigsur.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-bigsur-x86_64--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-4-2
+    - build-nim-bigsur-x86_64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-4-2.outputs.release_name }}
+        tar=nim-1.4.2--x86_64-macos-bigsur.tar
+        tarball=nim-1.4.2--x86_64-macos-bigsur.tar.xz
         hub release download "$tag" -i "$tarball"
         pixz -d "$tarball" "nim-1.4.2.tar"
         tar -xf "nim-1.4.2.tar"
@@ -3054,7 +3238,19 @@ jobs:
 
 
 
+
+    - test-nim-catalina-x86_64--on-macos-11-0
+
     - test-nim-catalina-x86_64--on-macos-10-15
+
+
+
+
+
+
+
+    - test-nim-bigsur-x86_64--on-macos-11-0
+
 
 
 
@@ -3089,7 +3285,7 @@ jobs:
         if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
         then
           git commit -m "Re-rendered README.md"
-            git push || (git pull origin && git push || true)
+          git push || (git pull origin && git push || true)
         fi
 
 

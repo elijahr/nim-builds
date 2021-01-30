@@ -1,7 +1,5 @@
 Pipfile
-/build/src
-/build/nim-*.tar
-/build/nim-*.tar.xz
+/build/
 /nimcache
 .vscode
 .DS_Store
