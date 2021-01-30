@@ -120,7 +120,7 @@ def asset_blurb(asset):
             "bigsur": "Big Sur 11.0",
             "catalina": "Catalina 10.15",
         }[tail.split('.')[0]]
-        blurb = f"This was compiled on macOS {release_name}."
+        blurb = f"This was compiled on macOS {release_name} for the `{arch}` architecture."
         return blurb
 
     else:
@@ -299,11 +299,19 @@ def render_github_workflows():
 
 
 def render_readme():
-    releases = [
-        release
-        for release in github.repos.list_releases("elijahr", "nim-builds")
-        if not release.draft and len(release.assets)
-    ]
+    releases = []
+
+    p = 0
+    while True:
+        page = github.repos.list_releases("elijahr", "nim-builds", per_page=50, page=p)
+        if not page:
+            break
+        releases += [
+            release
+            for release in page
+            if not release.draft and len(release.assets)
+        ]
+        p += 1
     releases = [
         {
             "nim_version": release.tag_name.split("--")[0].replace("nim-", ""),
@@ -318,9 +326,9 @@ def render_readme():
         }
         for release in releases
     ]
-    releases = sorted(releases, key=lambda r: (r["nim_version"], r["date"]))
+    releases = sorted(releases, key=lambda r: (r["nim_version"], r["page_url"]))
     releases = [
-        list(rls)[0]
+        list(rls)[-1]
         for nim_version, rls in groupby(releases, lambda r: r["nim_version"])
     ]
     releases = sorted(
