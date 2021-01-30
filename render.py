@@ -119,7 +119,7 @@ def asset_blurb(asset):
         release_name = {
             "bigsur": "Big Sur 11.0",
             "catalina": "Catalina 10.15",
-        }[tail]
+        }[tail.split('.')[0]]
         blurb = f"This was compiled on macOS {release_name}."
         return blurb
 

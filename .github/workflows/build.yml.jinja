@@ -273,10 +273,12 @@ name: Build {{ nim_version }}
 on:
   pull_request:
     paths-ignore:
+      - "*"
       - "**.md"
       - "**.jinja"
   push:
     paths-ignore:
+      - "*"
       - "**.md"
       - "**.jinja"
 
