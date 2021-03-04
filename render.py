@@ -62,6 +62,10 @@ def fetch_nim_versions():
     return [tag.name[1:] for tag in tags if tag.name.startswith("v")]
 
 
+def runnable_platform(platform):
+    return "/".join(platform.split("/")[:2])
+
+
 toolchain_arch_by_docker_arch = {
     "linux/amd64": "x86_64",
     "linux/386": "i686",
@@ -265,6 +269,7 @@ macos_distros = [
 env = Environment(autoescape=False, undefined=StrictUndefined)
 env.filters["slugify"] = slugify
 env.filters["asset_blurb"] = asset_blurb
+env.filters["runnable_platform"] = runnable_platform
 
 
 def render(template, path, context):

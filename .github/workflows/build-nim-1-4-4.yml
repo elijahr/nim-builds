@@ -506,7 +506,7 @@ jobs:
 
         # Build in emulated container
         docker run \
-          --platform linux/arm/v6 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -603,7 +603,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm/v6 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -695,7 +695,7 @@ jobs:
 
         # Build in emulated container
         docker run \
-          --platform linux/arm/v7 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -792,7 +792,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm/v7 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -884,7 +884,7 @@ jobs:
 
         # Build in emulated container
         docker run \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -981,7 +981,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -1758,7 +1758,7 @@ jobs:
 
         # Build in emulated container
         docker run \
-          --platform linux/arm/v5 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -1856,7 +1856,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm/v5 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -1921,7 +1921,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm/v5 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -2017,7 +2017,7 @@ jobs:
 
         # Build in emulated container
         docker run \
-          --platform linux/arm/v7 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -2115,7 +2115,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm/v7 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -2180,7 +2180,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm/v7 \
+          --platform linux/arm \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -2276,7 +2276,7 @@ jobs:
 
         # Build in emulated container
         docker run \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -2374,7 +2374,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -2439,7 +2439,7 @@ jobs:
       run: |
         # Test in emulated container
         docker run \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
           --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
           --mount "type=bind,src=${PWD}/build,dst=/build" \
           --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \

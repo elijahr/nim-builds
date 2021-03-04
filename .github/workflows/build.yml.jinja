@@ -144,7 +144,7 @@ _anchors:
       {% if platform == "linux/amd64" %}
       # Build in native container
       docker run \
-        --platform {{ platform }} \
+        --platform {{ platform|runnable_platform }} \
         --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
         --mount "type=bind,src=${PWD}/build,dst=/build" \
         --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -159,7 +159,7 @@ _anchors:
 
       # Build in emulated container
       docker run \
-        --platform {{ platform }} \
+        --platform {{ platform|runnable_platform }} \
         --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
         --mount "type=bind,src=${PWD}/build,dst=/build" \
         --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
@@ -200,7 +200,7 @@ _anchors:
     run: |
       # Test in emulated container
       docker run \
-        --platform {{ platform_map[platform] }} \
+        --platform {{ platform_map[platform]|runnable_platform }} \
         --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
         --mount "type=bind,src=${PWD}/build,dst=/build" \
         --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
