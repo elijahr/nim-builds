@@ -16,7 +16,6 @@ _anchors:
   install_deps_ubuntu: &install_deps_ubuntu
     name: Install deps
     run: |
-      sudo add-apt-repository ppa:cpick/hub
       sudo apt-get update -q -y
       sudo apt-get -qq install -y hub pixz
 
