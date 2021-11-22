@@ -43,7 +43,7 @@ def interpolate_yaml(yaml_path):
 
 
 project_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-min_version = VersionInfo.parse("0.20.2")
+min_version = VersionInfo.parse("1.2.12")
 
 
 def slugify(string, delim="-", allowed_chars=""):
