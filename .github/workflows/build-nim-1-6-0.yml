@@ -127,7 +127,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -516,7 +524,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -703,7 +719,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -890,7 +914,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -1063,7 +1095,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -1562,7 +1602,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -1752,7 +1800,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -2008,7 +2064,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -2264,7 +2328,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -2580,7 +2652,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -2751,7 +2831,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 
@@ -2911,7 +2999,15 @@ jobs:
         rm -rf csources
         nim_dir="nim-1.6.0"
         tarball="${nim_dir}.tar.xz"
-        tar -cf "${nim_dir}.tar" --exclude ".*" --exclude "./csources" --exclude "./nimcache" "$nim_dir"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
         pixz "${nim_dir}.tar" "$tarball"
         echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
 

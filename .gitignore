@@ -5,3 +5,4 @@ Pipfile
 .DS_Store
 nim-builds.code-workspace
 Pipfile.lock
+/scripts/build
