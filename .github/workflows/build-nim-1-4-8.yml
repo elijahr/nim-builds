@@ -3324,18 +3324,18 @@ jobs:
 
       with:
         release_id: ${{ needs.create-release-nim-1-4-8.outputs.id }}
-
     - name: Checkout repo
       uses: actions/checkout@v2
       with:
         fetch-depth: 1
         submodules: recursive
 
-
     - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
-
+    - uses: oleksiyrudenko/gha-git-credentials@v2-latest
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Update README
       shell: bash
       run: |

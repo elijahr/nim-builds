@@ -432,11 +432,13 @@ jobs:
           {% endraw %}
         with:
           release_id: {{ '${{ needs.create-release-nim-' + slugify(nim_version) + '.outputs.id }}' }}
-
       - *checkout_repo
-
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-
+      - uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          {% raw %}
+          token: '${{ secrets.GITHUB_TOKEN }}'
+          {% endraw %}
       - *update_readme
