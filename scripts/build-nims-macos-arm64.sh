@@ -8,7 +8,7 @@ rm -rf "$dir/build/tmp"
 mkdir -p "$dir/build/tmp"
 git clone -q --depth 1 https://github.com/nim-lang/csources_v1.git "$dir/build/tmp/csources"
 
-versions=("1.2.12" "1.4.8" "1.6.0")
+versions=("1.2.16" "1.4.8" "1.6.2")
 
 for version in "${versions[@]}"
 do

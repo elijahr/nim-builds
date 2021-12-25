@@ -38,12 +38,15 @@ main () {
   "${NIM_DIR}/bin/nim" cc --opt:speed "$tester"
 
   # Run a small handful of tests
-  test_nim c compiler
-  test_nim c++ compiler
-  test_nim c compilerapi
-  test_nim c compilerfeatures
-  test_nim c nimble
-  test_nim c threads
+  test_nim c deps
+  test_nim c htmldocs
+  test_nim c pkgs
+  # test_nim c compiler
+  # test_nim c++ compiler
+  # test_nim c compilerapi
+  # test_nim c compilerfeatures
+  # test_nim c nimble
+  # test_nim c threads
 }
 
 main
