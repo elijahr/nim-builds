@@ -1,0 +1,3353 @@
+name: Build 1.2.18
+on:
+  pull_request:
+    paths-ignore:
+    - '**.md'
+    - '**.jinja'
+  push:
+    paths-ignore:
+    - '**.md'
+    - '**.jinja'
+
+jobs:
+  create-release-nim-1-2-18:
+    if: ${{ github.event_name == 'push' && contains(toJson(github.event.commits),
+      '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]')
+      == false && contains(toJson(github.event.commits), '[skip ci]') == false }}
+    name: Create release 1.2.18
+    runs-on: ubuntu-latest
+    outputs:
+      id: ${{ steps.create-release.outputs.id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.generate-release-name.outputs.release_name }}
+
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Generate release name
+      id: generate-release-name
+      run: |
+        release_name=nim-1.2.18--$(date '+%Y%m%d%H%M')
+        echo "::set-output name=release_name::${release_name}"
+
+    - name: Create release
+      id: create-release
+      uses: actions/create-release@v1
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate-release-name.outputs.release_name }}
+        release_name: ${{ steps.generate-release-name.outputs.release_name }}
+        draft: true
+        prerelease: ${{ !startsWith(github.event.ref, 'refs/tags/') }}
+
+
+
+
+
+  
+  
+  build-nim-alpine-3-12-linux-amd64:
+    name: Build nim-1.2.18--x86_64-linux-musl.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-alpine-3-12-linux-amd64
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        # Build in native container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm:alpine-3.12 \
+          sh /scripts/build-nim.sh /build/nim-1.2.18
+
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--x86_64-linux-musl.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-alpine-3-12-linux-amd64--on-alpine-3-12:
+    name: Test on alpine:3.12
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-musl.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.12 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-alpine-3-12-linux-amd64--on-alpine-3-11:
+    name: Test on alpine:3.11
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-musl.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.11 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-alpine-3-12-linux-amd64--on-alpine-3-10:
+    name: Test on alpine:3.10
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-musl.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.10 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-alpine-3-12-linux-amd64--on-alpine-3-9:
+    name: Test on alpine:3.9
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-musl.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.9 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-alpine-3-12-linux-amd64--on-alpine-3-8:
+    name: Test on alpine:3.8
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-musl.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.8 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+  build-nim-alpine-3-12-linux-arm-v6:
+    name: Build nim-1.2.18--armv6-linux-musleabihf.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-alpine-3-12-linux-arm-v6
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:alpine-3.12
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--armv6-linux-musleabihf.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+  
+  
+  test-nim-alpine-3-12-linux-arm-v6--on-alpine-3-12:
+    name: Test on alpine:3.12
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-arm-v6
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--armv6-linux-musleabihf.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.12 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-alpine-3-12-linux-arm-v7:
+    name: Build nim-1.2.18--armv7-linux-musleabihf.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-alpine-3-12-linux-arm-v7
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:alpine-3.12
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--armv7-linux-musleabihf.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+  
+  
+  test-nim-alpine-3-12-linux-arm-v7--on-alpine-3-12:
+    name: Test on alpine:3.12
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-arm-v7
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--armv7-linux-musleabihf.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.12 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-alpine-3-12-linux-arm64-v8:
+    name: Build nim-1.2.18--aarch64-linux-musl.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-alpine-3-12-linux-arm64-v8
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:alpine-3.12
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:alpine-3.12 \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--aarch64-linux-musl.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:alpine-3.12 --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+  
+  
+  test-nim-alpine-3-12-linux-arm64-v8--on-alpine-3-12:
+    name: Test on alpine:3.12
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-alpine-3-12-linux-arm64-v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--aarch64-linux-musl.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          alpine:3.12 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-debian-buster-linux-amd64:
+    name: Build nim-1.2.18--x86_64-linux-gnu.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-debian-buster-linux-amd64
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        # Build in native container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm:debian-buster-slim \
+          sh /scripts/build-nim.sh /build/nim-1.2.18
+
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--x86_64-linux-gnu.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-debian-buster-linux-amd64--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-debian-buster-linux-amd64--on-archlinux:
+    name: Test on archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+  test-nim-debian-buster-linux-amd64--on-ubuntu-bionic:
+    name: Test on ubuntu:bionic
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:bionic \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-debian-buster-linux-amd64--on-ubuntu-focal:
+    name: Test on ubuntu:focal
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          ubuntu:focal \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-debian-buster-linux-amd64--on-fedora-31:
+    name: Test on fedora:31
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:31 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-debian-buster-linux-amd64--on-fedora-32:
+    name: Test on fedora:32
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:32 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-debian-buster-linux-amd64--on-fedora-33:
+    name: Test on fedora:33
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-amd64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--x86_64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/amd64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          fedora:33 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+  build-nim-debian-buster-linux-386:
+    name: Build nim-1.2.18--i686-linux-gnu.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-debian-buster-linux-386
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/386 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--i686-linux-gnu.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+
+  
+  
+  test-nim-debian-buster-linux-386--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-386
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--i686-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/386 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-debian-buster-linux-arm-v5:
+    name: Build nim-1.2.18--armv5-linux-gnueabi.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-debian-buster-linux-arm-v5
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--armv5-linux-gnueabi.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+
+  
+  
+  test-nim-debian-buster-linux-arm-v5--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm-v5
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--armv5-linux-gnueabi.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+  test-nim-debian-buster-linux-arm-v5--on-lopsided-archlinux:
+    name: Test on lopsided/archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm-v5
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--armv5-linux-gnueabi.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          lopsided/archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-debian-buster-linux-arm-v7:
+    name: Build nim-1.2.18--armv7-linux-gnueabihf.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-debian-buster-linux-arm-v7
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--armv7-linux-gnueabihf.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+
+  
+  
+  test-nim-debian-buster-linux-arm-v7--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm-v7
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--armv7-linux-gnueabihf.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+  test-nim-debian-buster-linux-arm-v7--on-lopsided-archlinux:
+    name: Test on lopsided/archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm-v7
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--armv7-linux-gnueabihf.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          lopsided/archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-debian-buster-linux-arm64-v8:
+    name: Build nim-1.2.18--aarch64-linux-gnu.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-debian-buster-linux-arm64-v8
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--aarch64-linux-gnu.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+
+  
+  
+  test-nim-debian-buster-linux-arm64-v8--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm64-v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--aarch64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+  test-nim-debian-buster-linux-arm64-v8--on-lopsided-archlinux:
+    name: Test on lopsided/archlinux
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm64-v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--aarch64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          lopsided/archlinux \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+  test-nim-debian-buster-linux-arm64-v8--on-abyo-manjaro_aarch64:
+    name: Test on abyo/manjaro_aarch64
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-arm64-v8
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--aarch64-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/arm64 \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          abyo/manjaro_aarch64 \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  build-nim-debian-buster-linux-ppc64le:
+    name: Build nim-1.2.18--powerpc64le-linux-gnu.tar.xz
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-debian-buster-linux-ppc64le
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Start distcc host
+      run: |
+        docker run -d \
+          --platform linux/amd64 \
+          -p 3600-3900:3600-3900/tcp \
+          elijahru/build-farm:debian-buster-slim
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+
+        dump_logs () {
+          docker logs $(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        }
+
+        # Build in emulated container
+        docker run \
+          --platform linux/ppc64le \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          --workdir /build \
+          elijahru/build-farm-client:debian-buster-slim \
+          sh /scripts/build-nim.sh /build/nim-1.2.18 || (status=$?; dump_logs; exit $status)
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--powerpc64le-linux-gnu.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Stop distcc host
+      run: |
+        id=$(docker ps --filter ancestor=elijahru/build-farm:debian-buster-slim --format "{{.ID}}")
+        if [ "$id" != "" ]
+        then
+          docker kill $id
+        fi
+
+
+
+  
+  
+  test-nim-debian-buster-linux-ppc64le--on-debian-buster-slim:
+    name: Test on debian:buster-slim
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-debian-buster-linux-ppc64le
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Configure QEMU
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    - name: Enable Docker experimental features
+      run: |
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        docker version -f '{{.Server.Experimental}}'
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get -qq install -y hub pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tarball=nim-1.2.18--powerpc64le-linux-gnu.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+
+
+    - name: Run tests
+      run: |
+        # Test in emulated container
+        docker run \
+          --platform linux/ppc64le \
+          --mount "type=bind,src=${PWD}/nimcache,dst=/root/.cache/nim" \
+          --mount "type=bind,src=${PWD}/build,dst=/build" \
+          --mount "type=bind,src=${PWD}/scripts,dst=/scripts" \
+          debian:buster-slim \
+          sh /scripts/test-nim.sh /build/nim-1.2.18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  build-nim-catalina-x86_64:
+    name: Build nim-1.2.18--x86_64-macos-catalina.tar.xz
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-catalina-x86_64
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
+
+        sh ./scripts/build-nim.sh ./build/nim-1.2.18
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--x86_64-macos-catalina.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-catalina-x86_64--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-catalina-x86_64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tar=nim-1.2.18--x86_64-macos-catalina.tar
+        tarball=nim-1.2.18--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.18
+
+
+
+
+  test-nim-catalina-x86_64--on-macos-10-15:
+    name: Test on macos-10.15
+    runs-on: macos-10.15
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-catalina-x86_64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tar=nim-1.2.18--x86_64-macos-catalina.tar
+        tarball=nim-1.2.18--x86_64-macos-catalina.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.18
+
+
+
+
+  build-nim-bigsur-x86_64:
+    name: Build nim-1.2.18--x86_64-macos-bigsur.tar.xz
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-2-18
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Restore Nim cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          nimcache
+        key: cache-1.2.18-bigsur-x86_64
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download Nim source
+      run: |
+        cd build
+        nim_dir="nim-1.2.18"
+        wget "https://nim-lang.org/download/${nim_dir}.tar.xz"
+        pixz -d "${nim_dir}.tar.xz" "${nim_dir}.tar"
+        tar -xf "${nim_dir}.tar"
+        rm -f "${nim_dir}.tar.xz" "${nim_dir}.tar"
+
+    - name: Build Nim
+      id: build-nim
+      shell: bash
+      run: |
+        set -uexo pipefail
+        ln -s "${PWD}/nimcache" "${HOME}/.cache/nim"
+
+        sh ./scripts/build-nim.sh ./build/nim-1.2.18
+
+
+    - name: Create tarball
+      id: create-tarball
+      run: |
+        cd build
+        rm -rf .git
+        rm -rf csources
+        nim_dir="nim-1.2.18"
+        tarball="${nim_dir}.tar.xz"
+        tar -cf "${nim_dir}.tar" \
+          --exclude ".*" \
+          --exclude "$nim_dir/c_code" \
+          --exclude "$nim_dir/csources" \
+          --exclude "$nim_dir/csources/c_code" \
+          --exclude "$nim_dir/csources_v1" \
+          --exclude "$nim_dir/csources_v1/c_code" \
+          --exclude "$nim_dir/nimcache" \
+          "$nim_dir"
+        pixz "${nim_dir}.tar" "$tarball"
+        echo "::set-output name=tarball_asset_path::${PWD}/${tarball}"
+
+    - name: Add tarball to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        upload_url: ${{ needs.create-release-nim-1-2-18.outputs.upload_url }}
+        asset_path: ${{ steps.create-tarball.outputs.tarball_asset_path }}
+        asset_name: nim-1.2.18--x86_64-macos-bigsur.tar.xz
+        asset_content_type: application/x-xz
+
+
+  
+  
+  test-nim-bigsur-x86_64--on-macos-11-0:
+    name: Test on macos-11.0
+    runs-on: macos-11.0
+    needs:
+    - create-release-nim-1-2-18
+    - build-nim-bigsur-x86_64
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - name: Setup dirs
+      run: |
+        mkdir -p build
+        mkdir -p nimcache
+        mkdir -p ~/.cache/
+
+    - name: Install deps
+      run: |
+        brew install pixz
+
+    - name: Download released tarball
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd build
+        tag=${{ needs.create-release-nim-1-2-18.outputs.release_name }}
+        tar=nim-1.2.18--x86_64-macos-bigsur.tar
+        tarball=nim-1.2.18--x86_64-macos-bigsur.tar.xz
+        hub release download "$tag" -i "$tarball"
+        pixz -d "$tarball" "nim-1.2.18.tar"
+        tar -xf "nim-1.2.18.tar"
+
+    - name: Run tests
+      run: |
+        sh ./scripts/test-nim.sh ./build/nim-1.2.18
+
+
+
+
+
+  publish-release-nim-1-2-18:
+    name: Publish release 1.2.18
+    if: ${{ github.ref == 'refs/heads/devel' || startsWith(github.ref, 'refs/tags/')
+      }}
+    runs-on: ubuntu-latest
+    needs:
+    - create-release-nim-1-2-18
+
+
+
+
+    - test-nim-alpine-3-12-linux-amd64--on-alpine-3-12
+
+
+
+    - test-nim-alpine-3-12-linux-amd64--on-alpine-3-11
+
+
+
+    - test-nim-alpine-3-12-linux-amd64--on-alpine-3-10
+
+
+
+    - test-nim-alpine-3-12-linux-amd64--on-alpine-3-9
+
+
+
+    - test-nim-alpine-3-12-linux-amd64--on-alpine-3-8
+
+
+
+
+
+    - test-nim-alpine-3-12-linux-arm-v6--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-alpine-3-12-linux-arm-v7--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-alpine-3-12-linux-arm64-v8--on-alpine-3-12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-debian-buster-slim
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-archlinux
+
+
+
+
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-ubuntu-bionic
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-ubuntu-focal
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-fedora-31
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-fedora-32
+
+
+
+    - test-nim-debian-buster-linux-amd64--on-fedora-33
+
+
+
+
+
+    - test-nim-debian-buster-linux-386--on-debian-buster-slim
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-debian-buster-linux-arm-v5--on-debian-buster-slim
+
+
+
+
+
+    - test-nim-debian-buster-linux-arm-v5--on-lopsided-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-debian-buster-linux-arm-v7--on-debian-buster-slim
+
+
+
+
+
+    - test-nim-debian-buster-linux-arm-v7--on-lopsided-archlinux
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-debian-buster-linux-arm64-v8--on-debian-buster-slim
+
+
+
+
+
+    - test-nim-debian-buster-linux-arm64-v8--on-lopsided-archlinux
+
+
+
+    - test-nim-debian-buster-linux-arm64-v8--on-abyo-manjaro_aarch64
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-debian-buster-linux-ppc64le--on-debian-buster-slim
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - test-nim-catalina-x86_64--on-macos-11-0
+
+    - test-nim-catalina-x86_64--on-macos-10-15
+
+
+
+
+
+
+
+    - test-nim-bigsur-x86_64--on-macos-11-0
+
+
+
+
+
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      with:
+        release_id: ${{ needs.create-release-nim-1-2-18.outputs.id }}
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: recursive
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - uses: oleksiyrudenko/gha-git-credentials@v2-latest
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update README
+      shell: bash
+      run: |
+        set -uexo pipefail
+
+        pip install -r requirements.txt
+        python3.9 render.py readme
+        git add README.md || true
+        if [ "$(git diff --name-only --cached | grep README.md)" != "" ]
+        then
+          git commit -m "Re-rendered README.md"
+          git push || (git pull origin && git push || true)
+        fi
+
+
