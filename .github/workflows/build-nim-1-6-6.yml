@@ -51,8 +51,8 @@ jobs:
 
 
 
-
-
+  
+  
   build-nim-alpine-3-12-linux-amd64:
     name: Build nim-1.6.6--x86_64-linux-musl.tar.xz
     runs-on: ubuntu-latest
@@ -151,8 +151,8 @@ jobs:
         asset_content_type: application/x-xz
 
 
-
-
+  
+  
   test-nim-alpine-3-12-linux-amd64--on-alpine-3-12:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
@@ -556,8 +556,8 @@ jobs:
         fi
 
 
-
-
+  
+  
   test-nim-alpine-3-12-linux-arm-v6--on-alpine-3-12:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
@@ -751,8 +751,8 @@ jobs:
         fi
 
 
-
-
+  
+  
   test-nim-alpine-3-12-linux-arm-v7--on-alpine-3-12:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
@@ -946,8 +946,8 @@ jobs:
         fi
 
 
-
-
+  
+  
   test-nim-alpine-3-12-linux-arm64-v8--on-alpine-3-12:
     name: Test on alpine:3.12
     runs-on: ubuntu-latest
@@ -1119,8 +1119,8 @@ jobs:
         asset_content_type: application/x-xz
 
 
-
-
+  
+  
   test-nim-debian-buster-linux-amd64--on-debian-buster-slim:
     name: Test on debian:buster-slim
     runs-on: ubuntu-latest
@@ -1635,8 +1635,8 @@ jobs:
 
 
 
-
-
+  
+  
   test-nim-debian-buster-linux-386--on-debian-buster-slim:
     name: Test on debian:buster-slim
     runs-on: ubuntu-latest
@@ -1833,8 +1833,8 @@ jobs:
 
 
 
-
-
+  
+  
   test-nim-debian-buster-linux-arm-v5--on-debian-buster-slim:
     name: Test on debian:buster-slim
     runs-on: ubuntu-latest
@@ -2097,8 +2097,8 @@ jobs:
 
 
 
-
-
+  
+  
   test-nim-debian-buster-linux-arm-v7--on-debian-buster-slim:
     name: Test on debian:buster-slim
     runs-on: ubuntu-latest
@@ -2361,8 +2361,8 @@ jobs:
 
 
 
-
-
+  
+  
   test-nim-debian-buster-linux-arm64-v8--on-debian-buster-slim:
     name: Test on debian:buster-slim
     runs-on: ubuntu-latest
@@ -2685,8 +2685,8 @@ jobs:
 
 
 
-
-
+  
+  
   test-nim-debian-buster-linux-ppc64le--on-debian-buster-slim:
     name: Test on debian:buster-slim
     runs-on: ubuntu-latest
@@ -2771,8 +2771,8 @@ jobs:
 
 
 
-
-
+  
+  
   build-nim-catalina-x86_64:
     name: Build nim-1.6.6--x86_64-macos-catalina.tar.xz
     runs-on: macos-10.15
@@ -2855,8 +2855,8 @@ jobs:
         asset_content_type: application/x-xz
 
 
-
-
+  
+  
   test-nim-catalina-x86_64--on-macos-11-0:
     name: Test on macos-11.0
     runs-on: macos-11.0
@@ -3023,8 +3023,8 @@ jobs:
         asset_content_type: application/x-xz
 
 
-
-
+  
+  
   test-nim-bigsur-x86_64--on-macos-11-0:
     name: Test on macos-11.0
     runs-on: macos-11.0
